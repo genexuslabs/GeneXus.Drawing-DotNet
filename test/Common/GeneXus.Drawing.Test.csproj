@@ -12,7 +12,7 @@
     </ItemGroup>
   
     <ItemGroup>
-      <ProjectReference Include="..\Common\GeneXus.Drawing.Common.csproj" />
+      <ProjectReference Include="..\..\src\Common\GeneXus.Drawing.Common.csproj" />
     </ItemGroup>
   
 </Project>

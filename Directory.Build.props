@@ -1,0 +1,20 @@
+<Project>
+	<PropertyGroup>
+		<PackageOutputPath>$(MSBuildThisFileDirectory)_packages\$(Configuration)</PackageOutputPath>
+	</PropertyGroup>
+	<!-- START : Define a default Readme.md file for NuGet packages -->
+	<PropertyGroup>
+		<ProjectNeedsReadme>true</ProjectNeedsReadme>
+		<ProjectNeedsReadme Condition="Exists('$(MSBuildProjectDirectory)\README.md')">false</ProjectNeedsReadme>
+		<DefaultReadmeFile>$(MSBuildThisFileDirectory)src\PackageREADME.md</DefaultReadmeFile>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(ProjectNeedsReadme) and Exists('$(DefaultReadmeFile)')">
+		<PackageReadmeFile>PackageREADME.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup Condition="$(ProjectNeedsReadme) and Exists('$(DefaultReadmeFile)')">
+		<None Include="$(DefaultReadmeFile)" Pack="true" PackagePath="\">
+			<Link>PackageREADME.md</Link>
+		</None>
+	</ItemGroup>
+	<!-- END: Define a default Readme.md file for NuGet packages -->
+</Project>
