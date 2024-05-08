@@ -1,7 +1,21 @@
 <Project>
 	<PropertyGroup>
+
+		<Version>0.0.2</Version>
+
+		<Product>GeneXus</Product>
+		<Company>GeneXus</Company>
+		<Copyright>Copyright © $([System.DateTime]::Now.ToString('yyyy')) $(Company). All Rights Reserved</Copyright>
+
+		<AssemblyCompany>$(Company)</AssemblyCompany>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+
+		<PackageVersion>$(Version)</PackageVersion>
+
 		<PackageOutputPath>$(MSBuildThisFileDirectory)_packages\$(Configuration)</PackageOutputPath>
+
 	</PropertyGroup>
+	
 	<!-- START : Define a default Readme.md file for NuGet packages -->
 	<PropertyGroup>
 		<ProjectNeedsReadme>true</ProjectNeedsReadme>
@@ -17,4 +31,5 @@
 		</None>
 	</ItemGroup>
 	<!-- END: Define a default Readme.md file for NuGet packages -->
+	
 </Project>
