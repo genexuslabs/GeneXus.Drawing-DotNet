@@ -32,21 +32,21 @@ namespace GeneXus.Drawing
 			: this(unchecked((short)((dw >> 0) & 0xFFFF)), unchecked((short)((dw >> 16) & 0xFFFF))) { }
 
 		/// <summary>
-        /// Creates a human-readable string that represents this <see cref='Point'/>.
-        /// </summary>
+		/// Creates a human-readable string that represents this <see cref='Point'/>.
+		/// </summary>
 		public override readonly string ToString() => $"{{X={X},Y={Y}}}";
 
 
 		#region Operators
 
 		/// <summary>
-        /// Creates a <see cref='SKPoint'/> with the coordinates of the specified <see cref='Point'/> .
-        /// </summary>
+		/// Creates a <see cref='SKPoint'/> with the coordinates of the specified <see cref='Point'/> .
+		/// </summary>
 		public static explicit operator SKPoint(Point point) => point.m_point;
 
 		/// <summary>
-        /// Creates a <see cref='Size'/> with the coordinates of the specified <see cref='Point'/> .
-        /// </summary>
+		/// Creates a <see cref='Size'/> with the coordinates of the specified <see cref='Point'/> .
+		/// </summary>
 		public static explicit operator Size(Point p) => new(p.X, p.Y);
 
 		/// <summary>
@@ -64,13 +64,13 @@ namespace GeneXus.Drawing
 		public static bool operator !=(Point left, Point right) => left.m_point != right.m_point;
 
 		/// <summary>
-        /// Translates a <see cref='Point'/> by a given <see cref='Size'/> .
-        /// </summary>
+		/// Translates a <see cref='Point'/> by a given <see cref='Size'/> .
+		/// </summary>
 		public static Point operator +(Point pt, Size sz) => Add(pt, sz);
 
 		/// <summary>
-        /// Translates a <see cref='Point'/> by the negative of a given <see cref='Size'/> .
-        /// </summary>
+		/// Translates a <see cref='Point'/> by the negative of a given <see cref='Size'/> .
+		/// </summary>
 		public static Point operator -(Point pt, Size sz) => Subtract(pt, sz);
 
 		#endregion
@@ -79,20 +79,20 @@ namespace GeneXus.Drawing
 		#region IEquatable
 
 		/// <summary>
-        /// Tests whether a <see cref='Point'/> has the same coordinates
-        /// as this Point.
-        /// </summary>
+		/// Tests whether a <see cref='Point'/> has the same coordinates
+		/// as this Point.
+		/// </summary>
 		public readonly bool Equals(Point other) => m_point == other.m_point;
 
 		/// <summary>
-        /// Tests whether <paramref name="obj"/> is a <see cref='Point'/> with the same coordinates
-        /// as this Point.
-        /// </summary>
+		/// Tests whether <paramref name="obj"/> is a <see cref='Point'/> with the same coordinates
+		/// as this Point.
+		/// </summary>
 		public override readonly bool Equals(object obj) => m_point.Equals(obj);
 
 		/// <summary>
-        /// Returns a hash code.
-        /// </summary>
+		/// Returns a hash code.
+		/// </summary>
 		public override readonly int GetHashCode() => m_point.GetHashCode();
 
 		#endregion
@@ -120,8 +120,8 @@ namespace GeneXus.Drawing
 		}
 
 		/// <summary>
-        /// Gets the y-coordinate of this <see cref='Point'/>.
-        /// </summary>
+		/// Gets the y-coordinate of this <see cref='Point'/>.
+		/// </summary>
 		public float Y
 		{
 			readonly get => m_point.Y;
@@ -139,38 +139,38 @@ namespace GeneXus.Drawing
 		#region Methods
 
 		/// <summary>
-        /// Translates a <see cref='Point'/> by a given <see cref='Size'/> .
-        /// </summary>
+		/// Translates a <see cref='Point'/> by a given <see cref='Size'/> .
+		/// </summary>
 		public static Point Add(Point pt, Size sz) => new(pt.m_point + sz.m_size);
 
 		/// <summary>
-        /// Translates a <see cref='Point'/> by the negative of a given <see cref='Size'/> .
-        /// </summary>
+		/// Translates a <see cref='Point'/> by the negative of a given <see cref='Size'/> .
+		/// </summary>
 		public static Point Subtract(Point pt, Size sz) => new(pt.m_point - sz.m_size);
 
 		/// <summary>
-        /// Converts a <see cref='Point'/> by performing a ceiling operation on all the coordinates.
-        /// </summary>
+		/// Converts a <see cref='Point'/> by performing a ceiling operation on all the coordinates.
+		/// </summary>
 		public static Point Ceiling(Point value) => new(unchecked((int)Math.Ceiling(value.X)), unchecked((int)Math.Ceiling(value.Y)));
 
 		/// <summary>
-        /// Converts a <see cref='Point'/> by performing a truncate operation on all the coordinates.
-        /// </summary>
+		/// Converts a <see cref='Point'/> by performing a truncate operation on all the coordinates.
+		/// </summary>
 		public static Point Truncate(Point value) => new(unchecked((int)value.X), unchecked((int)value.Y));
 
 		/// <summary>
-        /// Converts a <see cref='Point'/> by performing a round operation on all the coordinates.
-        /// </summary>
+		/// Converts a <see cref='Point'/> by performing a round operation on all the coordinates.
+		/// </summary>
 		public static Point Round(Point value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
 
 		/// <summary>
-        /// Translates this <see cref='Point'/> by the specified amount.
-        /// </summary>
+		/// Translates this <see cref='Point'/> by the specified amount.
+		/// </summary>
 		public void Offset(float dx, float dy) => m_point.Offset(dx, dy);
 
 		/// <summary>
-        /// Translates this <see cref='Point'/> by the specified amount.
-        /// </summary>
+		/// Translates this <see cref='Point'/> by the specified amount.
+		/// </summary>
 		public void Offset(Point p) => Offset(p.X, p.Y);
 
 		#endregion

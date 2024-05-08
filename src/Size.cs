@@ -98,11 +98,11 @@ namespace GeneXus.Drawing
 		/// as this Size.
 		/// </summary>
 		public readonly bool Equals(Size other) => m_size == other.m_size;
-        
-        /// <summary>
-        /// Tests whether <paramref name="obj"/> is a <see cref='Size'/> with the same dimensions
-        /// as this Size.
-        /// </summary>
+
+		/// <summary>
+		/// Tests whether <paramref name="obj"/> is a <see cref='Size'/> with the same dimensions
+		/// as this Size.
+		/// </summary>
 		public override readonly bool Equals(object obj) => m_size.Equals(obj);
 
 		/// <summary>

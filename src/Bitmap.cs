@@ -108,8 +108,8 @@ namespace GeneXus.Drawing
 		#region Operators
 
 		/// <summary>
-        /// Creates a <see cref='SKBitmap'/> with the coordinates of the specified <see cref='Bitmap'/> .
-        /// </summary>
+		/// Creates a <see cref='SKBitmap'/> with the coordinates of the specified <see cref='Bitmap'/> .
+		/// </summary>
 		public static explicit operator SKBitmap(Bitmap bitmap) => bitmap.m_bitmap;
 
 		#endregion

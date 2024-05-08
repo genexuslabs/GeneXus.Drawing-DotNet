@@ -49,13 +49,13 @@ namespace GeneXus.Drawing
 		public static explicit operator SKRect(Rectangle rect) => rect.m_rect;
 
 		/// <summary>
-        /// Tests whether two <see cref='Rectangle'/> objects have equal location and size.
-        /// </summary>
+		/// Tests whether two <see cref='Rectangle'/> objects have equal location and size.
+		/// </summary>
 		public static bool operator ==(Rectangle left, Rectangle right) => left.m_rect == right.m_rect;
 
 		/// <summary>
-        /// Tests whether two <see cref='Rectangle'/> objects differ in location or size.
-        /// </summary>
+		/// Tests whether two <see cref='Rectangle'/> objects differ in location or size.
+		/// </summary>
 		public static bool operator !=(Rectangle left, Rectangle right) => left.m_rect != right.m_rect;
 
 		#endregion
@@ -64,15 +64,15 @@ namespace GeneXus.Drawing
 		#region IEquatable
 
 		/// <summary>
-        /// Tests whether a <see cref='Rectangle'/> has the same location
-        /// and size of this Rectangle.
-        /// </summary>
+		/// Tests whether a <see cref='Rectangle'/> has the same location
+		/// and size of this Rectangle.
+		/// </summary>
 		public readonly bool Equals(Rectangle other) => m_rect == other.m_rect;
 
 		/// <summary>
-        /// Tests whether <paramref name="obj"/> is a <see cref='Rectangle'/> with the same locaation
-        /// and size as this Rectangle.
-        /// </summary>
+		/// Tests whether <paramref name="obj"/> is a <see cref='Rectangle'/> with the same locaation
+		/// and size as this Rectangle.
+		/// </summary>
 		public override readonly bool Equals(object obj) => m_rect.Equals(obj);
 
 		/// <summary>
@@ -114,9 +114,9 @@ namespace GeneXus.Drawing
 		public readonly float Top => m_rect.Top;
 
 		/// <summary>
-        /// Gets the y-coordinate of the lower-right corner of the rectangular region defined by this
-        /// <see cref='Rectangle'/>.
-        /// </summary>
+		/// Gets the y-coordinate of the lower-right corner of the rectangular region defined by this
+		/// <see cref='Rectangle'/>.
+		/// </summary>
 		public readonly float Bottom => m_rect.Bottom;
 
 		/// <summary>
@@ -185,9 +185,9 @@ namespace GeneXus.Drawing
 		}
 
 		/// <summary>
-        /// Tests whether this <see cref='Rectangle'/> has a <see cref='Rectangle.Width'/>
-        /// or a <see cref='Rectangle.Height'/> of 0.
-        /// </summary>
+		/// Tests whether this <see cref='Rectangle'/> has a <see cref='Rectangle.Width'/>
+		/// or a <see cref='Rectangle.Height'/> of 0.
+		/// </summary>
 		public readonly bool IsEmpty => m_rect.IsEmpty;
 
 		#endregion
@@ -206,32 +206,32 @@ namespace GeneXus.Drawing
 		#region Methods
 
 		/// <summary>
-        /// Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within the
-        /// rectangular region represented by this <see cref='Rectangle'/> .
-        /// </summary>
+		/// Determines if the rectangular region represented by <paramref name="rect"/> is entirely contained within the
+		/// rectangular region represented by this <see cref='Rectangle'/> .
+		/// </summary>
 		public readonly bool Contains(Rectangle rect) => m_rect.Contains(rect.m_rect);
 
 		/// <summary>
-        /// Determines if the specified point is contained within the rectangular region defined by this
-        /// <see cref='Rectangle'/> .
-        /// </summary>
+		/// Determines if the specified point is contained within the rectangular region defined by this
+		/// <see cref='Rectangle'/> .
+		/// </summary>
 		public readonly bool Contains(float x, float y) => m_rect.Contains(x, y);
 
 		/// <summary>
-        /// Determines if the specified point is contained within the rectangular region defined by this
-        /// <see cref='Rectangle'/> .
-        /// </summary>
+		/// Determines if the specified point is contained within the rectangular region defined by this
+		/// <see cref='Rectangle'/> .
+		/// </summary>
 		public readonly bool Contains(Point pt) => Contains(pt.X, pt.Y);
 
 		/// <summary>
-        /// Creates a <see cref='Rectangle'/> that represents the intersection between this Rectangle and rect.
-        /// </summary>
+		/// Creates a <see cref='Rectangle'/> that represents the intersection between this Rectangle and rect.
+		/// </summary>
 		public void Intersect(Rectangle rect) => m_rect.Intersect(rect.m_rect);
 
 		/// <summary>
-        /// Creates a <see cref='Rectangle'/> that represents the intersection between a and b. If there 
+		/// Creates a <see cref='Rectangle'/> that represents the intersection between a and b. If there 
 		/// is no intersection, an empty rectangle is returned.
-        /// </summary>
+		/// </summary>
 		public static Rectangle Intersect(Rectangle a, Rectangle b)
 		{
 			var ret = SKRect.Intersect(a.m_rect, b.m_rect);
@@ -239,18 +239,18 @@ namespace GeneXus.Drawing
 		}
 
 		/// <summary>
-        /// Determines if this <see cref='Rectangle'/> intersects with rect.
-        /// </summary>
+		/// Determines if this <see cref='Rectangle'/> intersects with rect.
+		/// </summary>
 		public readonly bool IntersectsWith(Rectangle rect) => m_rect.IntersectsWith(rect.m_rect);
 
 		/// <summary>
-        /// Creates a <see cref='Rectangle'/> that represents the union between this Rectangle and rect.
-        /// </summary>
+		/// Creates a <see cref='Rectangle'/> that represents the union between this Rectangle and rect.
+		/// </summary>
 		public void Union(Rectangle rect) => m_rect.Union(rect.m_rect);
 
 		/// <summary>
-        /// Creates a <see cref='Rectangle'/> that represents the union between a and b.
-        /// </summary>
+		/// Creates a <see cref='Rectangle'/> that represents the union between a and b.
+		/// </summary>
 		public static Rectangle Union(Rectangle a, Rectangle b)
 		{
 			var ret = SKRect.Union(a.m_rect, b.m_rect);
@@ -258,18 +258,18 @@ namespace GeneXus.Drawing
 		}
 
 		/// <summary>
-        /// Inflates this <see cref='Rectangle'/> by the specified amount.
-        /// </summary>
+		/// Inflates this <see cref='Rectangle'/> by the specified amount.
+		/// </summary>
 		public void Inflate(float width, float height) => m_rect.Inflate(width, height);
 
 		/// <summary>
-        /// Inflates this <see cref='Rectangle'/> by the specified amount.
-        /// </summary>
+		/// Inflates this <see cref='Rectangle'/> by the specified amount.
+		/// </summary>
 		public void Inflate(Size size) => Inflate(size.Width, size.Height);
 
 		/// <summary>
-        /// Creates a <see cref='Rectangle'/> that is inflated by the specified amount.
-        /// </summary>
+		/// Creates a <see cref='Rectangle'/> that is inflated by the specified amount.
+		/// </summary>
 		public static Rectangle Inflate(Rectangle rect, float x, float y)
 		{
 			var ret = SKRect.Inflate(rect.m_rect, x, y);
@@ -277,13 +277,13 @@ namespace GeneXus.Drawing
 		}
 
 		/// <summary>
-        /// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
-        /// </summary>
+		/// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
+		/// </summary>
 		public void Offset(float x, float y) => m_rect.Offset(x, y);
 
 		/// <summary>
-        /// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
-        /// </summary>
+		/// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
+		/// </summary>
 		public void Offset(Point pos) => Offset(pos.X, pos.Y);
 
 		#endregion

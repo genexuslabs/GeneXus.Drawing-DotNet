@@ -17,23 +17,23 @@ namespace GeneXus.Drawing
 			m_color = color;
 		}
 
-        /// <summary>
+		/// <summary>
 		/// Initializes a new instance of the <see cref='Color'/> structure with the specified 
-        /// alpha, red, green and blue values.
+		/// alpha, red, green and blue values.
 		/// </summary>
 		public Color(int alpha, int red, int green, int blue)
 			: this(CreateFromRgba(red, green, blue, alpha)) { }
 
-        /// <summary>
+		/// <summary>
 		/// Initializes a new instance of the <see cref='Color'/> structure with the specified 
-        /// hexadecimal string value RRGGBBAA or AARRGGBB if argb flag is enabled.
+		/// hexadecimal string value RRGGBBAA or AARRGGBB if argb flag is enabled.
 		/// </summary>
 		public Color(string hex, bool argb = false)
 			: this(CreateFromHex(hex, argb)) { }
 
-        /// <summary>
-        /// Creates a human-readable string that represents this <see cref='Color'/>.
-        /// </summary>
+		/// <summary>
+		/// Creates a human-readable string that represents this <see cref='Color'/>.
+		/// </summary>
 		public override readonly string ToString()
 		{
 			string name = IsKnownColor ? Name : $"A={A}, R={R}, G={G}, B={B}";
@@ -43,17 +43,17 @@ namespace GeneXus.Drawing
 
 		#region Operators
 
-        /// <summary>
-        /// Creates a <see cref='SKColor'/> with the coordinates of the specified <see cref='Color'/> .
-        /// </summary>
+		/// <summary>
+		/// Creates a <see cref='SKColor'/> with the coordinates of the specified <see cref='Color'/> .
+		/// </summary>
 		public static explicit operator SKColor(Color color) => color.m_color;
 
-        /// <summary>
+		/// <summary>
 		/// Tests whether two <see cref='Color'/> objects are identical.
 		/// </summary>
 		public static bool operator ==(Color left, Color right) => left.m_color == right.m_color;
 
-        /// <summary>
+		/// <summary>
 		/// Tests whether two <see cref='Color'/> objects are different.
 		/// </summary>
 		public static bool operator !=(Color left, Color right) => left.m_color != right.m_color;
@@ -63,21 +63,21 @@ namespace GeneXus.Drawing
 
 		#region IEquatable
 
-        /// <summary>
+		/// <summary>
 		/// Tests whether a <see cref='Color'/> has the same values
-        /// as this Color.
+		/// as this Color.
 		/// </summary>
 		public readonly bool Equals(Color other) => m_color.Equals(other.m_color);
 
-        /// <summary>
-        /// Tests whether <paramref name="obj"/> is a <see cref='Color'/> with the same values
-        /// as this Color.
-        /// </summary>
+		/// <summary>
+		/// Tests whether <paramref name="obj"/> is a <see cref='Color'/> with the same values
+		/// as this Color.
+		/// </summary>
 		public override readonly bool Equals(object obj) => obj is Color color && Equals(color);
 
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
+		/// <summary>
+		/// Returns a hash code.
+		/// </summary>
 		public override readonly int GetHashCode() => m_color.GetHashCode();
 
 		#endregion
@@ -85,7 +85,7 @@ namespace GeneXus.Drawing
 
 		#region Fields
 
-        /// <summary>
+		/// <summary>
 		/// Creates a new instance of the <see cref='Color'/> class with member data left uninitialized.
 		/// </summary>
 		public static readonly Color Empty = default;
@@ -95,43 +95,43 @@ namespace GeneXus.Drawing
 
 		#region Properties
 
-        /// <summary>
+		/// <summary>
 		/// Gets a value indicating whether this <see cref='Color'/> is empty.
 		/// </summary>
 		public readonly bool IsEmpty => m_color == default;
 
-        /// <summary>
+		/// <summary>
 		/// Gets a value indicating whether this <see cref='Color'/> is a known color.
 		/// </summary>
 		public readonly bool IsKnownColor => KnownColorToName(this)?.Length > 0;
 
-        /// <summary>
-        /// Gets the alpha component value of this <see cref='Color'/> structure.
+		/// <summary>
+		/// Gets the alpha component value of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly int A => m_color.Alpha;
 
-        /// <summary>
-        /// Gets the red component value of this <see cref='Color'/> structure.
+		/// <summary>
+		/// Gets the red component value of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly int R => m_color.Red;
-        
-        /// <summary>
-        /// Gets the green component value of this <see cref='Color'/> structure.
+		
+		/// <summary>
+		/// Gets the green component value of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly int G => m_color.Green;
-        
-        /// <summary>
-        /// Gets the blue component value of this <see cref='Color'/> structure.
+		
+		/// <summary>
+		/// Gets the blue component value of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly int B => m_color.Blue;
 
-        /// <summary>
-        /// Gets the name component value of this <see cref='Color'/> structure.
+		/// <summary>
+		/// Gets the name component value of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly string Name => KnownColorToName(this) ?? $"{m_HexA}{m_HexR}{m_HexG}{m_HexB}";
 
-        /// <summary>
-        /// Gets the hexadecimal representation in #RRGGBBAA (or #RGBA if can be reduced) of this <see cref='Color'/> structure.
+		/// <summary>
+		/// Gets the hexadecimal representation in #RRGGBBAA (or #RGBA if can be reduced) of this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly string Hex
 		{
@@ -165,23 +165,23 @@ namespace GeneXus.Drawing
 
 		#region Factory
 
-        /// <summary>
-        /// Creates a <see cref='Color'/> structure from the hexadecimal representation in RRGGBBAA (or AARRGGBB if argb flag enabled) values.
+		/// <summary>
+		/// Creates a <see cref='Color'/> structure from the hexadecimal representation in RRGGBBAA (or AARRGGBB if argb flag enabled) values.
 		/// </summary>
 		public static Color FromHex(string hex, bool argb = false) => new(hex, argb);
 
-        /// <summary>
-        /// Creates a <see cref='Color'/> structure from the four 8-bit ARGB components (alpha, red, green, and blue) values.
+		/// <summary>
+		/// Creates a <see cref='Color'/> structure from the four 8-bit ARGB components (alpha, red, green, and blue) values.
 		/// </summary>
 		public static Color FromArgb(int alpha, int red, int green, int blue) => new(alpha, red, green, blue);
 
-        /// <summary>
-        /// Creates a <see cref='Color'/> structure from the four 8-bit RGB components (red, green, and blue) values.
+		/// <summary>
+		/// Creates a <see cref='Color'/> structure from the four 8-bit RGB components (red, green, and blue) values.
 		/// </summary>
 		public static Color FromArgb(int red, int green, int blue) => FromArgb(255, red, green, blue);
 
-        /// <summary>
-        /// Creates a <see cref='Color'/> structure from a 32-bit ARGB value.
+		/// <summary>
+		/// Creates a <see cref='Color'/> structure from a 32-bit ARGB value.
 		/// </summary>
 		public static Color FromArgb(int argb)
 		{
@@ -192,8 +192,8 @@ namespace GeneXus.Drawing
 			return FromArgb(a, r, g, b);
 		}
 
-        /// <summary>
-        /// Creates a <see cref='Color'/> structure from the specified name of a predefined color.
+		/// <summary>
+		/// Creates a <see cref='Color'/> structure from the specified name of a predefined color.
 		/// </summary>
 		public static Color FromName(string name)
 		{
@@ -209,23 +209,23 @@ namespace GeneXus.Drawing
 
 		#region Methods
 
-        /// <summary>
-        /// Gets the 32-bit ARGB value of this <see cref='Color'/>  structure.
+		/// <summary>
+		/// Gets the 32-bit ARGB value of this <see cref='Color'/>  structure.
 		/// </summary>
 		public readonly int ToArgb() => (A << 24) | (R << 16) | (G << 8) | B;
 
-        /// <summary>
-        /// Gets the hue-saturation-lightness (HSL) lightness value for this <see cref='Color'/> structure.
+		/// <summary>
+		/// Gets the hue-saturation-lightness (HSL) lightness value for this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly float GetBrightness() => m_HSL.Luminosity / 100.0f;
-        
-        /// <summary>
-        /// Gets the hue-saturation-lightness (HSL) staturation value for this <see cref='Color'/> structure.
+		
+		/// <summary>
+		/// Gets the hue-saturation-lightness (HSL) staturation value for this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly float GetSaturation() => m_HSL.Saturation / 100.0f;
-        
-        /// <summary>
-        /// Gets the hue-saturation-lightness (HSL) hue value for this <see cref='Color'/> structure.
+		
+		/// <summary>
+		/// Gets the hue-saturation-lightness (HSL) hue value for this <see cref='Color'/> structure.
 		/// </summary>
 		public readonly float GetHue() => m_HSL.Hue;
 
