@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneXus.Drawing.Common", "src\GeneXus.Drawing.Common.csproj", "{C60C8780-AB51-4C6D-9F8B-3505A1C9AC34}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneXus.Drawing.Test", "test\GeneXus.Drawing.Test.csproj", "{061B3AA5-4A3D-4061-8904-C1127AFEB660}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C60C8780-AB51-4C6D-9F8B-3505A1C9AC34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C60C8780-AB51-4C6D-9F8B-3505A1C9AC34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C60C8780-AB51-4C6D-9F8B-3505A1C9AC34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C60C8780-AB51-4C6D-9F8B-3505A1C9AC34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061B3AA5-4A3D-4061-8904-C1127AFEB660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061B3AA5-4A3D-4061-8904-C1127AFEB660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061B3AA5-4A3D-4061-8904-C1127AFEB660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061B3AA5-4A3D-4061-8904-C1127AFEB660}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3640FFFA-9A72-4342-A3C6-CCCE530DDA8F}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,14 @@
+<Project Sdk="GeneXus.Build.Sdk">
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);PACKAGE_COPYRIGHT_START_YEAR</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="2.88.7" />
+    <PackageReference Include="SkiaSharp.Extended" Version="2.0.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.7" />
+    <PackageReference Include="SkiaSharp.Svg" Version="1.60.0" />
+  </ItemGroup>
+
+</Project>
