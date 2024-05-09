@@ -1,6 +1,7 @@
 <Project Sdk="GeneXus.Build.Sdk">
 
   <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\scripts\gxdrawing.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);PACKAGE_COPYRIGHT_START_YEAR</DefineConstants>
   </PropertyGroup>
 
