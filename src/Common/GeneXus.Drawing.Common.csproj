@@ -1,4 +1,4 @@
-<Project Sdk="GeneXus.Build.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\scripts\gxdrawing.snk</AssemblyOriginatorKeyFile>
