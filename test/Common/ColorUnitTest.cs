@@ -1,5 +1,3 @@
-using GeneXus.Drawing;
-
 namespace GeneXus.Drawing.Test;
 
 internal class ColorUnitTest
