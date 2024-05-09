@@ -14,15 +14,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{0AA3DD
 		NuGet.Config = NuGet.Config
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConfigTests", "ConfigTests", "{78EDCF29-0777-462A-9050-DED15C1AE0C0}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{CCD059C7-E040-4C1E-B0E8-8EE0ADA66943}"
 	ProjectSection(SolutionItems) = preProject
 		src\PackageREADME.md = src\PackageREADME.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConfigTests", "ConfigTests", "{78EDCF29-0777-462A-9050-DED15C1AE0C0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{02269C1C-4965-4883-B220-CB20C513AA1F}"
 	ProjectSection(SolutionItems) = preProject
-		test\Directory.Build.props = test\Directory.Build.props
+		.github\workflows\build.yml = .github\workflows\build.yml
 	EndProjectSection
 EndProject
 Global
