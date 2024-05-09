@@ -1,4 +1,4 @@
-using GeneXus.Drawing.Common;
+using GeneXus.Drawing;
 
 namespace GeneXus.Drawing.Test;
 

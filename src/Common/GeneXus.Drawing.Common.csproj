@@ -3,6 +3,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\scripts\gxdrawing.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);PACKAGE_COPYRIGHT_START_YEAR</DefineConstants>
+    <RootNamespace>GeneXus.Drawing</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

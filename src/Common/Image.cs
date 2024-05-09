@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using SkiaSharp;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 [Serializable]
 public class Image : IDisposable, ICloneable

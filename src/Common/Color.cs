@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 [Serializable]
 [DebuggerDisplay("{NameAndARGBValue}")]

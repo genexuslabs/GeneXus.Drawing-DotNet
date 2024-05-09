@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 public class FontFamily : IDisposable
 {

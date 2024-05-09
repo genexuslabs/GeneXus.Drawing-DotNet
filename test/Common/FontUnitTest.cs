@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using GeneXus.Drawing.Common;
+using GeneXus.Drawing;
 using SkiaSharp;
 
 namespace GeneXus.Drawing.Test;

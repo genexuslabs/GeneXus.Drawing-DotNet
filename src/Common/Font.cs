@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 [Serializable]
 public class Font : IDisposable, ICloneable

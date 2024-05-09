@@ -2,7 +2,7 @@ using SkiaSharp;
 using System;
 using System.IO;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 [Serializable]
 public class Bitmap : IDisposable, ICloneable

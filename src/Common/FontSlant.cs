@@ -1,4 +1,4 @@
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 /// <summary>
 /// Specifies the slant type.

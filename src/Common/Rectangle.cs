@@ -1,7 +1,7 @@
 using SkiaSharp;
 using System;
 
-namespace GeneXus.Drawing.Common;
+namespace GeneXus.Drawing;
 
 [Serializable]
 public struct Rectangle : IEquatable<Rectangle>
