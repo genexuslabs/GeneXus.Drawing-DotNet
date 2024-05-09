@@ -63,6 +63,21 @@ jobs:
     - name: Test
       run: dotnet test --configuration $env:Configuration --no-build
 
+    - name: Sign packages
+      if: steps.buildVariables.outputs.IS_PUBLISH_TO_NUGETORG == 'true'
+      env:
+        TIMESTAMPER_URL: ${{ secrets.CODE_SIGN_CERTIFICATE_TIMESTAMPER_URL }}
+        PFX_BASE64: ${{ secrets.CODE_SIGN_CERTIFICATE_BASE64 }}
+        PFX_PASS: ${{ secrets.CODE_SIGN_CERTIFICATE_PASSWORD }}
+      run: |
+        $codesign_pfx = "code_sign_cert.pfx"
+        $bytes = [Convert]::FromBase64String($Env:PFX_BASE64)
+        [IO.File]::WriteAllBytes($codesign_pfx, $bytes)
+
+        Get-ChildItem .\_packages\$Env:Configuration\*.nupkg -Recurse |
+          dotnet nuget sign $_.FullName --certificate-path $codesign_pfx --certificate-password $Env:PFX_PASS --timestamper $Env:TIMESTAMPER_URL
+        }
+
     - name: Publish
       run: |
         if ( ${{ steps.buildVariables.outputs.IS_PUBLISH_TO_NUGETORG }} ) {
