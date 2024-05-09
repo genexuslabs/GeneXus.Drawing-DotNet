@@ -50,12 +50,10 @@ public class FontFamily : IDisposable
 	/// <summary>
 	/// Indicates whether the specified object is a <see cref='FontFamily'/> and is identical to this <see cref='FontFamily'/>.
 	/// </summary>
-#nullable enable
-	public override bool Equals(object? obj)
+	public override bool Equals(object obj)
 		=> obj is FontFamily ff
 		&& ff.m_typeface.FamilyName.Equals(m_typeface.FamilyName, StringComparison.OrdinalIgnoreCase)
 		&& ff.m_index == m_index;
-#nullable disable
 
 	/// <summary>
 	///  Gets a hash code for this <see cref='FontFamily'/>.
