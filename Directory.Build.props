@@ -1,10 +1,15 @@
 <Project>
 	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-		<Version>0.0.2</Version>
+		<LangVersion>latest</LangVersion>
+
+		<Version>0.0.14</Version>
 
 		<Product>GeneXus</Product>
 		<Company>GeneXus</Company>
+		<Authors>$(Company)</Authors>
 		<Copyright>Copyright © $([System.DateTime]::Now.ToString('yyyy')) $(Company). All Rights Reserved</Copyright>
 
 		<AssemblyCompany>$(Company)</AssemblyCompany>
@@ -14,8 +19,16 @@
 
 		<PackageOutputPath>$(MSBuildThisFileDirectory)_packages\$(Configuration)</PackageOutputPath>
 
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackRelease>true</PackRelease>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+		<RemoveCopyLocalToProjects>true</RemoveCopyLocalToProjects>
+
 	</PropertyGroup>
-	
+
 	<!-- START : Define a default Readme.md file for NuGet packages -->
 	<PropertyGroup>
 		<ProjectNeedsReadme>true</ProjectNeedsReadme>
@@ -27,9 +40,9 @@
 	</PropertyGroup>
 	<ItemGroup Condition="$(ProjectNeedsReadme) and Exists('$(DefaultReadmeFile)')">
 		<None Include="$(DefaultReadmeFile)" Pack="true" PackagePath="\">
-			<Link>PackageREADME.md</Link>
+			<Link>README.md</Link>
 		</None>
 	</ItemGroup>
 	<!-- END: Define a default Readme.md file for NuGet packages -->
-	
+
 </Project>

@@ -1,8 +1,4 @@
 {
-  "msbuild-sdks": {
-    "GeneXus.Base.Sdk": "2.2.5",
-    "GeneXus.Build.Sdk": "2.2.5",
-  },
    "sdk": {
     "version": "7.0.0",
     "rollForward": "latestMinor",

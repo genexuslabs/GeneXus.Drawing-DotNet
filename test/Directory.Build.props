@@ -1,0 +1,16 @@
+<Project>
+	<!-- Inherit general configuration but overwrite some for test projects -->
+	<Import Project="$(MSBuildThisFileDirectory)..\Directory.Build.props"/>
+
+	<PropertyGroup>
+		<TargetFrameworks>net7.0</TargetFrameworks>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<OutputPath>bin\$(Configuration)\</OutputPath>
+		<RunsLocally>true</RunsLocally>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="$(DefaultReadmeFile)" />
+	</ItemGroup>
+
+</Project>
