@@ -1,4 +1,4 @@
-namespace GeneXus.Drawing;
+namespace GeneXus.Drawing.Imaging;
 
 /// <summary>
 ///  Specifies the format of the image.

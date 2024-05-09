@@ -1,8 +1,9 @@
-<Project Sdk="GeneXus.Build.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\scripts\gxdrawing.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>$(DefineConstants);PACKAGE_COPYRIGHT_START_YEAR</DefineConstants>
+    <RootNamespace>GeneXus.Drawing</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +11,10 @@
     <PackageReference Include="SkiaSharp.Extended" Version="2.0.0" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.7" />
     <PackageReference Include="SkiaSharp.Svg" Version="1.60.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Imaging\" />
   </ItemGroup>
 
 </Project>
