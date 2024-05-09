@@ -51,7 +51,7 @@ namespace GeneXus.Drawing
 		/// <summary>
 		/// Indicates whether the specified object is a <see cref='FontFamily'/> and is identical to this <see cref='FontFamily'/>.
 		/// </summary>
-		public override bool Equals(object? obj)
+		public override bool Equals(object obj)
 			=> obj is FontFamily ff
 			&& ff.m_typeface.FamilyName.Equals(m_typeface.FamilyName, StringComparison.OrdinalIgnoreCase)
 			&& ff.m_index == m_index;
