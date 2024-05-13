@@ -2,6 +2,11 @@ name: Build & Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      force-dev-push:
+          description: 'Force publication of NuGet package of a developer version to an internal feed for test purpose'
+          required: false
+          default: 'false'
   push:
     branches: [ "main" ]
   pull_request:
@@ -32,6 +37,7 @@ jobs:
       id: buildVariables
       run: |
         $VersionTag = ''
+        $doPush = $true
 
         #switch -regex ($Env:GITHUB_REF_NAME) {
         #  '^main' {
@@ -40,6 +46,11 @@ jobs:
         #  default {
             $PUBLISH_TO_NUGETORG = 'false'
             $VersionTag = "dev"
+            if ([string]::IsNullOrEmpty("${{ github.event.inputs.force-dev-push }}") ) {
+              $doPush = $false
+            } else {
+              $doPush = [System.Convert]::ToBoolean("${{ github.event.inputs.force-dev-push }}")
+            }
         #  }
         #}
 
@@ -51,9 +62,10 @@ jobs:
           $Timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")
           $NuGetPackageVersion = $NuGetPackageVersion + "-" + $VersionTag + "." + $Timestamp
         }
-            
+
         echo "NuGetPackageVersion=$NuGetPackageVersion" >> $Env:GITHUB_ENV
         echo "IS_PUBLISH_TO_NUGETORG=$PUBLISH_TO_NUGETORG" >> $Env:GITHUB_OUTPUT
+        echo "DO_PACKAGE_PUSH=$doPush" >> $Env:GITHUB_OUTPUT
 
         write-host [INFO] NuGet Package Version: $NuGetPackageVersion
 
@@ -79,6 +91,7 @@ jobs:
         }
 
     - name: Publish
+      if: steps.buildVariables.outputs.DO_PACKAGE_PUSH == 'true'
       run: |
         if ( ${{ steps.buildVariables.outputs.IS_PUBLISH_TO_NUGETORG }} ) {
           dotnet nuget add source ${{ vars.NUGET_ORG_FEED }} --name NuGetFeed4Deploy --username gxbuilder --password ${{ secrets.NUGET_ORG_TOKEN }}
