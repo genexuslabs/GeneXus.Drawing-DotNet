@@ -5,7 +5,7 @@
 
 		<LangVersion>latest</LangVersion>
 
-		<Version>0.0.14</Version>
+		<Version>1.0.0</Version>
 
 		<Product>GeneXus</Product>
 		<Company>GeneXus</Company>
@@ -45,4 +45,7 @@
 	</ItemGroup>
 	<!-- END: Define a default Readme.md file for NuGet packages -->
 
+	<Target Name="GetPackageVersion">
+		<Message Text="NuGetPackageVersion:$(PackageVersion)" Importance="high"/>
+	</Target>
 </Project>
