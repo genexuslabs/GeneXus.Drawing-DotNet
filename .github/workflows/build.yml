@@ -39,11 +39,18 @@ jobs:
         $VersionTag = ''
         $doPush = $true
 
-        #switch -regex ($Env:GITHUB_REF_NAME) {
-        #  '^main' {
-        #    $PUBLISH_TO_NUGETORG = 'true'
-        #   }
-        #  default {
+        switch -regex ($Env:GITHUB_REF_NAME) {
+          '^main' {
+             #$PUBLISH_TO_NUGETORG = 'true'
+
+             #---
+             # Temporary publish to an internal feed with prerelease tag 'trunk'
+             # while we are working in the first release
+             $PUBLISH_TO_NUGETORG = 'false'
+             $VersionTag = 'trunk'
+             #---
+           }
+          default {
             $PUBLISH_TO_NUGETORG = 'false'
             $VersionTag = "dev"
             if ([string]::IsNullOrEmpty("${{ github.event.inputs.force-dev-push }}") ) {
@@ -51,8 +58,8 @@ jobs:
             } else {
               $doPush = [System.Convert]::ToBoolean("${{ github.event.inputs.force-dev-push }}")
             }
-        #  }
-        #}
+          }
+        }
 
         $NuGetPackageVersion = dotnet msbuild Directory.Build.props /t:GetPackageVersion
         "$NuGetPackageVersion" -match "(?<=NuGetPackageVersion:)(.*)"
