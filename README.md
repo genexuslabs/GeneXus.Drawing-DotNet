@@ -25,4 +25,5 @@ GeneXus.Drawing is based on the project SkiaSharp which is licensed under open s
 >SkiaSharp is a cross-platform 2D graphics API for .NET platforms based on Google's Skia Graphics Library (skia.org). It provides a comprehensive 2D API that can be used across mobile, server and desktop models to render images.
 
 URL: https://github.com/mono/SkiaSharp
+
 License (MIT): https://github.com/mono/SkiaSharp/blob/main/LICENSE.md
