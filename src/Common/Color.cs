@@ -202,17 +202,20 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the hexadecimal representation in RRGGBBAA (or AARRGGBB if argb flag enabled) values.
 	/// </summary>
-	public static Color FromHex(string hex, bool argb = false) => new(hex, argb);
+	public static Color FromHex(string hex, bool argb = false)
+		=> new(hex, argb);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the four 8-bit ARGB components (alpha, red, green, and blue) values.
 	/// </summary>
-	public static Color FromArgb(int alpha, int red, int green, int blue) => new(alpha, red, green, blue);
+	public static Color FromArgb(int alpha, int red, int green, int blue)
+		=> new(alpha, red, green, blue);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the four 8-bit RGB components (red, green, and blue) values.
 	/// </summary>
-	public static Color FromArgb(int red, int green, int blue) => FromArgb(255, red, green, blue);
+	public static Color FromArgb(int red, int green, int blue)
+		=> FromArgb(255, red, green, blue);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from a 32-bit ARGB value.
