@@ -218,6 +218,13 @@ public struct Color : IEquatable<Color>
 		=> FromArgb(255, red, green, blue);
 
 	/// <summary>
+	/// Creates a <see cref='Color'/> structure from the specified base <see cref='Color'/> structure, but 
+	/// with the new specified alpha value.
+	/// </summary>
+	public static Color FromArgb(int alpha, Color baseColor)
+		=> FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B);
+
+	/// <summary>
 	/// Creates a <see cref='Color'/> structure from a 32-bit ARGB value.
 	/// </summary>
 	public static Color FromArgb(int argb)
