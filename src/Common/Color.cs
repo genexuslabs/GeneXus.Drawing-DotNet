@@ -40,7 +40,7 @@ public struct Color : IEquatable<Color>
 	/// </summary>
 	public override readonly string ToString()
 	{
-		string name = IsKnownColor ? Name : $"A={A}, R={R}, G={G}, B={B}";
+		string name = IsNamedColor ? Name : IsEmpty ? "Empty" : $"A={A}, R={R}, G={G}, B={B}";
 		return $"{nameof(Color)} [{name}]";
 	}
 
@@ -108,7 +108,7 @@ public struct Color : IEquatable<Color>
 	/// Gets a value indicating whether this <see cref='Color'/> structure is a predefined color. 
 	/// Predefined colors are represented by the elements of the <see cref='KnownColor'/> enumeration.
 	/// </summary>
-	public readonly bool IsKnownColor 
+	public readonly bool IsKnownColor
 		=> m_index > 0 && m_index <= (int)KnownColor.RebeccaPurple;
 
 	/// <summary>
@@ -116,8 +116,8 @@ public struct Color : IEquatable<Color>
 	/// color is a color that is used in a Windows display element. System colors are represented by 
 	/// elements of the <see cref='KnownColor'/> enumeration.
 	/// </summary>
-	public readonly bool IsSystemColor 
-		=> m_index >= (int)KnownColor.ActiveBorder && m_index <= (int)KnownColor.WindowText 
+	public readonly bool IsSystemColor
+		=> m_index >= (int)KnownColor.ActiveBorder && m_index <= (int)KnownColor.WindowText
 		|| m_index >= (int)KnownColor.ButtonFace && m_index <= (int)KnownColor.MenuHighlight;
 
 	/// <summary>
