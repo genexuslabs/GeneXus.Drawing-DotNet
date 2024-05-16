@@ -309,6 +309,9 @@ public struct Color : IEquatable<Color>
 		}
 	}
 
+	private static bool IsHexDigit(char c)
+		=> (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+
 	private static int ParseHex(string value, int start, int lenght = 2)
 		=> int.Parse(value.Substring(start, lenght), System.Globalization.NumberStyles.HexNumber);
 
@@ -324,6 +327,8 @@ public struct Color : IEquatable<Color>
 	private static SKColor CreateFromHex(string hex, bool argb)
 	{
 		hex = hex.TrimStart('#').ToLower();
+		if (!hex.All(IsHexDigit))
+			throw new ArgumentException($"invalid hex digit in #{hex}", nameof(hex));
 
 		// expand for reduced hex
 		hex = hex.Length switch
@@ -332,7 +337,7 @@ public struct Color : IEquatable<Color>
 			4 => string.Concat(hex[0], hex[0], hex[1], hex[1], hex[2], hex[2], hex[3], hex[3]),
 			6 => string.Concat(hex, "ff"),
 			8 => hex,
-			_ => throw new ArgumentException($"invalid hex value #{hex}", nameof(hex))
+			_ => throw new ArgumentException($"invalid hex length #{hex}", nameof(hex))
 		};
 
 		// change rgba to argb
