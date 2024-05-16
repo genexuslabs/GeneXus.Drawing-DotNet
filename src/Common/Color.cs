@@ -10,11 +10,15 @@ namespace GeneXus.Drawing;
 [DebuggerDisplay("{NameAndARGBValue}")]
 public struct Color : IEquatable<Color>
 {
+	private readonly string m_name;
+	private readonly int m_index;
 	internal readonly SKColor m_color;
 
-	internal Color(SKColor color)
+	internal Color(SKColor color, string name = null, int index = 0)
 	{
 		m_color = color;
+		m_name = name;
+		m_index = index;
 	}
 
 	/// <summary>
@@ -101,9 +105,25 @@ public struct Color : IEquatable<Color>
 	public readonly bool IsEmpty => m_color == default;
 
 	/// <summary>
-	/// Gets a value indicating whether this <see cref='Color'/> is a known color.
+	/// Gets a value indicating whether this <see cref='Color'/> structure is a predefined color. 
+	/// Predefined colors are represented by the elements of the <see cref='KnownColor'/> enumeration.
 	/// </summary>
-	public readonly bool IsKnownColor => KnownColorToName(this)?.Length > 0;
+	public readonly bool IsKnownColor 
+		=> m_index > 0 && m_index <= (int)KnownColor.RebeccaPurple;
+
+	/// <summary>
+	/// Gets a value indicating whether this <see cref='Color'/> structure is a system color. A system 
+	/// color is a color that is used in a Windows display element. System colors are represented by 
+	/// elements of the <see cref='KnownColor'/> enumeration.
+	/// </summary>
+	public readonly bool IsSystemColor 
+		=> m_index >= (int)KnownColor.ActiveBorder && m_index <= (int)KnownColor.WindowText 
+		|| m_index >= (int)KnownColor.ButtonFace && m_index <= (int)KnownColor.MenuHighlight;
+
+	/// <summary>
+	/// Gets a value indicating whether this <see cref='Color'/> is a named color.
+	/// </summary>
+	public readonly bool IsNamedColor => m_name?.Length > 0;
 
 	/// <summary>
 	/// Gets the alpha component value of this <see cref='Color'/> structure.
@@ -128,7 +148,21 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets the name component value of this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly string Name => KnownColorToName(this) ?? $"{m_HexA}{m_HexR}{m_HexG}{m_HexB}";
+	public readonly string Name
+	{
+		get
+		{
+			if (IsNamedColor || IsKnownColor)
+				return m_name;
+
+			PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
+			foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
+				if (property.GetValue(null) is Color color && color.Equals(this))
+					return property.Name;
+
+			return ToArgb().ToString("x");
+		}
+	}
 
 	/// <summary>
 	/// Gets the hexadecimal representation in #RRGGBBAA (or #RGBA if can be reduced) of this <see cref='Color'/> structure.
@@ -199,9 +233,19 @@ public struct Color : IEquatable<Color>
 	{
 		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
 		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-			if (property.GetValue(null) is Color knownColor && knownColor.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-				return knownColor;
+			if (property.GetValue(null) is Color color && property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+				return new(color.m_color, property.Name);
 		return Empty;
+	}
+
+	/// <summary>
+	/// Creates a <see cref='Color'/> structure from the specified predefined <see cref='KnownColor'/> color.
+	/// </summary>
+	public static Color FromKnownColor(KnownColor color)
+	{
+		var knownName = color.ToString();
+		var knownColor = FromName(knownName); // NOTE: system colors are not supported and will be returned as empty
+		return new(knownColor.m_color, knownColor.m_name ?? knownName, (int)color);
 	}
 
 	#endregion
@@ -228,6 +272,11 @@ public struct Color : IEquatable<Color>
 	/// Gets the hue-saturation-lightness (HSL) hue value for this <see cref='Color'/> structure.
 	/// </summary>
 	public readonly float GetHue() => m_HSL.Hue;
+
+	/// <summary>
+	/// Gets the <see cref='KnownColor'/> value of this <see cref='Color'/> structure.
+	/// </summary>
+	public readonly KnownColor ToKnownColor() => Enum.TryParse(Name, out KnownColor color) ? color : 0;
 
 	#endregion
 
@@ -287,19 +336,10 @@ public struct Color : IEquatable<Color>
 		return CreateFromRgba(r, g, b, a);
 	}
 
-	public static string KnownColorToName(Color color)
-	{
-		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
-		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-			if (property.GetValue(null) is Color knownColor && knownColor == color)
-				return property.Name;
-		return null;
-	}
-
 	#endregion
 
 
-	#region KnownColors
+	#region NamedColors
 
 	public static Color Translarent => new(SKColors.Transparent);
 	public static Color AliceBlue => new(SKColors.AliceBlue);
@@ -416,6 +456,7 @@ public struct Color : IEquatable<Color>
 	public static Color PowderBlue => new(SKColors.PowderBlue);
 	public static Color Purple => new(SKColors.Purple);
 	public static Color Red => new(SKColors.Red);
+	public static Color RebeccaPurple => new("#663399");
 	public static Color RosyBrown => new(SKColors.RosyBrown);
 	public static Color RoyalBlue => new(SKColors.RoyalBlue);
 	public static Color SaddleBrown => new(SKColors.SaddleBrown);
