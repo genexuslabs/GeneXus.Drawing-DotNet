@@ -92,7 +92,7 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Creates a new instance of the <see cref='Color'/> class with member data left uninitialized.
 	/// </summary>
-	public static readonly Color Empty = default;
+	public static readonly Color Empty = new(SKColor.Empty, null, -1);
 
 	#endregion
 
@@ -102,7 +102,7 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Color'/> is empty.
 	/// </summary>
-	public readonly bool IsEmpty => m_color == default;
+	public readonly bool IsEmpty => m_color == SKColor.Empty && m_index < 0;
 
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Color'/> structure is a predefined color. 
