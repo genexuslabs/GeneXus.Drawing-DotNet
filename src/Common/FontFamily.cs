@@ -44,6 +44,12 @@ public class FontFamily : IDisposable
 			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0) { }
 
 	/// <summary>
+	///  Initializes a new instance of the <see cref='FontFamily'/> class from the specified generic font family.
+	/// </summary>
+	public FontFamily(GenericFontFamilies genericFamily)
+		: this(GetGenericFontFamily(genericFamily).m_data, 0) { }
+
+	/// <summary>
 	///  Cleans up resources for this <see cref='FontFamily'/>.
 	/// </summary>
 	~FontFamily() => Dispose();
@@ -103,6 +109,27 @@ public class FontFamily : IDisposable
 	/// </summary>
 	public string Name => m_typeface.FamilyName;
 
+	/// <summary>
+	///  Returns an array that contains all of the <see cref='FontFamily'/> objects associated with the current
+	///  graphics context.
+	/// </summary>
+	public static FontFamily[] Families => new InstalledFontCollection().Families;
+
+	/// <summary>
+	///  Gets a generic monospace <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericMonospace => new(GenericFontFamilies.Monospace);
+
+	/// <summary>
+	///  Gets a generic SansSerif <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericSansSerif => new(GenericFontFamilies.SansSerif);
+
+	/// <summary>
+	///  Gets a generic Serif <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericSerif => new(GenericFontFamilies.Serif);
+
 	#endregion
 
 
@@ -130,6 +157,16 @@ public class FontFamily : IDisposable
 	/// specified <see cref='FontStyle'/>.
 	/// </summary>
 	public int GetLineSpacing() => (int)Math.Abs(m_font.Spacing * GetEmHeight() / m_font.Size);
+
+	/// <summary>
+	///  Returns the name of this <see cref='FontFamily'/> in the specified language.
+	/// </summary>
+	public string GetName(int language) => Name; // NOTE: Language is not suppored in SkiaSharp
+
+	/// <summary>
+	///  Indicates whether the specified <see cref='FontStyle'/> is available.
+	/// </summary>
+	public bool IsStyleAvailable(FontStyle style) => (new Font(this).Style & style) == style;
 
 	#endregion
 
@@ -202,6 +239,21 @@ public class FontFamily : IDisposable
 
 			return faceName.Append(faceName.Length > 0 ? string.Empty : "Regular").ToString();
 		}
+	}
+
+	private static FontFamily GetGenericFontFamily(GenericFontFamilies genericFamily)
+	{
+		var candidates = genericFamily switch // NOTE: Define a set of predefined fonts
+		{
+			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
+			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
+			GenericFontFamilies.Serif	  => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
+			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
+		};
+		foreach (var candidate in candidates)
+			if (Font.SystemFonts.FirstOrDefault(f => f.FamilyName.Equals(candidate, StringComparison.OrdinalIgnoreCase)) is Font font)
+				return font.FontFamily;
+		throw new ArgumentException($"invalid generic font family", nameof(genericFamily));
 	}
 
 	internal bool MatchFamily(string familyName) // TODO: Improve this code
