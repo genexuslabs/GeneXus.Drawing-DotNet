@@ -29,7 +29,8 @@ public class Font : IDisposable, ICloneable
 	/// Initializes a new <see cref='Font'/> using the specified family name and size.
 	/// </summary>
 	public Font(string familyName, float size = 12)
-		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName)), size)
+		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName))
+			  ?? throw new ArgumentException("missing font family", nameof(familyName)), size)
 	{
 		m_original = familyName;
 	}
@@ -130,6 +131,16 @@ public class Font : IDisposable, ICloneable
 	/// Gets the slant of this <see cref='Font'/>.
 	/// </summary>
 	public SlantType Slant => m_family.Slant;
+
+	/// <summary>
+	/// Gets the FamilyName associated with this <see cref='Font'/>.
+	/// </summary>
+	public string FamilyName => m_family.Name;
+
+	/// <summary>
+	/// Gets the FaceName associated with this <see cref='Font'/>.
+	/// </summary>
+	public string FaceName => m_family.Face;
 
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> has the italic style applied.
