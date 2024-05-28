@@ -92,7 +92,7 @@ internal class BitmapUnitTest
 	}
 
 	[Test]
-	public void GetPixel_SetGetPixel()
+	public void Method_SetGetPixel()
 	{
 		using var bitmap = new Bitmap(100, 100);
 		bitmap.SetPixel(50, 50, Color.Red);
