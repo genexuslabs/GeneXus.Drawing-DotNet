@@ -1,3 +1,5 @@
+using GeneXus.Drawing.Text;
+using NUnit.Framework;
 using System;
 using System.IO;
 
@@ -66,6 +68,22 @@ internal class FontFamilyUnitTest
 			Assert.That(family.GetCellDescent(), Is.EqualTo(descent));
 			Assert.That(family.GetLineSpacing(), Is.EqualTo(lineSpacing));
 			Assert.That(family.GetEmHeight(), Is.EqualTo(emHeight));
+		});
+	}
+
+	public void Constructor_FontCollection()
+	{
+		using var pfc = new PrivateFontCollection();
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Regular.ttf"));
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Italic.ttf"));
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Bold.ttf"));
+		Assert.That(pfc.Families.Length, Is.EqualTo(3));
+
+		using var family = new FontFamily("Montserrat-Regular", pfc);
+		Assert.Multiple(() =>
+		{
+			Assert.That(family, Is.Not.EqualTo(pfc.Families[0])); // not the same instance
+			Assert.That(family.Name, Is.EqualTo(pfc.Families[0].Name));
 		});
 	}
 }

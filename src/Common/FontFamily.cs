@@ -1,3 +1,4 @@
+using GeneXus.Drawing.Text;
 using System;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,14 @@ public class FontFamily : IDisposable
 	/// </summary>
 	public FontFamily(Stream stream, int index = 0)
 		: this(SKData.Create(stream), index) { }
+
+	/// <summary>
+	///  Initializes a new instance of the <see cref='FontFamily'/> class in the specified
+	///  <see cref='FontCollection'/> and with the specified name.
+	/// </summary>
+	public FontFamily(string name, FontCollection fontCollection)
+		: this(fontCollection.Families.FirstOrDefault(ff => ff.MatchFamily(name))?.m_data
+			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0) { }
 
 	/// <summary>
 	///  Cleans up resources for this <see cref='FontFamily'/>.
@@ -195,7 +204,7 @@ public class FontFamily : IDisposable
 		}
 	}
 
-	internal bool MatchFamily(string familyName)
+	internal bool MatchFamily(string familyName) // TODO: Improve this code
 		=> new string[] { Name, $"{Name} {Face}", $"{Name}-{Face}" }.Any(candidateName
 			=> candidateName.Equals(familyName, StringComparison.OrdinalIgnoreCase));
 
