@@ -133,6 +133,31 @@ public class Font : IDisposable, ICloneable
 	public SlantType Slant => m_family.Slant;
 
 	/// <summary>
+	/// Gets style information for this <see cref='Font'/>.
+	/// </summary>
+	public FontStyle Style
+	{
+		get
+		{
+			FontStyle style = FontStyle.Regular;
+
+			if (Italic)
+				style |= FontStyle.Italic;
+
+			if (Bold)
+				style |= FontStyle.Bold;
+
+			if (Underline)
+				style |= FontStyle.Underline;
+
+			if (Strikeout)
+				style |= FontStyle.Strikeout;
+
+			return style;
+		}
+	}
+
+	/// <summary>
 	/// Gets the FamilyName associated with this <see cref='Font'/>.
 	/// </summary>
 	public string FamilyName => m_family.Name;
