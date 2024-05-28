@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -196,7 +196,8 @@ public class FontFamily : IDisposable
 	}
 
 	internal bool MatchFamily(string familyName)
-		=> Regex.IsMatch(familyName, $"^{Name}[ -]({Face})?$", RegexOptions.IgnoreCase);
+		=> new string[] { Name, $"{Name} {Face}", $"{Name}-{Face}" }.Any(candidateName
+			=> candidateName.Equals(familyName, StringComparison.OrdinalIgnoreCase));
 
 	#endregion
 }
