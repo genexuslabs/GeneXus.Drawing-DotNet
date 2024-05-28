@@ -114,22 +114,22 @@ public class FontFamily : IDisposable
 	/// <summary>
 	/// Returns the cell ascent of this <see cref='FontFamily'/>.
 	/// </summary>
-	public float GetCellAscent() => Math.Abs(m_font.Metrics.Ascent * GetEmHeight() / m_font.Size);
+	public int GetCellAscent() => (int)Math.Abs(m_font.Metrics.Ascent * GetEmHeight() / m_font.Size);
 
 	/// <summary>
 	/// Returns the cell descent of this <see cref='FontFamily'/>.
 	/// </summary>
-	public float GetCellDescent() => Math.Abs(m_font.Metrics.Descent * GetEmHeight() / m_font.Size);
+	public int GetCellDescent() => (int)Math.Abs(m_font.Metrics.Descent * GetEmHeight() / m_font.Size);
 
 	/// <summary>
 	/// Gets the height, of the em square of this <see cref='FontFamily'/>.
 	/// </summary>
-	public float GetEmHeight() => m_typeface.UnitsPerEm;
+	public int GetEmHeight() => m_typeface.UnitsPerEm;
 
 	/// Returns the distance between two consecutive lines of text for this <see cref='FontFamily'/> with the
 	/// specified <see cref='FontStyle'/>.
 	/// </summary>
-	public float GetLineSpacing() => Math.Abs(m_font.Spacing * GetEmHeight() / m_font.Size);
+	public int GetLineSpacing() => (int)Math.Abs(m_font.Spacing * GetEmHeight() / m_font.Size);
 
 	#endregion
 
