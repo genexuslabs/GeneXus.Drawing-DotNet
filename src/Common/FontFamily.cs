@@ -24,8 +24,8 @@ public class FontFamily : IDisposable
 	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified filename name
 	/// and optional index for font collection.
 	/// </summary>
-	public FontFamily(string filename, int index = 0)
-		: this(SKData.Create(filename), index) { }
+	public FontFamily(string name, int index = 0)
+		: this(File.Exists(name) ? SKData.Create(name) : new Font(name).FontFamily.m_data, index) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified stream name
