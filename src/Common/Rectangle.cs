@@ -198,7 +198,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Creates a new <see cref='Rectangle'/> with the specified location and size.
 	/// </summary>
-	public static Rectangle FromLTRB(int left, int top, int right, int bottom) => new(left, top, unchecked(right - left), unchecked(bottom - top));
+	public static Rectangle FromLTRB(float left, float top, float right, float bottom) => new(left, top, unchecked(right - left), unchecked(bottom - top));
 
 	#endregion
 
