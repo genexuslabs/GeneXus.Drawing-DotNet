@@ -26,7 +26,7 @@ internal class FontUnitTest
 	[TestCase("EncodeSans-Condensed.ttf", "Encode Sans", "Condensed", 400, 3, 15, SlantType.Normal, FontStyle.Regular)]
 	[TestCase("EncodeSans-Expanded.ttf", "Encode Sans", "Expanded", 400, 7, 15, SlantType.Normal, FontStyle.Regular)]
 	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Regular", 400, 5, 17, SlantType.Normal, FontStyle.Regular, 7)]
-	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Italic", 400, 5, 17, SlantType.Italic, FontStyle.Regular | FontStyle.Regular, 4)]
+	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Italic", 400, 5, 17, SlantType.Italic, FontStyle.Regular | FontStyle.Italic, 4)]
 	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Bold", 700, 5, 17, SlantType.Normal, FontStyle.Regular | FontStyle.Bold, 0)]
 	public void Constructor_Family(string fileName, string familyName, string faceName, int fontWeight, int fontWidth, int fontHeight, SlantType fontSlant, FontStyle fontStyle, int fontIndex = 0)
 	{
