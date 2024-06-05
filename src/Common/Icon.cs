@@ -200,8 +200,11 @@ public class Icon : IDisposable, ICloneable
 			throw new ArgumentException("portable executable (PE) file format is not supported.", nameof(filePath));
 
 		var icon = new Icon(filePath, size, size);
-		if (id >= 0 && id < icon.m_entries.Count) // defined index
-			icon.m_index = id;
+		if (icon.Width == size && icon.Height == size)
+			id = int.MaxValue; // set to undefined
+		
+		if (id >= 0 && id < icon.m_entries.Count) 
+			icon.m_index = id; // set defined index
 
 		return icon;
 	}
