@@ -141,4 +141,49 @@ internal class IconUnitTest
 		byte[] pngHeader = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 		Assert.That(streamHeader, Is.EqualTo(pngHeader));
 	}
+
+	[Test]
+	public void Method_ExtractAssociatedIcon()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.ico");
+		using var icon = Icon.ExtractAssociatedIcon(filePath);
+		Assert.Multiple(() =>
+		{
+			Assert.That(icon, Is.Not.Null);
+			Assert.That(icon.Width, Is.EqualTo(32));
+			Assert.That(icon.Height, Is.EqualTo(32));
+			Assert.That(icon.Size.Width, Is.EqualTo(32));
+			Assert.That(icon.Size.Height, Is.EqualTo(32));
+		});
+	}
+
+	[Test]
+	public void Method_ExtractIcon_SmallIcon()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.ico");
+		using var icon = Icon.ExtractIcon(filePath, 0, true);
+		Assert.Multiple(() =>
+		{
+			Assert.That(icon, Is.Not.Null);
+			Assert.That(icon.Width, Is.EqualTo(16));
+			Assert.That(icon.Height, Is.EqualTo(16));
+			Assert.That(icon.Size.Width, Is.EqualTo(16));
+			Assert.That(icon.Size.Height, Is.EqualTo(16));
+		});
+	}
+
+	[Test]
+	public void Method_ExtractIcon_Size()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.ico");
+		using var icon = Icon.ExtractIcon(filePath, 0, 20);
+		Assert.Multiple(() =>
+		{
+			Assert.That(icon, Is.Not.Null);
+			Assert.That(icon.Width, Is.EqualTo(20));
+			Assert.That(icon.Height, Is.EqualTo(20));
+			Assert.That(icon.Size.Width, Is.EqualTo(20));
+			Assert.That(icon.Size.Height, Is.EqualTo(20));
+		});
+	}
 }
