@@ -20,6 +20,10 @@ public class Image : IDisposable, ICloneable
 		m_bitmap = bitmap;
 		m_frames = frames;
 		m_format = format;
+
+		using var surface = SKSurface.Create(new SKImageInfo(m_bitmap.Width, m_bitmap.Height));
+		HorizontalResolution = (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
+		VerticalResolution = (int)(100f * surface.Canvas.DeviceClipBounds.Height / surface.Canvas.LocalClipBounds.Height);
 	}
 
 	/// <summary>
@@ -66,7 +70,8 @@ public class Image : IDisposable, ICloneable
 	#region Properties
 
 	/// <summary>
-	///  Gets attribute flags for the pixel data of this <see cref='Image'/>.
+	///  Gets attribute flags for the pixel data of this <see cref='Image'/> defined by the 
+	///  bitwise combination of <see cref='ImageFlags'/>.
 	/// </summary>
 	public int Flags => throw new NotImplementedException();
 
