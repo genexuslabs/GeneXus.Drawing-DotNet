@@ -6,32 +6,53 @@ using SkiaSharp;
 namespace GeneXus.Drawing;
 
 [Serializable]
-public class Bitmap : IDisposable, ICloneable
+public class Bitmap : Image, IDisposable, ICloneable
 {
-	internal readonly SKBitmap m_bitmap;
-
 	internal Bitmap(SKBitmap skBitmap)
-	{
-		m_bitmap = skBitmap;
-	}
+		: base(skBitmap, ImageFormat.Png, 1) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class from a filename
 	/// </summary>
-	public Bitmap(string filename)
-		: this(Image.FromFile(filename)) { }
+	public Bitmap(string filename, bool useIcm = true)
+		: this(FromFile(filename)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class from a file stream
 	/// </summary>
-	public Bitmap(Stream stream)
-		: this(Image.FromStream(stream)) { }
+	public Bitmap(Stream stream, bool useIcm = true)
+		: this(FromStream(stream)) { }
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref='Bitmap'/> class from a file stream
+	/// </summary>
+	public Bitmap(Type type, string resource)
+		: this(GetResourceStream(type, resource)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified width and height
 	/// </summary>
 	public Bitmap(float width, float height)
 		: this(new SKBitmap((int)width, (int)height)) { }
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size 
+	/// and with the resolution of the specified <see cref='Graphics'/> object.
+	/// </summary>
+	//public Bitmap(int width, int height, object g) // TODO: Implement Graphics
+	//	: this(width, height) => throw new NotImplementedException();
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size and format.
+	/// </summary>
+	public Bitmap(int width, int height, object format)  // TODO: Implement PixelFormat
+		: this(width, height, 4, format, IntPtr.Zero) { }
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size, pixel format, and pixel data
+	/// </summary>
+	public Bitmap(int width, int height, int stride, object format, IntPtr scan0) // TODO: Implement PixelFormat
+		: this(width, height) => throw new NotImplementedException();
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Size'/>
@@ -43,31 +64,13 @@ public class Bitmap : IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Image'/>
 	/// </summary>
 	public Bitmap(Image original)
-		: this(SKBitmap.FromImage(original.m_image))
-	{
-		if (original.m_index == 0 && original.m_frames == 1) return;
-
-		using var stream = new MemoryStream();
-		original.Save(stream, ImageFormat.Png);
-		stream.Seek(0, SeekOrigin.Begin);
-
-		var bitmap = m_bitmap;
-
-		var image = Image.FromStream(stream);
-		m_bitmap = SKBitmap.FromImage(image.m_image);
-
-		bitmap.Dispose();
-	}
+		: this(original, original.Width, original.Height) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Image'/>, width and height
 	/// </summary>
 	public Bitmap(Image original, float width, float height)
-		: this(original)
-	{
-		var resizeInfo = new SKImageInfo(Convert.ToInt32(width), Convert.ToInt32(height));
-		m_bitmap = m_bitmap.Resize(resizeInfo, SKFilterQuality.High);
-	}
+	: this(original.m_bitmap.Resize(new SKImageInfo((int)width, (int)height), SKFilterQuality.High)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Image'/> and <see cref='Size'/>
@@ -86,22 +89,18 @@ public class Bitmap : IDisposable, ICloneable
 	public override string ToString() => $"{GetType().Name}: {Width}x{Height}";
 
 
-	#region IDisposable
-
-	/// <summary>
-	///  Cleans up resources for this <see cref='Bitmap'/>.
-	/// </summary>
-	public void Dispose() => m_bitmap.Dispose();
-
-	#endregion
-
-
 	#region IClonable
 
 	/// <summary>
-	///  Creates an exact copy of this <see cref='Bitmap'/>.
+	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
+	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
 	/// </summary>
-	public object Clone() => new Bitmap(m_bitmap.Copy());
+	public object Clone(Rectangle rect, object format) // TODO: Implement PixelFormat
+	{
+		var bitmap = new Bitmap(rect.Width, rect.Height);
+		var portion = new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
+		return m_bitmap.ExtractSubset(bitmap.m_bitmap, portion) ? bitmap : base.Clone();
+	}
 
 	#endregion
 
@@ -109,7 +108,7 @@ public class Bitmap : IDisposable, ICloneable
 	#region Operators
 
 	/// <summary>
-	/// Creates a <see cref='SKBitmap'/> with the coordinates of the specified <see cref='Bitmap'/> .
+	/// Creates a <see cref='SKBitmap'/> with the coordinates of the specified <see cref='Bitmap'/>.
 	/// </summary>
 	public static explicit operator SKBitmap(Bitmap bitmap) => bitmap.m_bitmap;
 
@@ -119,24 +118,55 @@ public class Bitmap : IDisposable, ICloneable
 	#region Properties
 
 	/// <summary>
-	///  Gets the width of this <see cref='Bitmap'/>.
-	/// </summary>
-	public int Width => m_bitmap.Width;
-
-	/// <summary>
-	///  Gets the height of this <see cref='Bitmap'/>.
-	/// </summary>
-	public int Height => m_bitmap.Height;
-
-	/// <summary>
 	///  Gets the bytes-per-pixel value of this <see cref='Bitmap'/>.
 	/// </summary>
 	public int BytesPerPixel => m_bitmap.BytesPerPixel;
+
+	/// <summary>
+	///  Gets the handle of this <see cref='Bitmap'/>.
+	/// </summary>
+	public IntPtr Handle => m_bitmap.Handle;
+
+	#endregion
+
+
+	#region Factory
+
+	/// <summary>
+	///  Creates a <see cref='Bitmap'/> from a Windows handle to an icon.
+	/// </summary>
+	public static Bitmap FromHicon(IntPtr hicon)
+		=> throw new NotSupportedException("windows specific");
+
+	/// <summary>
+	///  Creates a <see cref='Bitmap'/> from the specified Windows resource.
+	/// </summary>
+	public static Bitmap FromResource(IntPtr hinstance, string bitmapName)
+		=> throw new NotSupportedException("windows specific");
 
 	#endregion
 
 
 	#region Methods
+
+	/// <summary>
+	///  Creates a GDI bitmap object from this <see cref='Bitmap'/>.
+	/// </summary>
+	public IntPtr GetHbitmap()
+		=> GetHbitmap(Color.LightGray);
+
+	/// <summary>
+	///  Creates a GDI bitmap object from this <see cref='Bitmap'/> with the 
+	///  specificed <see cref='Bitmap'/> structure as background.
+	/// </summary>
+	public IntPtr GetHbitmap(Color background)
+		=> throw new NotSupportedException("windows specific");
+
+	/// <summary>
+	///  Returns the handle to an icon.
+	/// </summary>
+	public IntPtr GetHicon()
+		=> throw new NotSupportedException("windows specific");
 
 	/// <summary>
 	///  Gets the color of the specified pixel in this <see cref='Bitmap'/>.
@@ -148,6 +178,38 @@ public class Bitmap : IDisposable, ICloneable
 	}
 
 	/// <summary>
+	///  Locks a <see cref='Bitmap'/> into system memory.
+	/// </summary>
+	public object LockBits(Rectangle rect, object flags, object format) // TODO: Implement ImageLockMode and PixelFormat
+		=> LockBits(rect, flags, format, new());
+
+	/// <summary>
+	///  Locks a <see cref='Bitmap'/> into system memory using a BitmapData information.
+	/// </summary>
+	public object LockBits(Rectangle rect, object flags, object format, object bitmapData)
+		=> throw new NotImplementedException();
+
+	/// <summary>
+	///  Makes the default transparent color transparent for this <see cref='Bitmap'/>.
+	/// </summary>
+	public void MakeTransparent()
+		=> MakeTransparent(Width > 0 && Height > 0 ? GetPixel(0, Height - 1) : Color.LightGray);
+
+	/// <summary>
+	///  Makes the specified color transparent for this <see cref='Bitmap'/>.
+	/// </summary>
+	public void MakeTransparent(Color transparentColor)
+	{
+		if (transparentColor.A < 255)
+			return; // already transparent, return the bitmap as is
+
+		for (int x = 0; x < Width; x++)
+			for (int y = 0; y < Height; y++)
+				if (GetPixel(x, y) == transparentColor)
+					SetPixel(x, y, Color.Translarent);
+	}
+
+	/// <summary>
 	///  Sets the color of the specified pixel in this <see cref='Bitmap'/>.
 	/// </summary>
 	public void SetPixel(int x, int y, Color color)
@@ -156,20 +218,46 @@ public class Bitmap : IDisposable, ICloneable
 		m_bitmap.SetPixel(x, y, c);
 	}
 
+	/// <summary>
+	///  Sets the resolution for this <see cref='Bitmap'/>.
+	/// </summary>
+	public void SetResolution(float xDpi, float yDpi)
+	{
+		HorizontalResolution = xDpi; // TODO: this is not doing anything
+		VerticalResolution = yDpi;
+
+		using var surface = SKSurface.Create(new SKImageInfo(Width, Height));
+		float dpiX = 100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width;
+		float dpiY = 100f * surface.Canvas.DeviceClipBounds.Height / surface.Canvas.LocalClipBounds.Height;
+
+		int width = (int)(Width * xDpi / dpiX);
+		int height = (int)(Height * yDpi / dpiY);
+
+		using var resize = m_bitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.High);
+		if (m_bitmap.ScalePixels(resize, SKFilterQuality.High))
+			return;
+		throw new Exception("could not set resolution");
+	}
+
+	/// <summary>
+	///  Unlocks this <see cref='Bitmap'/> from system memory.
+	/// </summary>
+	public void UnlockBits(object bitmapdata)
+		=> throw new NotImplementedException(); // TODO: implement BitmapData
+
 	#endregion
 
 
 	#region Utilities
 
-	/// <summary>
-	///  Saves this <see cref='Bitmap'/> into a stream with a specified format.
-	/// </summary>
-	internal void Save(Stream stream, SKEncodedImageFormat format, int quality = 100)
+	private static Stream GetResourceStream(Type type, string resource)
 	{
-		using var skStream = new SKManagedWStream(stream);
-		var isOk = m_bitmap.Encode(skStream, format, quality);
-		if (isOk) return;
-		throw new Exception("failed to save bitmap");
+		if (type == null)
+			throw new ArgumentNullException(nameof(type));
+		if (resource == null)
+			throw new ArgumentNullException(nameof(resource));
+		return type.Module.Assembly.GetManifestResourceStream(type, resource)
+			?? throw new ArgumentException("resource not found", nameof(resource));
 	}
 
 	#endregion
