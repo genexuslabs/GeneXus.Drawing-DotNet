@@ -180,7 +180,7 @@ public class Icon : IDisposable, ICloneable
 	///  Returns an icon representation of an image that is contained in the specified file.
 	/// </summary>
 	public static Icon ExtractAssociatedIcon(string filePath)
-		=> ExtractIcon(filePath, -1, true); // NOTE: https://stackoverflow.com/a/37419253
+		=> ExtractIcon(filePath, -1); // NOTE: https://stackoverflow.com/a/37419253
 
 	/// <summary>
 	///  Extracts a specified icon from the given <paramref name="filePath"/>.
