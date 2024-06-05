@@ -39,13 +39,13 @@ public class Icon : IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Icon'/> class from a  <see cref='Bitmap'/> instance.
 	/// </summary>
 	public Icon(Bitmap bitmap)
-		: this(bitmap, new List<IconEntry>().Append(new IconEntry { Width = (byte)bitmap.Width, Height = (byte)bitmap.Height }).ToList(), int.MinValue, int.MinValue) { }
+		: this(bitmap, new() { new IconEntry { Width = (byte)bitmap.Width, Height = (byte)bitmap.Height } }, -1, -1) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Icon'/> class from the specified file name.
 	/// </summary>
 	public Icon(string filename)
-		: this(filename, int.MinValue, int.MinValue) { }
+		: this(filename, byte.MaxValue, byte.MaxValue) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Icon'/> class of the specified <see cref='Size'/> from the specified file.
@@ -63,7 +63,7 @@ public class Icon : IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Icon'/> class from the specified data stream.
 	/// </summary>
 	public Icon(Stream stream)
-		: this(stream, int.MinValue, int.MinValue) { }
+		: this(stream, byte.MaxValue, byte.MaxValue) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Icon'/> class of the specified size from the specified stream.
@@ -81,7 +81,7 @@ public class Icon : IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Icon'/> class by copy.
 	/// </summary>
 	public Icon(Icon original)
-		: this(original, int.MinValue, int.MinValue) { }
+		: this(original, original.Width, original.Height) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Icon'/> class by copy and attempts to find a version of the
