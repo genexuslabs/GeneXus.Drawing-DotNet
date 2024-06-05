@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GeneXus.Drawing.Imaging;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -134,9 +135,9 @@ public class Icon : IDisposable, ICloneable
 	#region Properties
 
 	/// <summary>
-	///  Gets the width of this <see cref='Icon'/>.
+	///  Gets the Windows handle for this <see cref='Icon'/>. This is not a copy of the handle; do not free it.
 	/// </summary>
-	public int Width => m_entries[m_index].Width;
+	public IntPtr Handle => m_bitmap.Handle;
 
 	/// <summary>
 	///  Gets the height of this <see cref='Icon'/>.
@@ -148,20 +149,74 @@ public class Icon : IDisposable, ICloneable
 	/// </summary>
 	public Size Size => new(Width, Height);
 
+	/// <summary>
+	///  Gets the width of this <see cref='Icon'/>.
+	/// </summary>
+	public int Width => m_entries[m_index].Width;
+
+	#endregion
+
+
+	#region Factory
+
+	/// <summary>
+	///  Creates a GDI+ <see cref='Icon'/> from the specified Windows handle to an icon (HICON).
+	/// </summary>
+	public static Icon FromHandle(IntPtr handle)
+	{
+		var info = new SKImageInfo(100, 100);
+		var skBitmap = new SKBitmap();
+		skBitmap.InstallPixels(info, handle, info.RowBytes);
+		var bitmap = new Bitmap(skBitmap);
+		return new Icon(bitmap);
+	}
+
 	#endregion
 
 
 	#region Methods
 
 	/// <summary>
-	///  Converts this <see cref='Icon'/> to a <see cref='Bitmap'/>.
+	///  Returns an icon representation of an image that is contained in the specified file.
 	/// </summary>
-	public Bitmap ToBitmap() => new(m_Resized);
+	public static Icon ExtractAssociatedIcon(string filePath)
+		=> ExtractIcon(filePath, -1, true); // NOTE: https://stackoverflow.com/a/37419253
+
+	/// <summary>
+	///  Extracts a specified icon from the given <paramref name="filePath"/>.
+	/// </summary>
+	public static Icon ExtractIcon(string filePath, int id, bool smallIcon = false)
+		=> ExtractIcon(filePath, id, smallIcon ? 8 : ushort.MaxValue);
+
+	/// <summary>
+	///  Extracts a specified icon from the given <paramref name="filePath"/> and specified size.
+	/// </summary>
+	public static Icon ExtractIcon(string filePath, int id, int size)
+	{
+		if (size is <= 0 or > ushort.MaxValue)
+			throw new ArgumentOutOfRangeException(nameof(size));
+
+		if (new[] { ".dll", ".exe" }.Contains(Path.GetExtension(filePath)))
+			throw new ArgumentException("portable executable (PE) file format is not supported.", nameof(filePath));
+
+		var icon = new Icon(filePath, size, size);
+		if (id >= 0 && id < icon.m_entries.Count) // defined index
+			icon.m_index = id;
+
+		return icon;
+	}
 
 	/// <summary>
 	///  Saves this <see cref='Icon'/> to the specified output <see cref='Stream'/>.
 	/// </summary>
-	public void Save(Stream stream) => new Bitmap(m_Resized).Save(stream, SKEncodedImageFormat.Png, 100);
+	public void Save(Stream stream)
+		=> new Bitmap(m_Resized).Save(stream, ImageFormat.Png, 100);
+
+	/// <summary>
+	///  Converts this <see cref='Icon'/> to a <see cref='Bitmap'/>.
+	/// </summary>
+	public Bitmap ToBitmap()
+		=> new(m_Resized);
 
 	#endregion
 
@@ -218,7 +273,7 @@ public class Icon : IDisposable, ICloneable
 	{
 		get
 		{
-			var original = m_bitmap.Clone() as Bitmap ?? throw new Exception("Cloning bitmap failed");
+			var original = m_bitmap.Clone() as Bitmap ?? throw new Exception("cloning bitmap failed.");
 			var resized = new SKBitmap(Width, Height);
 			original.m_bitmap.ScalePixels(resized, SKFilterQuality.High);
 			return resized;
