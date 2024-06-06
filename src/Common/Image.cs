@@ -267,8 +267,29 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Rotates, flips, or rotates and flips the <see cref='Image'/>.
 	/// </summary>
-	public void RotateFlip(object rotateFlipType)
-		=> throw new NotImplementedException(); // TODO: implement RotateFlipType
+	public void RotateFlip(RotateFlipType rotateFlipType)
+	{
+		(int degrees, int scaleX, int scaleY) = rotateFlipType switch
+		{
+			RotateFlipType.RotateNoneFlipNone => (0,   1,  1),
+			RotateFlipType.RotateNoneFlipX	  => (0,  -1,  1),
+			RotateFlipType.RotateNoneFlipY	  => (0,   1, -1),
+			RotateFlipType.RotateNoneFlipXY   => (0,  -1, -1),
+			RotateFlipType.Rotate90FlipNone   => (90,  1,  1),
+			RotateFlipType.Rotate90FlipX	  => (90,  1, -1),
+			RotateFlipType.Rotate90FlipY	  => (90, -1,  1),
+			RotateFlipType.Rotate90FlipXY	  => (90, -1, -1),
+			_ => throw new ArgumentException($"unrecognized value {rotateFlipType}", nameof(rotateFlipType))
+		};
+
+		using var surface = SKSurface.Create(m_bitmap.Info);
+		surface.Canvas.RotateDegrees(degrees, Width / 2f, Height / 2f);
+		surface.Canvas.Scale(scaleX, scaleY, Width / 2f, Height / 2f);
+		surface.Canvas.DrawBitmap(m_bitmap, 0, 0);
+
+		var rotated = SKBitmap.FromImage(surface.Snapshot());
+		m_bitmap.SetPixels(rotated.GetPixels());
+	}
 
 	/// <summary>
 	///  Saves this <see cref='Image'/> to the specified file.
