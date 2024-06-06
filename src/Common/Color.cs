@@ -301,7 +301,7 @@ public struct Color : IEquatable<Color>
 
 	#region KnownColors
 
-	public static Color Translarent => new(SKColors.Transparent);
+	public static Color Transparent => new(SKColors.Transparent);
 	public static Color AliceBlue => new(SKColors.AliceBlue);
 	public static Color AntiqueWhite => new(SKColors.AntiqueWhite);
 	public static Color Aqua => new(SKColors.Aqua);
