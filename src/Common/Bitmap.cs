@@ -180,14 +180,14 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// <summary>
 	///  Locks a <see cref='Bitmap'/> into system memory.
 	/// </summary>
-	public object LockBits(Rectangle rect, object flags, object format) // TODO: Implement ImageLockMode and PixelFormat
-		=> LockBits(rect, flags, format, new());
+	public object LockBits(Rectangle rect, ImageLockMode flags, object format)
+		=> LockBits(rect, flags, format, new()); // TODO: implement BitmapData
 
 	/// <summary>
 	///  Locks a <see cref='Bitmap'/> into system memory using a BitmapData information.
 	/// </summary>
-	public object LockBits(Rectangle rect, object flags, object format, object bitmapData)
-		=> throw new NotImplementedException();
+	public object LockBits(Rectangle rect, ImageLockMode flags, object format, object bitmapData)
+		=> throw new NotImplementedException(); // TODO: implement BitmapData
 
 	/// <summary>
 	///  Makes the default transparent color transparent for this <see cref='Bitmap'/>.
