@@ -93,7 +93,7 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets or sets the color palette used for this <see cref='Image'/>.
 	/// </summary>
-	public object Palette // TODO: implement ColorPalette
+	public object Palette
 	{
 		get => throw new NotImplementedException();
 		set => throw new NotImplementedException();
@@ -203,8 +203,12 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets a bounding rectangle in the specified units for this <see cref='Image'/>.
 	/// </summary>
-	public Rectangle GetBounds(ref object pageUnit)
-		=> throw new NotImplementedException(); // TODO: implement GraphicsUnit
+	public Rectangle GetBounds(ref GraphicsUnit pageUnit)
+	{
+		var bounds = new Rectangle(0, 0, Width, Height);
+		pageUnit = GraphicsUnit.Pixel;
+		return bounds;
+	}
 
 	/// <summary>
 	///  Returns information about the codecs used for this <see cref='Image'/>.
