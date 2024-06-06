@@ -107,7 +107,7 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the <see cref='Drawing.PixelFormat'/> for this <see cref='Image'/>.
 	/// </summary>
-	public object PixelFormat => throw new NotImplementedException();
+	public PixelFormat PixelFormat => ToPixelFormat(m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.BytesPerPixel, m_bitmap.Pixels, m_bitmap.Bytes);
 
 	/// <summary>
 	///  Gets IDs of the property items stored in this <see cref='Image'/>.
@@ -225,8 +225,8 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Returns the size of the specified pixel format.
 	/// </summary>
-	public static int GetPixelFormatSize(object pixfmt)
-		=> throw new NotImplementedException(); // TODO: implement PixelFormat
+	public static int GetPixelFormatSize(PixelFormat pixfmt)
+		=> ((int)pixfmt >> 8) & 0xFF;
 
 	/// <summary>
 	///  Gets the specified property item from this <see cref='Image'/>.
@@ -243,20 +243,20 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Returns a value indicating whether the pixel format contains alpha information.
 	/// </summary>
-	public static bool IsAlphaPixelFormat(object pixfmt)
-		=> throw new NotImplementedException(); // TODO: implement PixelFormat
+	public static bool IsAlphaPixelFormat(PixelFormat pixfmt)
+		=> (pixfmt & PixelFormat.Alpha) != 0;
 
 	/// <summary>
 	///  Returns a value indicating whether the pixel format is canonical.
 	/// </summary>
-	public static bool IsCanonicalPixelFormat(object pixfmt)
-		=> throw new NotImplementedException(); // TODO: implement PixelFormat
+	public static bool IsCanonicalPixelFormat(PixelFormat pixfmt)
+		=> (pixfmt & PixelFormat.Canonical) != 0;
 
 	/// <summary>
 	///  Returns a value indicating whether the pixel format is extended.
 	/// </summary>
-	public static bool IsExtendedPixelFormat(object pixfmt)
-		=> throw new NotImplementedException(); // TODO: implement PixelFormat
+	public static bool IsExtendedPixelFormat(PixelFormat pixfmt)
+		=> (pixfmt & PixelFormat.Extended) != 0;
 
 	/// <summary>
 	///  Removes the specified property item from this <see cref='Image'/>.
@@ -389,6 +389,59 @@ public class Image : IDisposable, ICloneable
 		byte[] bytes = data.ToArray(), header = new byte[5];
 		Array.Copy(bytes, header, 5);
 		return Encoding.UTF8.GetString(header) == "<svg ";
+	}
+
+	private static PixelFormat ToPixelFormat(SKColorType colorType, SKAlphaType alphaType, int bytesPerPixel, SKColor[] pixels, byte[] _pixels)
+	{
+		if (alphaType == SKAlphaType.Opaque && pixels.All(pixel => pixel.Red == pixel.Green && pixel.Green == pixel.Blue))
+			return PixelFormat.Format8bppIndexed; // NOTE: to behave as System.Drawing but SkiaSharp seems to treat it differently
+
+		switch (colorType)
+		{
+			case SKColorType.Rgb565 when alphaType == SKAlphaType.Opaque:
+				return bytesPerPixel == 2 ? PixelFormat.Format16bppRgb565
+					 : PixelFormat.Undefined;
+
+			case SKColorType.Rgb888x when alphaType == SKAlphaType.Unpremul:
+				return bytesPerPixel == 3 ? PixelFormat.Format24bppRgb
+					 : bytesPerPixel == 4 ? PixelFormat.Format32bppRgb
+					 : bytesPerPixel == 6 ? PixelFormat.Format48bppRgb
+					 : PixelFormat.Undefined;
+
+			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Opaque:
+			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Opaque:
+				return bytesPerPixel == 4 ? PixelFormat.Format24bppRgb
+					 : bytesPerPixel == 6 ? PixelFormat.Format32bppRgb
+					 : bytesPerPixel == 8 ? PixelFormat.Format48bppRgb
+					 : PixelFormat.Undefined;
+
+			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Unpremul:
+			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Unpremul:
+				return bytesPerPixel == 4 ? PixelFormat.Format32bppArgb
+					 : bytesPerPixel == 8 ? PixelFormat.Format64bppArgb
+					 : PixelFormat.Undefined;
+
+			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Premul:
+			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Premul:
+				return bytesPerPixel == 4 ? PixelFormat.Format32bppPArgb
+					 : bytesPerPixel == 8 ? PixelFormat.Format64bppPArgb
+					 : PixelFormat.Undefined;
+
+			case SKColorType.Gray8:
+				return bytesPerPixel == 2 ? PixelFormat.Format16bppGrayScale
+					 : PixelFormat.Undefined;
+
+			default:
+				/*
+				 * TODO: missing value mappings
+				 * - Format1bppIndexed
+				 * - Format4bppIndexed
+				 * - Format8bppIndexed
+				 * - Format16bppRgb555
+				 * - Format16bppArgb1555
+				 */
+				return PixelFormat.Undefined;
+		}
 	}
 
 	#endregion

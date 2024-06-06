@@ -45,13 +45,13 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size and format.
 	/// </summary>
-	public Bitmap(int width, int height, object format)  // TODO: Implement PixelFormat
+	public Bitmap(int width, int height, PixelFormat format)
 		: this(width, height, 4, format, IntPtr.Zero) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size, pixel format, and pixel data
 	/// </summary>
-	public Bitmap(int width, int height, int stride, object format, IntPtr scan0) // TODO: Implement PixelFormat
+	public Bitmap(int width, int height, int stride, PixelFormat format, IntPtr scan0)
 		: this(width, height) => throw new NotImplementedException();
 
 	/// <summary>
@@ -95,7 +95,7 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
 	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
 	/// </summary>
-	public object Clone(Rectangle rect, object format) // TODO: Implement PixelFormat
+	public object Clone(Rectangle rect, PixelFormat format)
 	{
 		var bitmap = new Bitmap(rect.Width, rect.Height);
 		var portion = new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
@@ -180,13 +180,13 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// <summary>
 	///  Locks a <see cref='Bitmap'/> into system memory.
 	/// </summary>
-	public object LockBits(Rectangle rect, ImageLockMode flags, object format)
+	public object LockBits(Rectangle rect, ImageLockMode flags, PixelFormat format)
 		=> LockBits(rect, flags, format, new()); // TODO: implement BitmapData
 
 	/// <summary>
 	///  Locks a <see cref='Bitmap'/> into system memory using a BitmapData information.
 	/// </summary>
-	public object LockBits(Rectangle rect, ImageLockMode flags, object format, object bitmapData)
+	public object LockBits(Rectangle rect, ImageLockMode flags, PixelFormat format, object bitmapData)
 		=> throw new NotImplementedException(); // TODO: implement BitmapData
 
 	/// <summary>
