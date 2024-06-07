@@ -73,7 +73,52 @@ public class Image : IDisposable, ICloneable
 	///  Gets attribute flags for the pixel data of this <see cref='Image'/> defined by the 
 	///  bitwise combination of <see cref='ImageFlags'/>.
 	/// </summary>
-	public int Flags => throw new NotImplementedException();
+	public int Flags
+	{
+		get
+		{
+			var flags = ImageFlags.None;
+
+			if (m_bitmap.IsImmutable)
+				flags |= ImageFlags.ReadOnly;
+
+			if (m_bitmap.Pixels.Any(pixel => pixel.Alpha < 255))
+				flags |= ImageFlags.HasAlpha;
+
+			if (m_bitmap.Pixels.Any(pixel => pixel.Alpha > 0 && pixel.Alpha < 255))
+				flags |= ImageFlags.HasTranslucent;
+
+			if (m_bitmap.Width > 0 && m_bitmap.Height > 0)
+				flags |= ImageFlags.HasRealPixelSize;
+
+			switch (m_bitmap.ColorType)
+			{
+				case SKColorType.Rgb565:
+				case SKColorType.Rgb888x:
+				case SKColorType.Rgba8888:
+				case SKColorType.Bgra8888:
+					flags |= ImageFlags.ColorSpaceRgb;
+					break;
+
+				case SKColorType.Gray8:
+					flags |= ImageFlags.ColorSpaceGray;
+					break;
+			}
+
+			/* 
+			 * TODO: Missing flags
+			 * - ImageFlags.Caching
+			 * - ImageFlags.ColorSpaceCmyk
+			 * - ImageFlags.ColorSpaceYcbcr
+			 * - ImageFlags.ColorSpaceYcck
+			 * - ImageFlags.HasRealDpi
+			 * - ImageFlags.PartiallyScalable
+			 * - ImageFlags.Scalable
+			 */
+
+			return (int)flags;
+		}
+	}
 
 	/// <summary>
 	///  Gets an array of GUIDs that represent the dimensions of frames within this <see cref='Image'/>.
