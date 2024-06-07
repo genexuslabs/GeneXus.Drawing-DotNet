@@ -223,20 +223,9 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// </summary>
 	public void SetResolution(float xDpi, float yDpi)
 	{
-		HorizontalResolution = xDpi; // TODO: this is not doing anything
-		VerticalResolution = yDpi;
-
-		using var surface = SKSurface.Create(new SKImageInfo(Width, Height));
-		float dpiX = 100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width;
-		float dpiY = 100f * surface.Canvas.DeviceClipBounds.Height / surface.Canvas.LocalClipBounds.Height;
-
-		int width = (int)(Width * xDpi / dpiX);
-		int height = (int)(Height * yDpi / dpiY);
-
-		using var resize = m_bitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.High);
-		if (m_bitmap.ScalePixels(resize, SKFilterQuality.High))
-			return;
-		throw new Exception("could not set resolution");
+		if (xDpi <= 0 || yDpi <= 0) 
+			throw new ArgumentOutOfRangeException("DPI values must be greater than zero.");
+		throw new NotSupportedException("not supported by skia"); // SOURCE: https://issues.skia.org/issues/40043604
 	}
 
 	/// <summary>
