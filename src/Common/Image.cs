@@ -150,7 +150,7 @@ public class Image : IDisposable, ICloneable
 	public Size PhysicalDimension => throw new NotImplementedException();
 
 	/// <summary>
-	///  Gets the <see cref='Drawing.PixelFormat'/> for this <see cref='Image'/>.
+	///  Gets the <see cref='Imaging.PixelFormat'/> for this <see cref='Image'/>.
 	/// </summary>
 	public PixelFormat PixelFormat => ToPixelFormat(m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.BytesPerPixel, m_bitmap.Pixels);
 
