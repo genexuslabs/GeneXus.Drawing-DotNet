@@ -67,6 +67,17 @@ public class Image : IDisposable, ICloneable
 	#endregion
 
 
+	#region Delegates
+
+	/// <summary>
+	///  Provides a callback method for determining when the <see cref="GetThumbnailImage" /> method 
+	///  should prematurely cancel execution.
+	///  </summary>
+	public delegate bool GetThumbnailImageAbort();
+	
+	#endregion
+
+
 	#region Properties
 
 	/// <summary>
@@ -278,12 +289,18 @@ public class Image : IDisposable, ICloneable
 	/// </summary>
 	public object GetPropertyItem(int propid)
 		=> throw new NotImplementedException(); // TODO: implement PropertyItem
-
+	
 	/// <summary>
 	///  Returns the thumbnail for this <see cref='Image'/>.
 	/// </summary>
-	public Image GetThumbnailImage(int thumbWidth, int thumbHeight, object callback, IntPtr callbackData)
-		=> throw new NotImplementedException();
+	public Image GetThumbnailImage(int thumbWidth, int thumbHeight, GetThumbnailImageAbort callback, IntPtr callbackData)
+	{
+		// NOTE: callback and callbackData parameters are ignored according to the deocumentation
+		var info = new SKImageInfo(thumbWidth, thumbHeight, m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.ColorSpace);
+		var thumb = m_bitmap.Resize(info, SKFilterQuality.High);
+		if (thumb == null) throw new Exception("could not resize.");
+		return new Image(thumb, m_format, m_frames);
+	}
 
 	/// <summary>
 	///  Returns a value indicating whether the pixel format contains alpha information.
