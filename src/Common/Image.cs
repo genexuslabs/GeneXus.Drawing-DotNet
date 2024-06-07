@@ -15,11 +15,15 @@ public class Image : IDisposable, ICloneable
 	internal readonly ImageFormat m_format;
 	internal readonly int m_frames;
 
+	private ColorPalette m_palette;
+
 	internal Image(SKBitmap bitmap, ImageFormat format, int frames)
 	{
 		m_bitmap = bitmap;
 		m_frames = frames;
 		m_format = format;
+
+		m_palette = new ColorPalette();
 
 		using var surface = SKSurface.Create(new SKImageInfo(m_bitmap.Width, m_bitmap.Height));
 		HorizontalResolution = (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
@@ -74,7 +78,7 @@ public class Image : IDisposable, ICloneable
 	///  should prematurely cancel execution.
 	///  </summary>
 	public delegate bool GetThumbnailImageAbort();
-	
+
 	#endregion
 
 
@@ -149,10 +153,10 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets or sets the color palette used for this <see cref='Image'/>.
 	/// </summary>
-	public object Palette
+	public ColorPalette Palette 
 	{
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
+		get => m_palette; 
+		set => m_palette = value.Entries.Length > 0 ? value : throw new ArgumentException("parameter is not valid.");
 	}
 
 	/// <summary>
@@ -289,7 +293,7 @@ public class Image : IDisposable, ICloneable
 	/// </summary>
 	public object GetPropertyItem(int propid)
 		=> throw new NotImplementedException(); // TODO: implement PropertyItem
-	
+
 	/// <summary>
 	///  Returns the thumbnail for this <see cref='Image'/>.
 	/// </summary>
