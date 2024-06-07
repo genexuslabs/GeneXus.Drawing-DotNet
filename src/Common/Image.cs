@@ -107,7 +107,7 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the <see cref='Drawing.PixelFormat'/> for this <see cref='Image'/>.
 	/// </summary>
-	public PixelFormat PixelFormat => ToPixelFormat(m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.BytesPerPixel, m_bitmap.Pixels, m_bitmap.Bytes);
+	public PixelFormat PixelFormat => ToPixelFormat(m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.BytesPerPixel, m_bitmap.Pixels);
 
 	/// <summary>
 	///  Gets IDs of the property items stored in this <see cref='Image'/>.
@@ -412,7 +412,7 @@ public class Image : IDisposable, ICloneable
 		return Encoding.UTF8.GetString(header) == "<svg ";
 	}
 
-	private static PixelFormat ToPixelFormat(SKColorType colorType, SKAlphaType alphaType, int bytesPerPixel, SKColor[] pixels, byte[] _pixels)
+	private static PixelFormat ToPixelFormat(SKColorType colorType, SKAlphaType alphaType, int bytesPerPixel, SKColor[] pixels)
 	{
 		if (alphaType == SKAlphaType.Opaque && pixels.All(pixel => pixel.Red == pixel.Green && pixel.Green == pixel.Blue))
 			return PixelFormat.Format8bppIndexed; // NOTE: to behave as System.Drawing but SkiaSharp seems to treat it differently
