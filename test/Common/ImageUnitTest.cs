@@ -135,4 +135,80 @@ internal class ImageUnitTest
 		using var bitmap = new Bitmap(image);
 		Assert.That(bitmap.GetPixel(40, 10), Is.EqualTo(Color.Red));
 	}
+
+	[Test]
+	[TestCase(RotateFlipType.RotateNoneFlipNone, 0, 1, 1)]
+	[TestCase(RotateFlipType.RotateNoneFlipX, 0, -1, 1)]
+	[TestCase(RotateFlipType.RotateNoneFlipY, 0, 1, -1)]
+	[TestCase(RotateFlipType.RotateNoneFlipXY, 0, -1, -1)]
+	[TestCase(RotateFlipType.Rotate90FlipNone, 90, 1, 1)]
+	[TestCase(RotateFlipType.Rotate90FlipX, 90, -1, 1)]
+	[TestCase(RotateFlipType.Rotate90FlipY, 90, 1, -1)]
+	[TestCase(RotateFlipType.Rotate90FlipXY, 90, -1, -1)]
+	public void Method_RotateFlip(RotateFlipType type, int deg, int sx, int sy)
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
+		using var image = Image.FromFile(filePath);
+
+		using var rotated = image.Clone() as Image;
+		rotated.RotateFlip(type);
+
+		(int pivW, int pivH) = (image.Width, image.Height);
+		(int newW, int newH) = deg switch // calculate size after rotation and flipping
+		{
+			 0 or 180 => (image.Width, image.Height),
+			90 or 270 => (image.Height, image.Width),
+			_ => throw new ArgumentException($"unrecognized angle {deg}", nameof(deg))
+		};
+
+		Assert.Multiple(() =>
+		{
+			Assert.That(rotated.Width, Is.EqualTo(newW));
+			Assert.That(rotated.Height, Is.EqualTo(newH));
+		});
+
+		(int pivX, int pivY) = (17, 23);
+		(int newX, int newY) = deg switch // calculate coordinates after rotation and flipping
+		{
+			  0 => (sx == -1 ? pivW - 1 - pivX : pivX, sy == -1 ? pivH - 1 - pivY : pivY),
+			 90 => (sx == -1 ? pivY : pivW - 1 - pivY, sy == -1 ? pivH - 1 - pivX : pivX),
+			180 => (sx == -1 ? pivX : pivW - 1 - pivX, sy == -1 ? pivY : pivH - 1 - pivY),
+			270 => (sx == -1 ? pivH - 1 - pivY : pivY, sy == -1 ? pivX : pivW - 1 - pivX),
+			_ => throw new ArgumentException($"unrecognized angle {deg}", nameof(deg))
+		};
+
+		using var expected = new Bitmap(image);
+		using var obtained = new Bitmap(rotated);
+		Assert.That(obtained.GetPixel(newX, newY), Is.EqualTo(expected.GetPixel(pivX, pivY)));
+	}
+
+	[Test]
+	public void Method_GetThumbnailImage()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
+		using var image = Image.FromFile(filePath);
+		using var thumb = image.GetThumbnailImage(20, 20, new Image.GetThumbnailImageAbort(() => false), IntPtr.Zero);
+		Assert.Multiple(() =>
+		{
+			Assert.That(thumb.Width, Is.EqualTo(20));
+			Assert.That(thumb.Height, Is.EqualTo(20));
+		});
+	}
+
+	[Test]
+	public void Method_GetBounds()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
+		using var image = Image.FromFile(filePath);
+		var unit = GraphicsUnit.Pixel;
+		var bounds = image.GetBounds(ref unit);
+		Assert.Multiple(() =>
+		{
+			Assert.That(unit, Is.EqualTo(GraphicsUnit.Pixel));
+			Assert.That(bounds.X, Is.Zero);
+			Assert.That(bounds.Y, Is.Zero);
+			Assert.That(bounds.Width, Is.EqualTo(image.Width));
+			Assert.That(bounds.Height, Is.EqualTo(image.Height));
+		});
+	}
 }
