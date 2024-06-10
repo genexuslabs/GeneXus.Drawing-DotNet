@@ -302,8 +302,9 @@ public class Image : IDisposable, ICloneable
 		// NOTE: callback and callbackData parameters are ignored according to the deocumentation
 		var info = new SKImageInfo(thumbWidth, thumbHeight, m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.ColorSpace);
 		var thumb = m_bitmap.Resize(info, SKFilterQuality.High);
-		if (thumb == null) throw new Exception("could not resize.");
-		return new Image(thumb, m_format, m_frames);
+		return thumb == null
+			 ? throw new Exception("could not resize.")
+			 : new Image(thumb, m_format, m_frames);
 	}
 
 	/// <summary>
