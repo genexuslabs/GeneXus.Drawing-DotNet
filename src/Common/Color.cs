@@ -241,10 +241,9 @@ public readonly struct Color : IEquatable<Color>
 	/// </summary>
 	public static Color FromName(string name)
 	{
-		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
-		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-			if (property.GetValue(null) is Color color && property.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-				return new(color.m_color, property.Name);
+		PropertyInfo property = typeof(Color).GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
+		if (property?.GetValue(null) is Color color)
+			return new(color.m_color, property.Name);
 		return Empty;
 	}
 
