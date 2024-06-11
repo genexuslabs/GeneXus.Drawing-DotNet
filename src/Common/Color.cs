@@ -242,7 +242,7 @@ public readonly struct Color : IEquatable<Color>
 	public static Color FromName(string name)
 	{
 		PropertyInfo property = typeof(Color).GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
-		if (property?.GetValue(null) is Color color)
+		if (property?.PropertyType == typeof(Color) && property.GetValue(null) is Color color)
 			return new(color.m_color, property.Name);
 		return Empty;
 	}
