@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,17 @@ public readonly struct Color : IEquatable<Color>
 	private readonly string m_name;
 	private readonly int m_index;
 	private readonly SKColor m_color;
+
+	private static readonly Dictionary<SKColor, string> m_KnownColorNames;
+
+	static Color()
+	{
+		m_KnownColorNames = new Dictionary<SKColor, string>();
+		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
+		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
+			if (property.GetValue(null) is Color color)
+				m_KnownColorNames[color.m_color] = property.Name;
+	}
 
 	internal Color(SKColor color, string name = null, int index = 0)
 	{
@@ -155,10 +167,8 @@ public readonly struct Color : IEquatable<Color>
 			if (IsNamedColor || IsKnownColor)
 				return m_name;
 
-			PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
-			foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-				if (property.GetValue(null) is Color color && color.Equals(this))
-					return property.Name;
+			if (m_KnownColorNames.TryGetValue(m_color, out string name))
+				return name;
 
 			return ToArgb().ToString("x");
 		}
