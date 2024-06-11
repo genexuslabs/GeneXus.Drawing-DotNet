@@ -172,10 +172,10 @@ public struct Color : IEquatable<Color>
 		get
 		{
 			// Get hex values
-			string hexR = m_HexR;
-			string hexG = m_HexG;
-			string hexB = m_HexB;
-			string hexA = m_HexA;
+			string hexR = HexR;
+			string hexG = HexG;
+			string hexB = HexB;
+			string hexA = HexA;
 
 			// CHeck reduce hex
 			if (hexR[0] == hexR[1] && hexG[0] == hexG[1] && hexB[0] == hexB[1] && hexA[0] == hexA[1])
@@ -187,7 +187,7 @@ public struct Color : IEquatable<Color>
 			}
 
 			// Ignore alpha if opaque
-			hexA = m_HexA.Equals("ff") ? "" : hexA;
+			hexA = HexA.Equals("ff") ? "" : hexA;
 
 			// Return RGBA value
 			return $"#{hexR}{hexG}{hexB}{hexA}".ToUpper();
@@ -295,10 +295,10 @@ public struct Color : IEquatable<Color>
 
 	private readonly string NameAndARGBValue => $"{{Name = {Name}, ARGB = ({A}, {R}, {G}, {B})}}";
 
-	private readonly string m_HexA => A.ToString("x2");
-	private readonly string m_HexR => R.ToString("x2");
-	private readonly string m_HexG => G.ToString("x2");
-	private readonly string m_HexB => B.ToString("x2");
+	private readonly string HexA => A.ToString("x2");
+	private readonly string HexR => R.ToString("x2");
+	private readonly string HexG => G.ToString("x2");
+	private readonly string HexB => B.ToString("x2");
 
 	private readonly (float Hue, float Saturation, float Luminosity) m_HSL
 	{
