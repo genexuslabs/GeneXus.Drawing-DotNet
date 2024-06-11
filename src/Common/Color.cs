@@ -271,17 +271,17 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets the hue-saturation-lightness (HSL) lightness value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetBrightness() => m_HSL.Luminosity / 100.0f;
+	public readonly float GetBrightness() => HSL.Luminosity / 100.0f;
 
 	/// <summary>
 	/// Gets the hue-saturation-lightness (HSL) saturation value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetSaturation() => m_HSL.Saturation / 100.0f;
+	public readonly float GetSaturation() => HSL.Saturation / 100.0f;
 
 	/// <summary>
 	/// Gets the hue-saturation-lightness (HSL) hue value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetHue() => m_HSL.Hue;
+	public readonly float GetHue() => HSL.Hue;
 
 	/// <summary>
 	/// Gets the <see cref='KnownColor'/> value of this <see cref='Color'/> structure.
@@ -300,7 +300,7 @@ public struct Color : IEquatable<Color>
 	private readonly string HexG => G.ToString("x2");
 	private readonly string HexB => B.ToString("x2");
 
-	private readonly (float Hue, float Saturation, float Luminosity) m_HSL
+	private readonly (float Hue, float Saturation, float Luminosity) HSL
 	{
 		get
 		{
