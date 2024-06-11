@@ -274,7 +274,7 @@ public struct Color : IEquatable<Color>
 	public readonly float GetBrightness() => m_HSL.Luminosity / 100.0f;
 
 	/// <summary>
-	/// Gets the hue-saturation-lightness (HSL) staturation value for this <see cref='Color'/> structure.
+	/// Gets the hue-saturation-lightness (HSL) saturation value for this <see cref='Color'/> structure.
 	/// </summary>
 	public readonly float GetSaturation() => m_HSL.Saturation / 100.0f;
 
@@ -312,8 +312,8 @@ public struct Color : IEquatable<Color>
 	private static bool IsHexDigit(char c)
 		=> (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 
-	private static int ParseHex(string value, int start, int lenght = 2)
-		=> int.Parse(value.Substring(start, lenght), System.Globalization.NumberStyles.HexNumber);
+	private static int ParseHex(string value, int start, int length = 2)
+		=> int.Parse(value.Substring(start, length), System.Globalization.NumberStyles.HexNumber);
 
 	private static SKColor CreateFromRgba(int red, int green, int blue, int alpha)
 	{
