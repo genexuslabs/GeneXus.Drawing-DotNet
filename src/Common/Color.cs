@@ -8,7 +8,7 @@ namespace GeneXus.Drawing;
 
 [Serializable]
 [DebuggerDisplay("{NameAndARGBValue}")]
-public struct Color : IEquatable<Color>
+public readonly struct Color : IEquatable<Color>
 {
 	private readonly string m_name;
 	private readonly int m_index;
