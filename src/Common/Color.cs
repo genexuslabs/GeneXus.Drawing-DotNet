@@ -13,7 +13,7 @@ public readonly struct Color : IEquatable<Color>
 {
 	private readonly string m_name;
 	private readonly int m_index;
-	private readonly SKColor m_color;
+	internal readonly SKColor m_color;
 
 	private static readonly Dictionary<SKColor, string> m_KnownColorNames;
 
