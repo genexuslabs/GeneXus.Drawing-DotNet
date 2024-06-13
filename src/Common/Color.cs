@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -8,13 +9,28 @@ namespace GeneXus.Drawing;
 
 [Serializable]
 [DebuggerDisplay("{NameAndARGBValue}")]
-public struct Color : IEquatable<Color>
+public readonly struct Color : IEquatable<Color>
 {
+	private readonly string m_name;
+	private readonly int m_index;
 	internal readonly SKColor m_color;
 
-	internal Color(SKColor color)
+	private static readonly Dictionary<SKColor, string> m_KnownColorNames;
+
+	static Color()
+	{
+		m_KnownColorNames = new Dictionary<SKColor, string>();
+		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
+		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
+			if (property.GetValue(null) is Color color)
+				m_KnownColorNames[color.m_color] = property.Name;
+	}
+
+	internal Color(SKColor color, string name = null, int index = 0)
 	{
 		m_color = color;
+		m_name = name;
+		m_index = index;
 	}
 
 	/// <summary>
@@ -36,7 +52,7 @@ public struct Color : IEquatable<Color>
 	/// </summary>
 	public override readonly string ToString()
 	{
-		string name = IsKnownColor ? Name : $"A={A}, R={R}, G={G}, B={B}";
+		string name = IsNamedColor ? Name : IsEmpty ? "Empty" : $"A={A}, R={R}, G={G}, B={B}";
 		return $"{nameof(Color)} [{name}]";
 	}
 
@@ -88,7 +104,7 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Creates a new instance of the <see cref='Color'/> class with member data left uninitialized.
 	/// </summary>
-	public static readonly Color Empty = default;
+	public static readonly Color Empty = new(SKColor.Empty, null, -1);
 
 	#endregion
 
@@ -98,12 +114,28 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Color'/> is empty.
 	/// </summary>
-	public readonly bool IsEmpty => m_color == default;
+	public readonly bool IsEmpty => m_color == SKColor.Empty && m_index < 0;
 
 	/// <summary>
-	/// Gets a value indicating whether this <see cref='Color'/> is a known color.
+	/// Gets a value indicating whether this <see cref='Color'/> structure is a predefined color. 
+	/// Predefined colors are represented by the elements of the <see cref='KnownColor'/> enumeration.
 	/// </summary>
-	public readonly bool IsKnownColor => KnownColorToName(this)?.Length > 0;
+	public readonly bool IsKnownColor
+		=> m_index > 0 && m_index <= (int)KnownColor.RebeccaPurple;
+
+	/// <summary>
+	/// Gets a value indicating whether this <see cref='Color'/> structure is a system color. A system 
+	/// color is a color that is used in a Windows display element. System colors are represented by 
+	/// elements of the <see cref='KnownColor'/> enumeration.
+	/// </summary>
+	public readonly bool IsSystemColor
+		=> m_index >= (int)KnownColor.ActiveBorder && m_index <= (int)KnownColor.WindowText
+		|| m_index >= (int)KnownColor.ButtonFace && m_index <= (int)KnownColor.MenuHighlight;
+
+	/// <summary>
+	/// Gets a value indicating whether this <see cref='Color'/> is a named color.
+	/// </summary>
+	public readonly bool IsNamedColor => m_name?.Length > 0;
 
 	/// <summary>
 	/// Gets the alpha component value of this <see cref='Color'/> structure.
@@ -128,7 +160,19 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets the name component value of this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly string Name => KnownColorToName(this) ?? $"{m_HexA}{m_HexR}{m_HexG}{m_HexB}";
+	public readonly string Name
+	{
+		get
+		{
+			if (IsNamedColor || IsKnownColor)
+				return m_name;
+
+			if (m_KnownColorNames.TryGetValue(m_color, out string name))
+				return name;
+
+			return ToArgb().ToString("x");
+		}
+	}
 
 	/// <summary>
 	/// Gets the hexadecimal representation in #RRGGBBAA (or #RGBA if can be reduced) of this <see cref='Color'/> structure.
@@ -138,10 +182,10 @@ public struct Color : IEquatable<Color>
 		get
 		{
 			// Get hex values
-			string hexR = m_HexR;
-			string hexG = m_HexG;
-			string hexB = m_HexB;
-			string hexA = m_HexA;
+			string hexR = HexR;
+			string hexG = HexG;
+			string hexB = HexB;
+			string hexA = HexA;
 
 			// CHeck reduce hex
 			if (hexR[0] == hexR[1] && hexG[0] == hexG[1] && hexB[0] == hexB[1] && hexA[0] == hexA[1])
@@ -153,7 +197,7 @@ public struct Color : IEquatable<Color>
 			}
 
 			// Ignore alpha if opaque
-			hexA = m_HexA.Equals("ff") ? "" : hexA;
+			hexA = HexA.Equals("ff") ? "" : hexA;
 
 			// Return RGBA value
 			return $"#{hexR}{hexG}{hexB}{hexA}".ToUpper();
@@ -168,17 +212,27 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the hexadecimal representation in RRGGBBAA (or AARRGGBB if argb flag enabled) values.
 	/// </summary>
-	public static Color FromHex(string hex, bool argb = false) => new(hex, argb);
+	public static Color FromHex(string hex, bool argb = false)
+		=> new(hex, argb);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the four 8-bit ARGB components (alpha, red, green, and blue) values.
 	/// </summary>
-	public static Color FromArgb(int alpha, int red, int green, int blue) => new(alpha, red, green, blue);
+	public static Color FromArgb(int alpha, int red, int green, int blue)
+		=> new(alpha, red, green, blue);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from the four 8-bit RGB components (red, green, and blue) values.
 	/// </summary>
-	public static Color FromArgb(int red, int green, int blue) => FromArgb(255, red, green, blue);
+	public static Color FromArgb(int red, int green, int blue)
+		=> FromArgb(255, red, green, blue);
+
+	/// <summary>
+	/// Creates a <see cref='Color'/> structure from the specified base <see cref='Color'/> structure, but 
+	/// with the new specified alpha value.
+	/// </summary>
+	public static Color FromArgb(int alpha, Color baseColor)
+		=> FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B);
 
 	/// <summary>
 	/// Creates a <see cref='Color'/> structure from a 32-bit ARGB value.
@@ -197,11 +251,20 @@ public struct Color : IEquatable<Color>
 	/// </summary>
 	public static Color FromName(string name)
 	{
-		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
-		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-			if (property.GetValue(null) is Color knownColor && knownColor.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-				return knownColor;
+		PropertyInfo property = typeof(Color).GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
+		if (property?.PropertyType == typeof(Color) && property.GetValue(null) is Color color)
+			return new(color.m_color, property.Name);
 		return Empty;
+	}
+
+	/// <summary>
+	/// Creates a <see cref='Color'/> structure from the specified predefined <see cref='KnownColor'/> color.
+	/// </summary>
+	public static Color FromKnownColor(KnownColor color)
+	{
+		var knownName = color.ToString();
+		var knownColor = FromName(knownName); // NOTE: system colors are not supported and will be returned as empty
+		return new(knownColor.m_color, knownColor.m_name ?? knownName, (int)color);
 	}
 
 	#endregion
@@ -217,17 +280,22 @@ public struct Color : IEquatable<Color>
 	/// <summary>
 	/// Gets the hue-saturation-lightness (HSL) lightness value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetBrightness() => m_HSL.Luminosity / 100.0f;
+	public readonly float GetBrightness() => HSL.Luminosity / 100.0f;
 
 	/// <summary>
-	/// Gets the hue-saturation-lightness (HSL) staturation value for this <see cref='Color'/> structure.
+	/// Gets the hue-saturation-lightness (HSL) saturation value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetSaturation() => m_HSL.Saturation / 100.0f;
+	public readonly float GetSaturation() => HSL.Saturation / 100.0f;
 
 	/// <summary>
 	/// Gets the hue-saturation-lightness (HSL) hue value for this <see cref='Color'/> structure.
 	/// </summary>
-	public readonly float GetHue() => m_HSL.Hue;
+	public readonly float GetHue() => HSL.Hue;
+
+	/// <summary>
+	/// Gets the <see cref='KnownColor'/> value of this <see cref='Color'/> structure.
+	/// </summary>
+	public readonly KnownColor ToKnownColor() => Enum.TryParse(Name, out KnownColor color) ? color : 0;
 
 	#endregion
 
@@ -236,12 +304,12 @@ public struct Color : IEquatable<Color>
 
 	private readonly string NameAndARGBValue => $"{{Name = {Name}, ARGB = ({A}, {R}, {G}, {B})}}";
 
-	private readonly string m_HexA => A.ToString("x2");
-	private readonly string m_HexR => R.ToString("x2");
-	private readonly string m_HexG => G.ToString("x2");
-	private readonly string m_HexB => B.ToString("x2");
+	private readonly string HexA => A.ToString("x2");
+	private readonly string HexR => R.ToString("x2");
+	private readonly string HexG => G.ToString("x2");
+	private readonly string HexB => B.ToString("x2");
 
-	private readonly (float Hue, float Saturation, float Luminosity) m_HSL
+	private readonly (float Hue, float Saturation, float Luminosity) HSL
 	{
 		get
 		{
@@ -250,8 +318,11 @@ public struct Color : IEquatable<Color>
 		}
 	}
 
-	private static int ParseHex(string value, int start, int lenght = 2)
-		=> int.Parse(value.Substring(start, lenght), System.Globalization.NumberStyles.HexNumber);
+	private static bool IsHexDigit(char c)
+		=> (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+
+	private static int ParseHex(string value, int start, int length = 2)
+		=> int.Parse(value.Substring(start, length), System.Globalization.NumberStyles.HexNumber);
 
 	private static SKColor CreateFromRgba(int red, int green, int blue, int alpha)
 	{
@@ -265,6 +336,8 @@ public struct Color : IEquatable<Color>
 	private static SKColor CreateFromHex(string hex, bool argb)
 	{
 		hex = hex.TrimStart('#').ToLower();
+		if (!hex.All(IsHexDigit))
+			throw new ArgumentException($"invalid hex digit in #{hex}", nameof(hex));
 
 		// expand for reduced hex
 		hex = hex.Length switch
@@ -273,7 +346,7 @@ public struct Color : IEquatable<Color>
 			4 => string.Concat(hex[0], hex[0], hex[1], hex[1], hex[2], hex[2], hex[3], hex[3]),
 			6 => string.Concat(hex, "ff"),
 			8 => hex,
-			_ => throw new ArgumentException($"invalid hex value #{hex}", nameof(hex))
+			_ => throw new ArgumentException($"invalid hex length #{hex}", nameof(hex))
 		};
 
 		// change rgba to argb
@@ -287,21 +360,12 @@ public struct Color : IEquatable<Color>
 		return CreateFromRgba(r, g, b, a);
 	}
 
-	public static string KnownColorToName(Color color)
-	{
-		PropertyInfo[] properties = typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static);
-		foreach (PropertyInfo property in properties.Where(prop => prop.PropertyType == typeof(Color)))
-			if (property.GetValue(null) is Color knownColor && knownColor == color)
-				return property.Name;
-		return null;
-	}
-
 	#endregion
 
 
-	#region KnownColors
+	#region NamedColors
 
-	public static Color Translarent => new(SKColors.Transparent);
+	public static Color Transparent => new(SKColors.Transparent);
 	public static Color AliceBlue => new(SKColors.AliceBlue);
 	public static Color AntiqueWhite => new(SKColors.AntiqueWhite);
 	public static Color Aqua => new(SKColors.Aqua);
@@ -416,6 +480,7 @@ public struct Color : IEquatable<Color>
 	public static Color PowderBlue => new(SKColors.PowderBlue);
 	public static Color Purple => new(SKColors.Purple);
 	public static Color Red => new(SKColors.Red);
+	public static Color RebeccaPurple => new("#663399");
 	public static Color RosyBrown => new(SKColors.RosyBrown);
 	public static Color RoyalBlue => new(SKColors.RoyalBlue);
 	public static Color SaddleBrown => new(SKColors.SaddleBrown);
