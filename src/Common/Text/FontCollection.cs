@@ -10,7 +10,7 @@ public abstract class FontCollection : IDisposable
 	/// <summary>
 	///  Cleans up resources for this <see cref='FontCollection'/>.
 	/// </summary>
-	~FontCollection() => Dispose();
+	~FontCollection() => Dispose(false);
 
 
 	#region IDisposable
@@ -20,7 +20,14 @@ public abstract class FontCollection : IDisposable
 	/// </summary>
 	public void Dispose()
 	{
-		m_families.ForEach(ff => ff.Dispose());
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
+		foreach (FontFamily ff in m_families)
+			ff.Dispose();
 		m_families.Clear();
 	}
 

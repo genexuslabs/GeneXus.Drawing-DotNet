@@ -41,7 +41,8 @@ public class FontFamily : IDisposable
 	/// </summary>
 	public FontFamily(string name, FontCollection fontCollection)
 		: this(fontCollection.Families.FirstOrDefault(ff => ff.MatchFamily(name))?.m_data
-			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0) { }
+			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0)
+	{ }
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref='FontFamily'/> class from the specified generic font family.
@@ -52,7 +53,7 @@ public class FontFamily : IDisposable
 	/// <summary>
 	///  Cleans up resources for this <see cref='FontFamily'/>.
 	/// </summary>
-	~FontFamily() => Dispose();
+	~FontFamily() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
@@ -84,6 +85,12 @@ public class FontFamily : IDisposable
 	///  Cleans up resources for this <see cref='FontFamily'/>.
 	/// </summary>
 	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing)
 	{
 		m_typeface.Dispose();
 		m_data.Dispose();
@@ -247,7 +254,7 @@ public class FontFamily : IDisposable
 		{
 			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
 			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
-			GenericFontFamilies.Serif	  => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
+			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
 			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
 		};
 		foreach (var candidate in candidates)

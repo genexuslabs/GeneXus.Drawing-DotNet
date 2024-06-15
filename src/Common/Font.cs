@@ -38,7 +38,7 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
-	~Font() => Dispose();
+	~Font() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Font'/>.
@@ -55,7 +55,13 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
-	public void Dispose() => m_family.Dispose();
+	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing) => m_family.Dispose();
 
 	#endregion
 
