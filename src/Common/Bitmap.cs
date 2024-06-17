@@ -6,7 +6,7 @@ using SkiaSharp;
 namespace GeneXus.Drawing;
 
 [Serializable]
-public class Bitmap : Image, IDisposable, ICloneable
+public sealed class Bitmap : Image, IDisposable, ICloneable
 {
 	internal Bitmap(SKBitmap skBitmap)
 		: base(skBitmap, ImageFormat.Png, 1) { }

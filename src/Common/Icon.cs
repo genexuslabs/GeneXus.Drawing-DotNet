@@ -8,7 +8,7 @@ using SkiaSharp;
 namespace GeneXus.Drawing;
 
 [Serializable]
-public class Icon : IDisposable, ICloneable
+public sealed class Icon : IDisposable, ICloneable
 {
 	internal readonly Bitmap m_bitmap;
 	internal readonly List<IconEntry> m_entries;
