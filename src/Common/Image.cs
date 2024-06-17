@@ -305,7 +305,7 @@ public class Image : IDisposable, ICloneable
 	/// </summary>
 	public Image GetThumbnailImage(int thumbWidth, int thumbHeight, GetThumbnailImageAbort callback, IntPtr callbackData)
 	{
-		// NOTE: callback and callbackData parameters are ignored according to the deocumentation
+		// NOTE: callback and callbackData parameters are ignored according to the documentation
 		var info = new SKImageInfo(thumbWidth, thumbHeight, m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.ColorSpace);
 		var thumb = m_bitmap.Resize(info, SKFilterQuality.High);
 		return thumb == null
