@@ -70,7 +70,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	public readonly bool Equals(Rectangle other) => m_rect == other.m_rect;
 
 	/// <summary>
-	/// Tests whether <paramref name="obj"/> is a <see cref='Rectangle'/> with the same locaation
+	/// Tests whether <paramref name="obj"/> is a <see cref='Rectangle'/> with the same location
 	/// and size as this Rectangle.
 	/// </summary>
 	public override readonly bool Equals(object obj) => m_rect.Equals(obj);
