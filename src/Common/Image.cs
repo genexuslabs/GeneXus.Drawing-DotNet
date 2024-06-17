@@ -240,17 +240,17 @@ public abstract class Image : IDisposable, ICloneable
 		{
 			var svg = new SkiaSharp.Extended.Svg.SKSvg();
 			svg.Load(data.AsStream());
-
+			
 			var bounds = svg.Picture.CullRect;
 			var size = new SKSizeI((int)bounds.Width, (int)bounds.Height);
-			var image = SKImage.FromPicture(svg.Picture, size);
+			using var image = SKImage.FromPicture(svg.Picture, size);
 
 			var bitmap = SKBitmap.FromImage(image);
 			return new Bitmap(bitmap, ImageFormat.Svg, 1);
 		}
 		else
 		{
-			var image = SKImage.FromEncodedData(data);
+			using var image = SKImage.FromEncodedData(data);
 
 			var codec = SKCodec.Create(image.EncodedData);
 			if (!SK2GX.TryGetValue(codec.EncodedFormat, out var format))
@@ -404,7 +404,7 @@ public abstract class Image : IDisposable, ICloneable
 		if (!GX2SK.TryGetValue(format, out var skFormat))
 			throw new NotSupportedException($"unsupported save {format} format");
 
-		var image = SKImage.FromBitmap(m_bitmap);
+		using var image = SKImage.FromBitmap(m_bitmap);
 
 		// TODO: Only Png, Jpeg and Webp allowed to encode, otherwise returns null
 		// ref: https://learn.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/bitmaps/saving#exploring-the-image-formats
