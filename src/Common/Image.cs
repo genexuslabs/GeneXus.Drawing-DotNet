@@ -33,7 +33,7 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Image'/>.
 	/// </summary>
-	~Image() => Dispose();
+	~Image() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Image'/>.
@@ -46,7 +46,13 @@ public class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Image'/>.
 	/// </summary>
-	public virtual void Dispose() => m_bitmap.Dispose();
+	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing) => m_bitmap.Dispose();
 
 	#endregion
 

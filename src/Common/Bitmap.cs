@@ -81,7 +81,7 @@ public class Bitmap : Image, IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Bitmap'/>.
 	/// </summary>
-	~Bitmap() => Dispose();
+	~Bitmap() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Bitmap'/>.

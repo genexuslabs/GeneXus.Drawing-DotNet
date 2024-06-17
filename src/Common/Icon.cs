@@ -100,7 +100,7 @@ public class Icon : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Icon'/>.
 	/// </summary>
-	~Icon() => Dispose();
+	~Icon() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Icon'/>.
@@ -113,7 +113,13 @@ public class Icon : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Icon'/>.
 	/// </summary>
-	public void Dispose() => m_bitmap.Dispose();
+	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	private void Dispose(bool disposing) => m_bitmap.Dispose();
 
 	#endregion
 
