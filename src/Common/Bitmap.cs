@@ -8,8 +8,8 @@ namespace GeneXus.Drawing;
 [Serializable]
 public sealed class Bitmap : Image, IDisposable, ICloneable
 {
-	internal Bitmap(SKBitmap skBitmap)
-		: base(skBitmap, ImageFormat.Png, 1) { }
+	internal Bitmap(SKBitmap bitmap, ImageFormat format = ImageFormat.Png, int frames = 1)
+		: base(bitmap, format, frames) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class from a filename
