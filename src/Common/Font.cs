@@ -29,7 +29,8 @@ public class Font : IDisposable, ICloneable
 	/// Initializes a new <see cref='Font'/> using the specified family name and size.
 	/// </summary>
 	public Font(string familyName, float size = 12)
-		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName)), size)
+		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName))
+			  ?? throw new ArgumentException("missing font family", nameof(familyName)), size)
 	{
 		m_original = familyName;
 	}
@@ -37,7 +38,7 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
-	~Font() => Dispose();
+	~Font() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Font'/>.
@@ -54,7 +55,13 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
-	public void Dispose() => m_family.Dispose();
+	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing) => m_family.Dispose();
 
 	#endregion
 
@@ -130,6 +137,41 @@ public class Font : IDisposable, ICloneable
 	/// Gets the slant of this <see cref='Font'/>.
 	/// </summary>
 	public SlantType Slant => m_family.Slant;
+
+	/// <summary>
+	/// Gets style information for this <see cref='Font'/>.
+	/// </summary>
+	public FontStyle Style
+	{
+		get
+		{
+			FontStyle style = FontStyle.Regular;
+
+			if (Italic)
+				style |= FontStyle.Italic;
+
+			if (Bold)
+				style |= FontStyle.Bold;
+
+			if (Underline)
+				style |= FontStyle.Underline;
+
+			if (Strikeout)
+				style |= FontStyle.Strikeout;
+
+			return style;
+		}
+	}
+
+	/// <summary>
+	/// Gets the FamilyName associated with this <see cref='Font'/>.
+	/// </summary>
+	public string FamilyName => m_family.Name;
+
+	/// <summary>
+	/// Gets the FaceName associated with this <see cref='Font'/>.
+	/// </summary>
+	public string FaceName => m_family.Face;
 
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> has the italic style applied.

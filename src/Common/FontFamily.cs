@@ -1,7 +1,8 @@
+using GeneXus.Drawing.Text;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -24,8 +25,8 @@ public class FontFamily : IDisposable
 	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified filename name
 	/// and optional index for font collection.
 	/// </summary>
-	public FontFamily(string filename, int index = 0)
-		: this(SKData.Create(filename), index) { }
+	public FontFamily(string name, int index = 0)
+		: this(File.Exists(name) ? SKData.Create(name) : new Font(name).FontFamily.m_data, index) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified stream name
@@ -35,14 +36,29 @@ public class FontFamily : IDisposable
 		: this(SKData.Create(stream), index) { }
 
 	/// <summary>
+	///  Initializes a new instance of the <see cref='FontFamily'/> class in the specified
+	///  <see cref='FontCollection'/> and with the specified name.
+	/// </summary>
+	public FontFamily(string name, FontCollection fontCollection)
+		: this(fontCollection.Families.FirstOrDefault(ff => ff.MatchFamily(name))?.m_data
+			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0)
+	{ }
+
+	/// <summary>
+	///  Initializes a new instance of the <see cref='FontFamily'/> class from the specified generic font family.
+	/// </summary>
+	public FontFamily(GenericFontFamilies genericFamily)
+		: this(GetGenericFontFamily(genericFamily).m_data, 0) { }
+
+	/// <summary>
 	///  Cleans up resources for this <see cref='FontFamily'/>.
 	/// </summary>
-	~FontFamily() => Dispose();
+	~FontFamily() => Dispose(false);
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
 	/// </summary>
-	public override string ToString() => $"[{GetType().Name}: Name={Name}, Index={m_index}]";
+	public override string ToString() => $"[{GetType().Name}: Name={m_typeface.FamilyName}]";
 
 
 	#region IEqualitable
@@ -70,6 +86,12 @@ public class FontFamily : IDisposable
 	/// </summary>
 	public void Dispose()
 	{
+		GC.SuppressFinalize(this);
+		Dispose(true);
+	}
+
+	protected virtual void Dispose(bool disposing)
+	{
 		m_typeface.Dispose();
 		m_data.Dispose();
 	}
@@ -93,6 +115,27 @@ public class FontFamily : IDisposable
 	/// Gets the name of this <see cref='FontFamily'/>.
 	/// </summary>
 	public string Name => m_typeface.FamilyName;
+
+	/// <summary>
+	///  Returns an array that contains all of the <see cref='FontFamily'/> objects associated with the current
+	///  graphics context.
+	/// </summary>
+	public static FontFamily[] Families => new InstalledFontCollection().Families;
+
+	/// <summary>
+	///  Gets a generic monospace <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericMonospace => new(GenericFontFamilies.Monospace);
+
+	/// <summary>
+	///  Gets a generic SansSerif <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericSansSerif => new(GenericFontFamilies.SansSerif);
+
+	/// <summary>
+	///  Gets a generic Serif <see cref='FontFamily'/>.
+	/// </summary>
+	public static FontFamily GenericSerif => new(GenericFontFamilies.Serif);
 
 	#endregion
 
@@ -121,6 +164,16 @@ public class FontFamily : IDisposable
 	/// specified <see cref='FontStyle'/>.
 	/// </summary>
 	public int GetLineSpacing() => (int)Math.Abs(m_font.Spacing * GetEmHeight() / m_font.Size);
+
+	/// <summary>
+	///  Returns the name of this <see cref='FontFamily'/> in the specified language.
+	/// </summary>
+	public string GetName(int language) => Name; // NOTE: Language is not suppored in SkiaSharp
+
+	/// <summary>
+	///  Indicates whether the specified <see cref='FontStyle'/> is available.
+	/// </summary>
+	public bool IsStyleAvailable(FontStyle style) => (new Font(this).Style & style) == style;
 
 	#endregion
 
@@ -195,8 +248,24 @@ public class FontFamily : IDisposable
 		}
 	}
 
-	internal bool MatchFamily(string familyName)
-		=> Regex.IsMatch(familyName, $"^{Name}[ -]({Face})?$", RegexOptions.IgnoreCase);
+	private static FontFamily GetGenericFontFamily(GenericFontFamilies genericFamily)
+	{
+		var candidates = genericFamily switch // NOTE: Define a set of predefined fonts
+		{
+			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
+			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
+			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
+			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
+		};
+		foreach (var candidate in candidates)
+			if (Font.SystemFonts.FirstOrDefault(f => f.FamilyName.Equals(candidate, StringComparison.OrdinalIgnoreCase)) is Font font)
+				return font.FontFamily;
+		throw new ArgumentException($"invalid generic font family", nameof(genericFamily));
+	}
+
+	internal bool MatchFamily(string familyName) // TODO: Improve this code
+		=> new string[] { Name, $"{Name} {Face}", $"{Name}-{Face}" }.Any(candidateName
+			=> candidateName.Equals(familyName, StringComparison.OrdinalIgnoreCase));
 
 	#endregion
 }

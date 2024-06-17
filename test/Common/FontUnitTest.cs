@@ -16,19 +16,19 @@ internal class FontUnitTest
 	}
 
 	[Test]
-	[TestCase("Montserrat-Regular.ttf", "Montserrat", "Regular", 400, 5, 15, SlantType.Normal)]
-	[TestCase("Montserrat-Italic.ttf", "Montserrat", "Italic", 400, 5, 15, SlantType.Italic)]
-	[TestCase("Montserrat-Bold.ttf", "Montserrat", "Bold", 700, 5, 15, SlantType.Normal)]
-	[TestCase("Graphik-Regular.otf", "Graphik", "Regular", 400, 5, 14, SlantType.Normal)]
-	[TestCase("Graphik-Italic.otf", "Graphik", "Italic", 400, 5, 14, SlantType.Italic)]
-	[TestCase("Graphik-Bold.otf", "Graphik", "Bold", 700, 5, 14, SlantType.Normal)]
-	[TestCase("EncodeSans-Regular.ttf", "Encode Sans", "Regular", 400, 5, 15, SlantType.Normal)]
-	[TestCase("EncodeSans-Condensed.ttf", "Encode Sans", "Condensed", 400, 3, 15, SlantType.Normal)]
-	[TestCase("EncodeSans-Expanded.ttf", "Encode Sans", "Expanded", 400, 7, 15, SlantType.Normal)]
-	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Regular", 400, 5, 17, SlantType.Normal, 7)]
-	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Italic", 400, 5, 17, SlantType.Italic, 4)]
-	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Bold", 700, 5, 17, SlantType.Normal, 0)]
-	public void Constructor_Family(string fileName, string familyName, string faceName, int fontWeight, int fontWidth, int fontHeight, SlantType fontSlant, int fontIndex = 0)
+	[TestCase("Montserrat-Regular.ttf", "Montserrat", "Regular", 400, 5, 15, SlantType.Normal, FontStyle.Regular)]
+	[TestCase("Montserrat-Italic.ttf", "Montserrat", "Italic", 400, 5, 15, SlantType.Italic, FontStyle.Regular | FontStyle.Italic)]
+	[TestCase("Montserrat-Bold.ttf", "Montserrat", "Bold", 700, 5, 15, SlantType.Normal, FontStyle.Regular | FontStyle.Bold)]
+	[TestCase("Graphik-Regular.otf", "Graphik", "Regular", 400, 5, 14, SlantType.Normal, FontStyle.Regular)]
+	[TestCase("Graphik-Italic.otf", "Graphik", "Italic", 400, 5, 14, SlantType.Italic, FontStyle.Regular | FontStyle.Italic)]
+	[TestCase("Graphik-Bold.otf", "Graphik", "Bold", 700, 5, 14, SlantType.Normal, FontStyle.Regular | FontStyle.Bold)]
+	[TestCase("EncodeSans-Regular.ttf", "Encode Sans", "Regular", 400, 5, 15, SlantType.Normal, FontStyle.Regular)]
+	[TestCase("EncodeSans-Condensed.ttf", "Encode Sans", "Condensed", 400, 3, 15, SlantType.Normal, FontStyle.Regular)]
+	[TestCase("EncodeSans-Expanded.ttf", "Encode Sans", "Expanded", 400, 7, 15, SlantType.Normal, FontStyle.Regular)]
+	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Regular", 400, 5, 17, SlantType.Normal, FontStyle.Regular, 7)]
+	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Italic", 400, 5, 17, SlantType.Italic, FontStyle.Regular | FontStyle.Italic, 4)]
+	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", "Bold", 700, 5, 17, SlantType.Normal, FontStyle.Regular | FontStyle.Bold, 0)]
+	public void Constructor_Family(string fileName, string familyName, string faceName, int fontWeight, int fontWidth, int fontHeight, SlantType fontSlant, FontStyle fontStyle, int fontIndex = 0)
 	{
 		var fontPath = Path.Combine(FONT_PATH, fileName);
 		using var family = new FontFamily(fontPath, fontIndex);
@@ -44,6 +44,7 @@ internal class FontUnitTest
 			Assert.That(font.Slant, Is.EqualTo(fontSlant));
 			Assert.That(font.Italic, Is.EqualTo(fontSlant != SlantType.Normal));
 			Assert.That(font.Bold, Is.EqualTo(fontWeight >= 600));
+			Assert.That(font.Style, Is.EqualTo(fontStyle));
 			Assert.That(font.Underline, Is.False);
 			Assert.That(font.Strikeout, Is.False);
 		});

@@ -1,3 +1,5 @@
+using GeneXus.Drawing.Text;
+using NUnit.Framework;
 using System;
 using System.IO;
 
@@ -67,5 +69,38 @@ internal class FontFamilyUnitTest
 			Assert.That(family.GetLineSpacing(), Is.EqualTo(lineSpacing));
 			Assert.That(family.GetEmHeight(), Is.EqualTo(emHeight));
 		});
+	}
+
+	[Test]
+	public void Constructor_FontCollection()
+	{
+		using var pfc = new PrivateFontCollection();
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Regular.ttf"));
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Italic.ttf"));
+		pfc.AddFontFile(Path.Combine(FONT_PATH, "Montserrat-Bold.ttf"));
+		Assert.That(pfc.Families, Has.Length.EqualTo(3));
+
+		using var font = new Font(pfc.Families[1]);
+		using var family = new FontFamily(font.Name, pfc);
+		Assert.Multiple(() =>
+		{
+			Assert.That(family.Name, Is.EqualTo("Montserrat"));
+			Assert.That(family.IsStyleAvailable(FontStyle.Regular), Is.True);
+			Assert.That(family.IsStyleAvailable(FontStyle.Italic), Is.EqualTo((font.Style & FontStyle.Italic) == FontStyle.Italic));
+			Assert.That(family.IsStyleAvailable(FontStyle.Bold), Is.EqualTo((font.Style & FontStyle.Bold) == FontStyle.Bold));
+		});
+	}
+
+	[Test]
+	public void Constructor_GenericFont()
+	{
+		using var monospace = new FontFamily(GenericFontFamilies.Monospace);
+		Assert.That(monospace.Name, Is.AnyOf("Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console").IgnoreCase);
+
+		using var sanserif = new FontFamily(GenericFontFamilies.SansSerif);
+		Assert.That(sanserif.Name, Is.AnyOf("Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans").IgnoreCase);
+
+		using var justserif = new FontFamily(GenericFontFamilies.Serif);
+		Assert.That(justserif.Name, Is.AnyOf("Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville").IgnoreCase);
 	}
 }
