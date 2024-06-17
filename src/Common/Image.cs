@@ -385,7 +385,7 @@ public class Image : IDisposable, ICloneable
 		stream.Close();
 	}
 
-	// <summary>
+	/// <summary>
 	///  Saves this <see cref='Image'/> to the specified file with the specified encoder and parameters.
 	/// </summary>
 	public void Save(string filename, object encoder, object encoderParams) // TODO: implement EncoderParameters
