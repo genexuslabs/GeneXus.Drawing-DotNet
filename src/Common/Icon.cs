@@ -12,7 +12,7 @@ public sealed class Icon : IDisposable, ICloneable
 {
 	internal readonly Bitmap m_bitmap;
 	internal readonly List<IconEntry> m_entries;
-	internal int m_index { get; private set; } = 0;
+	internal int EntryIndex { get; private set; }
 
 	private Icon(Bitmap bitmap, List<IconEntry> entries, float width, float height)
 	{
@@ -31,7 +31,7 @@ public sealed class Icon : IDisposable, ICloneable
 			if (diff >= pivot)
 				continue;
 			pivot = diff;
-			m_index = i;
+			EntryIndex = i;
 		}
 	}
 
@@ -148,7 +148,7 @@ public sealed class Icon : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the height of this <see cref='Icon'/>.
 	/// </summary>
-	public int Height => m_entries[m_index].Height;
+	public int Height => m_entries[EntryIndex].Height;
 
 	/// <summary>
 	///  Gets the size of this <see cref='Icon'/>.
@@ -158,7 +158,7 @@ public sealed class Icon : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the width of this <see cref='Icon'/>.
 	/// </summary>
-	public int Width => m_entries[m_index].Width;
+	public int Width => m_entries[EntryIndex].Width;
 
 	#endregion
 
@@ -210,7 +210,7 @@ public sealed class Icon : IDisposable, ICloneable
 			id = int.MaxValue; // set to undefined
 		
 		if (id >= 0 && id < icon.m_entries.Count) 
-			icon.m_index = id; // set defined index
+			icon.EntryIndex = id; // set defined index
 
 		return icon;
 	}
@@ -219,13 +219,13 @@ public sealed class Icon : IDisposable, ICloneable
 	///  Saves this <see cref='Icon'/> to the specified output <see cref='Stream'/>.
 	/// </summary>
 	public void Save(Stream stream)
-		=> new Bitmap(m_Resized).Save(stream, ImageFormat.Png, 100);
+		=> new Bitmap(Resized).Save(stream, ImageFormat.Png, 100);
 
 	/// <summary>
 	///  Converts this <see cref='Icon'/> to a <see cref='Bitmap'/>.
 	/// </summary>
 	public Bitmap ToBitmap()
-		=> new(m_Resized);
+		=> new(Resized);
 
 	#endregion
 
@@ -278,7 +278,7 @@ public sealed class Icon : IDisposable, ICloneable
 		return entries;
 	}
 
-	private SKBitmap m_Resized
+	private SKBitmap Resized
 	{
 		get
 		{
