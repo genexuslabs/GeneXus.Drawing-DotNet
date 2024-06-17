@@ -79,11 +79,6 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 		: this(original, size.Width, size.Height) { }
 
 	/// <summary>
-	///  Cleans up resources for this <see cref='Bitmap'/>.
-	/// </summary>
-	~Bitmap() => Dispose(false);
-
-	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='Bitmap'/>.
 	/// </summary>
 	public override string ToString() => $"{GetType().Name}: {Width}x{Height}";
