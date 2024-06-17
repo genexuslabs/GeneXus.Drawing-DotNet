@@ -246,7 +246,7 @@ public abstract class Image : IDisposable, ICloneable
 			var image = SKImage.FromPicture(svg.Picture, size);
 
 			var bitmap = SKBitmap.FromImage(image);
-			return CreateInstance(bitmap, ImageFormat.Svg, 1);
+			return new Bitmap(bitmap, ImageFormat.Svg, 1);
 		}
 		else
 		{
@@ -257,7 +257,7 @@ public abstract class Image : IDisposable, ICloneable
 				throw new ArgumentException($"unsupported format {codec.EncodedFormat}");
 
 			var bitmap = SKBitmap.FromImage(image);
-			return CreateInstance(bitmap, format, Math.Max(codec.FrameCount, 1));
+			return new Bitmap(bitmap, format, Math.Max(codec.FrameCount, 1));
 		}
 	}
 
@@ -310,7 +310,7 @@ public abstract class Image : IDisposable, ICloneable
 		var thumb = m_bitmap.Resize(info, SKFilterQuality.High);
 		return thumb == null
 			 ? throw new Exception("could not resize.")
-			 : CreateInstance(thumb, m_format, m_frames);
+			 : new Bitmap(thumb, m_format, m_frames);
 	}
 
 	/// <summary>
@@ -455,12 +455,6 @@ public abstract class Image : IDisposable, ICloneable
 
 
 	#region Utilities
-
-	private static Image CreateInstance(SKBitmap bitmap, ImageFormat format, int frames)
-	{
-		using var surface = SKSurface.Create(new SKImageInfo(bitmap.Width, bitmap.Height));
-		return new Bitmap(bitmap, format, frames);
-	}
 
 	// Indexing for frame-based images (e.g. gif)
 	internal int m_index = 0;
