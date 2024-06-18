@@ -70,7 +70,7 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Image'/>, width and height
 	/// </summary>
 	public Bitmap(Image original, float width, float height)
-	: this(original.m_bitmap.Resize(new SKImageInfo((int)width, (int)height), SKFilterQuality.High)) { }
+		: this(original.m_bitmap.Resize(new SKImageInfo((int)width, (int)height), SKFilterQuality.High)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified <see cref='Image'/> and <see cref='Size'/>
@@ -228,21 +228,6 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// </summary>
 	public void UnlockBits(object bitmapdata)
 		=> throw new NotImplementedException(); // TODO: implement BitmapData
-
-	#endregion
-
-
-	#region Utilities
-
-	private static Stream GetResourceStream(Type type, string resource)
-	{
-		if (type == null)
-			throw new ArgumentNullException(nameof(type));
-		if (resource == null)
-			throw new ArgumentNullException(nameof(resource));
-		return type.Module.Assembly.GetManifestResourceStream(type, resource)
-			?? throw new ArgumentException("resource not found", nameof(resource));
-	}
 
 	#endregion
 }

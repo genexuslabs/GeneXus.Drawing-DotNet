@@ -455,6 +455,16 @@ public abstract class Image : IDisposable, ICloneable
 
 	#region Utilities
 
+	protected static Stream GetResourceStream(Type type, string resource)
+	{
+		if (type == null)
+			throw new ArgumentNullException(nameof(type));
+		if (resource == null)
+			throw new ArgumentNullException(nameof(resource));
+		return type.Module.Assembly.GetManifestResourceStream(type, resource)
+			?? throw new ArgumentException("resource not found", nameof(resource));
+	}
+
 	// Indexing for frame-based images (e.g. gif)
 	internal int m_index = 0;
 
