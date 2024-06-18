@@ -24,7 +24,7 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 		: this(FromStream(stream)) { }
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref='Bitmap'/> class from a file stream
+	/// Initializes a new instance of the <see cref='Bitmap'/> from a specified resource
 	/// </summary>
 	public Bitmap(Type type, string resource)
 		: this(GetResourceStream(type, resource)) { }
