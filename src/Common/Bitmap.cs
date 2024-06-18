@@ -93,7 +93,7 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	public object Clone(Rectangle rect, PixelFormat format)
 	{
 		var bitmap = new Bitmap(rect.Width, rect.Height);
-		var portion = new SKRectI((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
+		var portion = SKRectI.Truncate(rect.m_rect);
 		return m_bitmap.ExtractSubset(bitmap.m_bitmap, portion) ? bitmap : base.Clone();
 	}
 

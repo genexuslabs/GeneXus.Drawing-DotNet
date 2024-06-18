@@ -241,9 +241,8 @@ public abstract class Image : IDisposable, ICloneable
 			var svg = new SkiaSharp.Extended.Svg.SKSvg();
 			svg.Load(data.AsStream());
 			
-			var bounds = svg.Picture.CullRect;
-			var size = new SKSizeI((int)bounds.Width, (int)bounds.Height);
-			using var image = SKImage.FromPicture(svg.Picture, size);
+			var bounds = SKRectI.Truncate(svg.Picture.CullRect);
+			using var image = SKImage.FromPicture(svg.Picture, bounds.Size);
 
 			var bitmap = SKBitmap.FromImage(image);
 			return new Bitmap(bitmap, ImageFormat.Svg, 1);
