@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using GeneXus.Drawing.Imaging;
 using SkiaSharp;
 
@@ -11,21 +12,20 @@ namespace GeneXus.Drawing;
 [Serializable]
 public abstract class Image : IDisposable, ICloneable
 {
-	internal readonly SKBitmap m_bitmap;
 	internal readonly ImageFormat m_format;
 	internal readonly int m_frames;
 
 	private ColorPalette m_palette;
 
-	internal Image(SKBitmap bitmap, ImageFormat format, int frames)
+	internal Image(ImageFormat format, int frames, SKSize size)
 	{
-		m_bitmap = bitmap;
 		m_frames = frames;
 		m_format = format;
 
 		m_palette = new ColorPalette();
 
-		using var surface = SKSurface.Create(new SKImageInfo(m_bitmap.Width, m_bitmap.Height));
+		var info = new SKImageInfo((int)size.Width, (int)size.Height);
+		using var surface = SKSurface.Create(info);
 		HorizontalResolution = (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
 		VerticalResolution = (int)(100f * surface.Canvas.DeviceClipBounds.Height / surface.Canvas.LocalClipBounds.Height);
 	}
@@ -52,7 +52,7 @@ public abstract class Image : IDisposable, ICloneable
 		Dispose(true);
 	}
 
-	protected virtual void Dispose(bool disposing) => m_bitmap.Dispose();
+	protected abstract void Dispose(bool disposing);
 
 	#endregion
 
@@ -62,7 +62,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Creates an exact copy of this <see cref='Image'/>.
 	/// </summary>
-	public virtual object Clone() => new Bitmap(m_bitmap.Copy());
+	public abstract object Clone();
 
 	#endregion
 
@@ -72,7 +72,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a <see cref='SKImage'/> with the coordinates of the specified <see cref='Image'/> .
 	/// </summary>
-	public static explicit operator SKImage(Image image) => SKImage.FromBitmap(image.m_bitmap);
+	public static explicit operator SKImage(Image image) => image.m_image;
 
 	#endregion
 
@@ -94,52 +94,7 @@ public abstract class Image : IDisposable, ICloneable
 	///  Gets attribute flags for the pixel data of this <see cref='Image'/> defined by the 
 	///  bitwise combination of <see cref='ImageFlags'/>.
 	/// </summary>
-	public int Flags
-	{
-		get
-		{
-			var flags = ImageFlags.None;
-
-			if (m_bitmap.IsImmutable)
-				flags |= ImageFlags.ReadOnly;
-
-			if (m_bitmap.Pixels.Any(pixel => pixel.Alpha < 255))
-				flags |= ImageFlags.HasAlpha;
-
-			if (m_bitmap.Pixels.Any(pixel => pixel.Alpha > 0 && pixel.Alpha < 255))
-				flags |= ImageFlags.HasTranslucent;
-
-			if (m_bitmap.Width > 0 && m_bitmap.Height > 0)
-				flags |= ImageFlags.HasRealPixelSize;
-
-			switch (m_bitmap.ColorType)
-			{
-				case SKColorType.Rgb565:
-				case SKColorType.Rgb888x:
-				case SKColorType.Rgba8888:
-				case SKColorType.Bgra8888:
-					flags |= ImageFlags.ColorSpaceRgb;
-					break;
-
-				case SKColorType.Gray8:
-					flags |= ImageFlags.ColorSpaceGray;
-					break;
-			}
-
-			/* 
-			 * TODO: Missing flags
-			 * - ImageFlags.Caching
-			 * - ImageFlags.ColorSpaceCmyk
-			 * - ImageFlags.ColorSpaceYcbcr
-			 * - ImageFlags.ColorSpaceYcck
-			 * - ImageFlags.HasRealDpi
-			 * - ImageFlags.PartiallyScalable
-			 * - ImageFlags.Scalable
-			 */
-
-			return (int)flags;
-		}
-	}
+	public int Flags { get; protected set; }
 
 	/// <summary>
 	///  Gets an array of GUIDs that represent the dimensions of frames within this <see cref='Image'/>.
@@ -149,7 +104,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the height of this <see cref='Image'/>.
 	/// </summary>
-	public int Height => m_bitmap.Height;
+	public int Height { get; protected set; }
 
 	/// <summary>
 	///  Gets the horizontal resolution, in pixels-per-inch, of this <see cref='Image'/>.
@@ -173,7 +128,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the <see cref='Imaging.PixelFormat'/> for this <see cref='Image'/>.
 	/// </summary>
-	public PixelFormat PixelFormat => ToPixelFormat(m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.BytesPerPixel, m_bitmap.Pixels);
+	public PixelFormat PixelFormat { get; protected set; }
 
 	/// <summary>
 	///  Gets IDs of the property items stored in this <see cref='Image'/>.
@@ -208,7 +163,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Gets the width of this <see cref='Image'/>.
 	/// </summary>
-	public int Width => m_bitmap.Width;
+	public int Width { get; protected set; }
 
 	#endregion
 
@@ -240,12 +195,11 @@ public abstract class Image : IDisposable, ICloneable
 		{
 			var svg = new SkiaSharp.Extended.Svg.SKSvg();
 			svg.Load(data.AsStream());
-			
-			var bounds = SKRectI.Truncate(svg.Picture.CullRect);
-			using var image = SKImage.FromPicture(svg.Picture, bounds.Size);
 
-			var bitmap = SKBitmap.FromImage(image);
-			return new Bitmap(bitmap, ImageFormat.Svg, 1);
+			var doc = new XmlDocument();
+			doc.Load(data.AsStream());
+
+			return new Svg(svg, doc);
 		}
 		else
 		{
@@ -305,8 +259,9 @@ public abstract class Image : IDisposable, ICloneable
 	public Image GetThumbnailImage(int thumbWidth, int thumbHeight, GetThumbnailImageAbort callback, IntPtr callbackData)
 	{
 		// NOTE: callback and callbackData parameters are ignored according to the documentation
-		var info = new SKImageInfo(thumbWidth, thumbHeight, m_bitmap.ColorType, m_bitmap.AlphaType, m_bitmap.ColorSpace);
-		var thumb = m_bitmap.Resize(info, SKFilterQuality.High);
+		var bitmap = SKBitmap.FromImage(m_image);
+		var info = new SKImageInfo(thumbWidth, thumbHeight, bitmap.ColorType, bitmap.AlphaType, bitmap.ColorSpace);
+		var thumb = bitmap.Resize(info, SKFilterQuality.High);
 		return thumb == null
 			 ? throw new Exception("could not resize.")
 			 : new Bitmap(thumb, m_format, m_frames);
@@ -353,20 +308,18 @@ public abstract class Image : IDisposable, ICloneable
 			RotateFlipType.Rotate90FlipXY	  => (90, -1, -1),
 			_ => throw new ArgumentException($"unrecognized value {rotateFlipType}", nameof(rotateFlipType))
 		};
-
-		using var surface = SKSurface.Create(m_bitmap.Info);
-		surface.Canvas.RotateDegrees(degrees, Width / 2f, Height / 2f);
-		surface.Canvas.Scale(scaleX, scaleY, Width / 2f, Height / 2f);
-		surface.Canvas.DrawBitmap(m_bitmap, 0, 0);
-
-		var rotated = SKBitmap.FromImage(surface.Snapshot());
-		m_bitmap.SetPixels(rotated.GetPixels());
+		RotateFlip(degrees, scaleX, scaleY);
 	}
+
+	/// <summary>
+	///  Rotates and scales the <see cref='Image'/>.
+	/// </summary>
+	protected abstract void RotateFlip(int degrees, float scaleX, float scaleY);
 
 	/// <summary>
 	///  Saves this <see cref='Image'/> to the specified file.
 	/// </summary>
-	public void Save(string filename) => Save(filename, RawFormat);
+	public virtual void Save(string filename) => Save(filename, RawFormat);
 
 	/// <summary>
 	///  Saves this <see cref='Image'/> to the specified file in the specified format.
@@ -387,7 +340,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	///  Saves this <see cref='Image'/> to the specified file with the specified encoder and parameters.
 	/// </summary>
-	public void Save(string filename, object encoder, object encoderParams) // TODO: implement EncoderParameters
+	public void Save(string filename, object encoder, object encoderParams) // TODO: implement ImageCodecInfo & EncoderParameters
 	{
 		var file = new FileInfo(filename);
 		var stream = file.OpenWrite();
@@ -400,14 +353,12 @@ public abstract class Image : IDisposable, ICloneable
 	/// </summary>
 	public void Save(Stream stream, ImageFormat format, int quality = 100)
 	{
-		if (!GX2SK.TryGetValue(format, out var skFormat))
+		if (!GX2SK.TryGetValue(format, out var encoder))
 			throw new NotSupportedException($"unsupported save {format} format");
-
-		using var image = SKImage.FromBitmap(m_bitmap);
 
 		// TODO: Only Png, Jpeg and Webp allowed to encode, otherwise returns null
 		// ref: https://learn.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/bitmaps/saving#exploring-the-image-formats
-		var data = image.Encode(skFormat, quality) ?? throw new NotSupportedException($"unsupported encoding format {format}");
+		var data = m_image.Encode(encoder, quality) ?? throw new NotSupportedException($"unsupported encoding format {format}");
 		data.SaveTo(stream);
 		data.Dispose();
 	}
@@ -455,6 +406,8 @@ public abstract class Image : IDisposable, ICloneable
 
 	#region Utilities
 
+	internal abstract SKImage m_image { get; }
+
 	protected static Stream GetResourceStream(Type type, string resource)
 	{
 		if (type == null)
@@ -492,59 +445,6 @@ public abstract class Image : IDisposable, ICloneable
 		byte[] bytes = data.ToArray(), header = new byte[5];
 		Array.Copy(bytes, header, 5);
 		return Encoding.UTF8.GetString(header) == "<svg ";
-	}
-
-	private static PixelFormat ToPixelFormat(SKColorType colorType, SKAlphaType alphaType, int bytesPerPixel, SKColor[] pixels)
-	{
-		if (alphaType == SKAlphaType.Opaque && pixels.All(pixel => pixel.Red == pixel.Green && pixel.Green == pixel.Blue))
-			return PixelFormat.Format8bppIndexed; // NOTE: to behave as System.Drawing but SkiaSharp seems to treat it differently
-
-		switch (colorType)
-		{
-			case SKColorType.Rgb565 when alphaType == SKAlphaType.Opaque:
-				return bytesPerPixel == 2 ? PixelFormat.Format16bppRgb565
-					 : PixelFormat.Undefined;
-
-			case SKColorType.Rgb888x when alphaType == SKAlphaType.Unpremul:
-				return bytesPerPixel == 3 ? PixelFormat.Format24bppRgb
-					 : bytesPerPixel == 4 ? PixelFormat.Format32bppRgb
-					 : bytesPerPixel == 6 ? PixelFormat.Format48bppRgb
-					 : PixelFormat.Undefined;
-
-			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Opaque:
-			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Opaque:
-				return bytesPerPixel == 4 ? PixelFormat.Format24bppRgb
-					 : bytesPerPixel == 6 ? PixelFormat.Format32bppRgb
-					 : bytesPerPixel == 8 ? PixelFormat.Format48bppRgb
-					 : PixelFormat.Undefined;
-
-			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Unpremul:
-			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Unpremul:
-				return bytesPerPixel == 4 ? PixelFormat.Format32bppArgb
-					 : bytesPerPixel == 8 ? PixelFormat.Format64bppArgb
-					 : PixelFormat.Undefined;
-
-			case SKColorType.Rgba8888 when alphaType == SKAlphaType.Premul:
-			case SKColorType.Bgra8888 when alphaType == SKAlphaType.Premul:
-				return bytesPerPixel == 4 ? PixelFormat.Format32bppPArgb
-					 : bytesPerPixel == 8 ? PixelFormat.Format64bppPArgb
-					 : PixelFormat.Undefined;
-
-			case SKColorType.Gray8:
-				return bytesPerPixel == 2 ? PixelFormat.Format16bppGrayScale
-					 : PixelFormat.Undefined;
-
-			default:
-				/*
-				 * TODO: missing value mappings
-				 * - Format1bppIndexed
-				 * - Format4bppIndexed
-				 * - Format8bppIndexed
-				 * - Format16bppRgb555
-				 * - Format16bppArgb1555
-				 */
-				return PixelFormat.Undefined;
-		}
 	}
 
 	#endregion

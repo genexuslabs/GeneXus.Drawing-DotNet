@@ -173,7 +173,7 @@ public sealed class Icon : IDisposable, ICloneable
 		var info = new SKImageInfo(100, 100);
 		var skBitmap = new SKBitmap();
 		skBitmap.InstallPixels(info, handle, info.RowBytes);
-		var bitmap = new Bitmap(skBitmap);
+		var bitmap = new Bitmap(skBitmap, ImageFormat.Ico);
 		return new Icon(bitmap);
 	}
 
@@ -219,13 +219,13 @@ public sealed class Icon : IDisposable, ICloneable
 	///  Saves this <see cref='Icon'/> to the specified output <see cref='Stream'/>.
 	/// </summary>
 	public void Save(Stream stream)
-		=> new Bitmap(Resized).Save(stream, ImageFormat.Png, 100);
+		=> ToBitmap().Save(stream, ImageFormat.Png, 100);
 
 	/// <summary>
 	///  Converts this <see cref='Icon'/> to a <see cref='Bitmap'/>.
 	/// </summary>
 	public Bitmap ToBitmap()
-		=> new(Resized);
+		=> new(Resized, ImageFormat.Png);
 
 	#endregion
 
