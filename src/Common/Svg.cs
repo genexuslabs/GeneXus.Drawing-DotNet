@@ -7,7 +7,8 @@ using SkiaSharp;
 
 namespace GeneXus.Drawing;
 
-public class Svg : Image
+[Serializable]
+public sealed class Svg : Image
 {
 	internal SkiaSharp.Extended.Svg.SKSvg m_svg;
 	internal XmlDocument m_doc = new();
