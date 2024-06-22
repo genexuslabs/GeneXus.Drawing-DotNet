@@ -31,7 +31,7 @@ internal class FontUnitTest
 	public void Constructor_Family(string fileName, string familyName, string faceName, int fontWeight, int fontWidth, int fontHeight, SlantType fontSlant, FontStyle fontStyle, int fontIndex = 0)
 	{
 		var fontPath = Path.Combine(FONT_PATH, fileName);
-		using var family = new FontFamily(fontPath, fontIndex);
+		using var family = FontFamilyFactory.Create(fontPath, fontIndex);
 
 		using var font = new Font(family);
 		Assert.Multiple(() =>
@@ -98,8 +98,8 @@ internal class FontUnitTest
 	[Test]
 	public void Method_Clone()
 	{
-		var fontpath = Path.Combine(FONT_PATH, "Montserrat-Regular.ttf");
-		using var family = new FontFamily(fontpath);
+		var fontPath = Path.Combine(FONT_PATH, "Montserrat-Regular.ttf");
+		using var family = FontFamilyFactory.Create(fontPath);
 
 		using var font1 = new Font(family);
 		using var font2 = font1.Clone() as Font;
@@ -130,5 +130,4 @@ internal class FontUnitTest
 		var count = Font.GetFontCount(stream);
 		Assert.That(count, Is.EqualTo(12));
 	}
-
 }

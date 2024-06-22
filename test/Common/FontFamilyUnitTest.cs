@@ -32,7 +32,7 @@ internal class FontFamilyUnitTest
 	public void Constructor_FileName(string fileName, string familyName, int ascent, int descent, int lineSpacing, int emHeight, int fontIndex = 0)
 	{
 		var fontPath = Path.Combine(FONT_PATH, fileName);
-		using var family = new FontFamily(fontPath, fontIndex);
+		using var family = FontFamilyFactory.Create(fontPath, fontIndex);
 		Assert.Multiple(() =>
 		{
 			Assert.That(family.Name, Is.EqualTo(familyName));
@@ -60,7 +60,7 @@ internal class FontFamilyUnitTest
 	{
 		var fontPath = Path.Combine(FONT_PATH, fileName);
 		using var fontStream = File.OpenRead(fontPath);
-		using var family = new FontFamily(fontStream, fontIndex);
+		using var family = FontFamilyFactory.Create(fontStream, fontIndex);
 		Assert.Multiple(() =>
 		{
 			Assert.That(family.Name, Is.EqualTo(familyName));
@@ -81,7 +81,7 @@ internal class FontFamilyUnitTest
 		Assert.That(pfc.Families, Has.Length.EqualTo(3));
 
 		using var font = new Font(pfc.Families[1]);
-		using var family = new FontFamily(font.Name, pfc);
+		using var family = FontFamilyFactory.Create(font.Name, pfc);
 		Assert.Multiple(() =>
 		{
 			Assert.That(family.Name, Is.EqualTo("Montserrat"));
@@ -94,13 +94,13 @@ internal class FontFamilyUnitTest
 	[Test]
 	public void Constructor_GenericFont()
 	{
-		using var monospace = new FontFamily(GenericFontFamilies.Monospace);
+		using var monospace = FontFamilyFactory.Create(GenericFontFamilies.Monospace);
 		Assert.That(monospace.Name, Is.AnyOf("Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console").IgnoreCase);
 
-		using var sanserif = new FontFamily(GenericFontFamilies.SansSerif);
+		using var sanserif = FontFamilyFactory.Create(GenericFontFamilies.SansSerif);
 		Assert.That(sanserif.Name, Is.AnyOf("Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans").IgnoreCase);
 
-		using var justserif = new FontFamily(GenericFontFamilies.Serif);
+		using var justserif = FontFamilyFactory.Create(GenericFontFamilies.Serif);
 		Assert.That(justserif.Name, Is.AnyOf("Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville").IgnoreCase);
 	}
 }

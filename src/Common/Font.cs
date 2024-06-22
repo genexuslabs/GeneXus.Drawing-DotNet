@@ -13,8 +13,8 @@ public class Font : IDisposable, ICloneable
 {
 	internal readonly FontFamily m_family;
 	internal readonly float m_size;
+	internal readonly string m_original;
 
-	internal readonly string m_original = null;
 
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> using the specified <see cref='Drawing.FontFamily'/> and size.
@@ -44,7 +44,7 @@ public class Font : IDisposable, ICloneable
 	/// </summary>
 	public override string ToString()
 	{
-		string suffix = m_family.m_index > 0 ? $"#{m_family.m_index}" : string.Empty;
+		string suffix = m_family is SkiaFontFamily { m_index: > 0 } sff ? $"#{sff.m_index}" : string.Empty;
 		return $"[{GetType().Name}: Name={Name}{suffix}, Size={Size}]";
 	}
 
@@ -68,16 +68,9 @@ public class Font : IDisposable, ICloneable
 	#region IClonable
 
 	/// <summary>
-	///  Creates an exact copy of this <see cref='Font'/>.
+	/// Creates an exact copy of this <see cref='Font'/>.
 	/// </summary>
-	public object Clone()
-	{
-		var index = m_family.m_index;
-		var bytes = m_family.m_data.ToArray();
-		var data = SKData.CreateCopy(bytes);
-		var family = new FontFamily(data, index);
-		return new Font(family);
-	}
+	public object Clone() => new Font((FontFamily)m_family.Clone());
 
 	#endregion
 
@@ -87,19 +80,17 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a <see cref='SKFont'/> with the coordinates of the specified <see cref='Font'/> .
 	/// </summary>
-	public static explicit operator SKFont(Font font) => font.m_family.GetFont(font.m_size);
+	public static explicit operator SKFont(Font font) => (font.m_family as SkiaFontFamily)?.GetFont(font.m_size);
 
 	#endregion
 
 
 	#region Properties
 
-	private SKFont m_font => m_family.GetFont(m_size);
-
 	/// <summary>
 	/// Gets the face name of this <see cref='Font'/>.
 	/// </summary>
-	public string Name => $"{m_family.Name} {m_family.Face}";
+	public string Name => m_family is SkiaFontFamily sff ? $"{sff.Name} {sff.Face}" : m_family.Name;
 
 	/// <summary>
 	/// Gets the name of the <see cref='Font'/> originally specified.
@@ -175,22 +166,24 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> has the italic style applied.
 	/// </summary>
-	public bool Italic => m_family.m_typeface.IsItalic;
+	public bool Italic => m_family.IsItalic;
 
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> is bold.
 	/// </summary>
-	public bool Bold => m_family.m_typeface.IsBold;
+	public bool Bold => m_family.IsBold;
 
+	private SKFontMetrics Metrics => m_family is SkiaFontFamily sff ? sff.GetFont(m_size).Metrics : new SKFontMetrics();
+	
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Font'/> is underlined.
 	/// </summary>
-	public bool Underline => m_font.Metrics.UnderlineThickness > 0 && m_font.Metrics.UnderlinePosition == 0f;
+	public bool Underline => Metrics is { UnderlineThickness: > 0, UnderlinePosition: 0f };
 
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Font'/> is strikeout (has a line through it).
 	/// </summary>
-	public bool Strikeout => m_font.Metrics.StrikeoutThickness > 0 && m_font.Metrics.StrikeoutPosition == 0f;
+	public bool Strikeout => Metrics is { StrikeoutThickness: > 0, StrikeoutPosition: 0f };
 
 	/// <summary>
 	/// Gets a value indicating whether the <see cref='Font'/> is a member of SystemFonts.
@@ -216,7 +209,7 @@ public class Font : IDisposable, ICloneable
 		}
 	}
 
-	private static ICollection<Font> s_SystemFonts = null;
+	private static ICollection<Font> s_SystemFonts;
 
 	#endregion
 
@@ -226,7 +219,7 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Returns the line spacing of this <see cref='Font'/>.
 	/// </summary>
-	public float GetHeight() => m_font.Metrics.Descent - m_font.Metrics.Ascent + m_font.Metrics.Leading;
+	public float GetHeight() => Metrics.Descent - Metrics.Ascent + Metrics.Leading;
 
 	/// <summary>
 	/// Returns a <see cref='Font'/> collection in the specified location.
@@ -239,7 +232,7 @@ public class Font : IDisposable, ICloneable
 		{
 			if (FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile)))
 			{
-				var family = new FontFamily(fontFile);
+				var family = FontFamilyFactory.Create(fontFile);
 				var font = new Font(family);
 				fonts.Add(font);
 			}

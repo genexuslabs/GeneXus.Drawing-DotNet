@@ -9,15 +9,15 @@ public class PrivateFontCollection : FontCollection
 	/// <summary>
 	///  Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
 	/// </summary>
-	public PrivateFontCollection() : base()
+	public PrivateFontCollection()
 	{ }
 
 	/// <summary>
 	///  Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
-	public void AddFontFile(string filename)
+	public void AddFontFile(string filePath)
 	{
-		var fontFamily = new FontFamily(filename);
+		var fontFamily = FontFamilyFactory.Create(filePath);
 		m_families.Add(fontFamily);
 	}
 
@@ -31,7 +31,7 @@ public class PrivateFontCollection : FontCollection
 
 		using var stream = new MemoryStream(fontData);
 
-		var fontFamily = new FontFamily(stream);
+		var fontFamily = FontFamilyFactory.Create(stream);
 		m_families.Add(fontFamily);
 	}
 }
