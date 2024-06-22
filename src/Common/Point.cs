@@ -16,7 +16,7 @@ public struct Point : IEquatable<Point>
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Point'/> class with the specified coordinates.
 	/// </summary>
-	public Point(float x, float y)
+	public Point(int x, int y)
 		: this(new SKPoint(x, y)) { }
 
 	/// <summary>
@@ -113,18 +113,18 @@ public struct Point : IEquatable<Point>
 	/// <summary>
 	/// Gets the x-coordinate of this <see cref='Point'/>.
 	/// </summary>
-	public float X
+	public int X
 	{
-		readonly get => m_point.X;
+		readonly get => (int)m_point.X;
 		set => m_point.X = value;
 	}
 
 	/// <summary>
 	/// Gets the y-coordinate of this <see cref='Point'/>.
 	/// </summary>
-	public float Y
+	public int Y
 	{
-		readonly get => m_point.Y;
+		readonly get => (int)m_point.Y;
 		set => m_point.Y = value;
 	}
 
@@ -149,24 +149,9 @@ public struct Point : IEquatable<Point>
 	public static Point Subtract(Point pt, Size sz) => new(pt.m_point - sz.m_size);
 
 	/// <summary>
-	/// Converts a <see cref='Point'/> by performing a ceiling operation on all the coordinates.
-	/// </summary>
-	public static Point Ceiling(Point value) => new(unchecked((int)Math.Ceiling(value.X)), unchecked((int)Math.Ceiling(value.Y)));
-
-	/// <summary>
-	/// Converts a <see cref='Point'/> by performing a truncate operation on all the coordinates.
-	/// </summary>
-	public static Point Truncate(Point value) => new(unchecked((int)value.X), unchecked((int)value.Y));
-
-	/// <summary>
-	/// Converts a <see cref='Point'/> by performing a round operation on all the coordinates.
-	/// </summary>
-	public static Point Round(Point value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
-
-	/// <summary>
 	/// Translates this <see cref='Point'/> by the specified amount.
 	/// </summary>
-	public void Offset(float dx, float dy) => m_point.Offset(dx, dy);
+	public void Offset(int dx, int dy) => m_point.Offset(dx, dy);
 
 	/// <summary>
 	/// Translates this <see cref='Point'/> by the specified amount.
