@@ -1,6 +1,8 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +17,21 @@ public class Font : IDisposable, ICloneable
 	internal readonly float m_size;
 	internal readonly string m_original;
 
-
+	/// <summary>
+	/// Initializes a new System.Drawing.Font that uses the specified existing <see cref='Font'/>
+	/// and <see cref='FontStyle'/> enumeration.
+	/// </summary>
+	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/></param>
+	/// <param name="newStyle">
+	/// The <see cref='FontStyle'/> to apply to the new S<see cref='Font'/>. Multiple
+	/// values of the <see cref='FontStyle'/> enumeration can be combined with the OR operator.
+	/// </param>
+	public Font(Font prototype, FontStyle newStyle)
+	{
+		m_family = prototype.FontFamily;
+		// TODO set newStyle
+	}
+	
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> using the specified <see cref='Drawing.FontFamily'/> and size.
 	/// </summary>
@@ -34,6 +50,15 @@ public class Font : IDisposable, ICloneable
 		m_original = familyName;
 	}
 
+	/// <summary>
+	/// Initializes a new <see cref='Font'/> using the specified family name, size, styl.
+	/// </summary>
+	public Font(string familyName, float size, FontStyle style, GraphicsUnit unit)
+		: this(familyName, size)
+	{
+		// TODO set style and unit
+	}
+	
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
@@ -211,6 +236,27 @@ public class Font : IDisposable, ICloneable
 
 	private static ICollection<Font> s_SystemFonts;
 
+	/// <summary>
+	/// Gets the em-size, in points, of this <see cref='Font'/>.
+	/// </summary>
+	/// <returns>The em-size, in points, of this <see cref='Font'/></returns>
+	[Browsable(false)]
+	public float SizeInPoints
+	{
+		get
+		{
+			// TODO calculate it for other units
+			Debug.Assert(Unit == GraphicsUnit.Point);
+			return Size;
+		}
+	}
+	
+	/// <summary>
+	/// Gets the unit of measure for this <see cref='Font'/>.
+	/// </summary>
+	/// <returns>A <see cref='GraphicsUnit'/> that represents the unit of measure for this <see cref='Font'/>.</returns>
+	public GraphicsUnit Unit => GraphicsUnit.Point;
+	
 	#endregion
 
 
