@@ -21,8 +21,9 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Properties()
 	{
-		float x = 10f, y = 20f;
-		var point = new Point() { X = x, Y = y };
+		const int x = 10;
+		const int y = 20;
+		Point point = new() { X = x, Y = y };
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(x));
@@ -33,8 +34,9 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Float()
 	{
-		float x = 10f, y = -20f;
-		var point = new Point(x, y);
+		const int x = 10;
+		const int y = -20;
+		Point point = new(x, y);
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(x));
@@ -45,8 +47,8 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Size()
 	{
-		var size = new Size(30f, 40f);
-		var point = new Point(size);
+		Size size = new(30, 40);
+		Point point = new(size);
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(size.Width));
@@ -57,9 +59,10 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Int()
 	{
-		int x = 100, y = 200;
-		int dw = unchecked(y << 16) | unchecked(x << 0);
-		var point = new Point(dw);
+		const int x = 100;
+		const int y = 200;
+		const int dw = y << 16 | x << 0;
+		Point point = new(dw);
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(x));
@@ -70,38 +73,38 @@ internal class PointUnitTest
 	[Test]
 	public void Operator_Equality()
 	{
-		var point1 = new Point(10f, 20f);
-		var point2 = new Point(10f, 20f);
+		Point point1 = new(10, 20);
+		Point point2 = new(10, 20);
 		Assert.That(point1 == point2, Is.True);
 	}
 
 	[Test]
 	public void Operator_Inequality()
 	{
-		var point1 = new Point(10f, 20f);
-		var point2 = new Point(20f, 30f);
-		Assert.That(point1 != point2, Is.True);
+		Point point1 = new(10, 20);
+		Point point2 = new(20, 30);
+		Assert.That(point1, Is.Not.EqualTo(point2));
 	}
 
 	[Test]
 	public void Operator_Addition()
 	{
-		var point = new Point(10f, 20f);
-		var size = new Size(30f, 40f);
-		var result = point + size;
+		Point point = new(10, 20);
+		Size size = new(30, 40);
+		Point result = point + size;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.X, Is.EqualTo(40f));
-			Assert.That(result.Y, Is.EqualTo(60f));
+			Assert.That(result.X, Is.EqualTo(40));
+			Assert.That(result.Y, Is.EqualTo(60));
 		});
 	}
 
 	[Test]
 	public void Operator_Subtraction()
 	{
-		var point = new Point(50f, 60f);
-		var size = new Size(20f, 30f);
-		var result = point - size;
+		Point point = new(50, 60);
+		Size size = new(20, 30);
+		Point result = point - size;
 		Assert.Multiple(() =>
 		{
 			Assert.That(result.X, Is.EqualTo(30f));
@@ -112,24 +115,24 @@ internal class PointUnitTest
 	[Test]
 	public void Method_Equals()
 	{
-		var point1 = new Point(10f, 20f);
-		var point2 = new Point(10f, 20f);
+		Point point1 = new(10, 20);
+		Point point2 = new(10, 20);
 		Assert.That(point1.Equals(point2), Is.True);
 	}
 
 	[Test]
 	public void Method_GetHashCode()
 	{
-		var point1 = new Point(10f, 20f);
-		var point2 = new Point(10f, 20f);
+		Point point1 = new(10, 20);
+		Point point2 = new(10, 20);
 		Assert.That(point2.GetHashCode(), Is.EqualTo(point1.GetHashCode()));
 	}
 
 	[Test]
 	public void Method_Offset()
 	{
-		var point = new Point(10f, 20f);
-		point.Offset(5f, -5f);
+		Point point = new(10, 20);
+		point.Offset(5, -5);
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(15f));
@@ -140,49 +143,13 @@ internal class PointUnitTest
 	[Test]
 	public void Method_Offset_Point()
 	{
-		var point = new Point(10f, 20f);
-		var offsetPoint = new Point(5f, -5f);
+		Point point = new(10, 20);
+		Point offsetPoint = new(5, -5);
 		point.Offset(offsetPoint);
 		Assert.Multiple(() =>
 		{
 			Assert.That(point.X, Is.EqualTo(15f));
 			Assert.That(point.Y, Is.EqualTo(15f));
-		});
-	}
-
-	[Test]
-	public void Static_Method_Ceiling()
-	{
-		var point = new Point(10.4f, 20.6f);
-		var result = Point.Ceiling(point);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.X, Is.EqualTo(11f));
-			Assert.That(result.Y, Is.EqualTo(21f));
-		});
-	}
-
-	[Test]
-	public void Static_Method_Truncate()
-	{
-		var point = new Point(10.9f, 20.6f);
-		var result = Point.Truncate(point);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.X, Is.EqualTo(10f));
-			Assert.That(result.Y, Is.EqualTo(20f));
-		});
-	}
-
-	[Test]
-	public void Static_Method_Round()
-	{
-		var point = new Point(10.4f, 20.6f);
-		var result = Point.Round(point);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.X, Is.EqualTo(10f));
-			Assert.That(result.Y, Is.EqualTo(21f));
 		});
 	}
 }
