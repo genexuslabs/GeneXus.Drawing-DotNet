@@ -29,8 +29,7 @@ public class Font : IDisposable, ICloneable
 	/// Initializes a new <see cref='Font'/> using the specified family name and size.
 	/// </summary>
 	public Font(string familyName, float size = 12)
-		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName))
-			  ?? throw new ArgumentException("missing font family", nameof(familyName)), size)
+		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(ff => ff is SkiaFontFamily sff && sff.MatchFamily(familyName)) ?? new UnknownFontFamily(familyName), size)
 	{
 		m_original = familyName;
 	}
