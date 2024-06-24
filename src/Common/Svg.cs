@@ -179,7 +179,7 @@ public sealed class Svg : Image
 
 	private static readonly string[] SHAPE_TAGS = { "path", "rect", "circle", "ellipse", "line", "polyline", "polygon" };
 
-	internal override SKImage m_image 
+	internal override SKImage InnerImage 
 		=> SKImage.FromPicture(m_svg.Picture, SKRectI.Truncate(m_svg.Picture.CullRect).Size);
 
 	private static Svg Resize(Image original, float width, float height)

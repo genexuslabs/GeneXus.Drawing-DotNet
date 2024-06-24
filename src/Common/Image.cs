@@ -72,7 +72,7 @@ public abstract class Image : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a <see cref='SKImage'/> with the coordinates of the specified <see cref='Image'/> .
 	/// </summary>
-	public static explicit operator SKImage(Image image) => image.m_image;
+	public static explicit operator SKImage(Image image) => image.InnerImage;
 
 	#endregion
 
@@ -259,7 +259,7 @@ public abstract class Image : IDisposable, ICloneable
 	public Image GetThumbnailImage(int thumbWidth, int thumbHeight, GetThumbnailImageAbort callback, IntPtr callbackData)
 	{
 		// NOTE: callback and callbackData parameters are ignored according to the documentation
-		var bitmap = SKBitmap.FromImage(m_image);
+		var bitmap = SKBitmap.FromImage(InnerImage);
 		var info = new SKImageInfo(thumbWidth, thumbHeight, bitmap.ColorType, bitmap.AlphaType, bitmap.ColorSpace);
 		var thumb = bitmap.Resize(info, SKFilterQuality.High);
 		return thumb == null
@@ -358,7 +358,7 @@ public abstract class Image : IDisposable, ICloneable
 
 		// TODO: Only Png, Jpeg and Webp allowed to encode, otherwise returns null
 		// ref: https://learn.microsoft.com/en-us/xamarin/xamarin-forms/user-interface/graphics/skiasharp/bitmaps/saving#exploring-the-image-formats
-		var data = m_image.Encode(encoder, quality) ?? throw new NotSupportedException($"unsupported encoding format {format}");
+		var data = InnerImage.Encode(encoder, quality) ?? throw new NotSupportedException($"unsupported encoding format {format}");
 		data.SaveTo(stream);
 		data.Dispose();
 	}
@@ -406,7 +406,7 @@ public abstract class Image : IDisposable, ICloneable
 
 	#region Utilities
 
-	internal abstract SKImage m_image { get; }
+	internal abstract SKImage InnerImage { get; }
 
 	protected static Stream GetResourceStream(Type type, string resource)
 	{

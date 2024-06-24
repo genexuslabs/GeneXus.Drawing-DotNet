@@ -278,11 +278,11 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 
 	#region Utilities
 
-	internal override SKImage m_image => SKImage.FromBitmap(m_bitmap);
+	internal override SKImage InnerImage => SKImage.FromBitmap(m_bitmap);
 
 	private static Bitmap Resize(Image original, float width, float height)
 	{
-		if (original.m_image is not SKImage image)
+		if (original.InnerImage is not SKImage image)
 			throw new ArgumentException($"not image.", nameof(original));
 		var info = new SKImageInfo((int)width, (int)height, image.ColorType, image.AlphaType, image.ColorSpace);
 		var bitmap = SKBitmap.FromImage(image).Resize(info, SKFilterQuality.High);
