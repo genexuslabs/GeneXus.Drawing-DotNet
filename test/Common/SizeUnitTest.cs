@@ -32,7 +32,7 @@ internal class SizeUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_Int()
 	{
 		const int w = 10;
 		const int h = 20;

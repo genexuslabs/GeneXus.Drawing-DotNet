@@ -8,7 +8,7 @@ internal class RectangleUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_Int()
 	{
 		int x = 5, y = 10, w = 100, h = 200;
 		var rect = new Rectangle(x, y, w, h);

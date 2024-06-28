@@ -32,7 +32,7 @@ internal class PointUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_Int()
 	{
 		const int x = 10;
 		const int y = -20;
