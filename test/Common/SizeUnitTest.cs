@@ -31,7 +31,7 @@ internal class SizeUnitTest
 	}
 
 	[Test]
-	public void Constructor_Int()
+	public void Constructor_WidthHeight()
 	{
 		const int w = 10, h = 20;
 		Size size = new(w, h);

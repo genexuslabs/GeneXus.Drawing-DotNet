@@ -8,7 +8,7 @@ internal class RectangleFUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_LeftTopWidthHeight()
 	{
 		const float x = 5f, y = 10f, w = 100f, h = 200f;
 		var rect = new RectangleF(x, y, w, h);

@@ -31,7 +31,7 @@ internal class PointFUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_LeftTop()
 	{
 		const float x = 10f, y = -20f;
 		var point = new PointF(x, y);

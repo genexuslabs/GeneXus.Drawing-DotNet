@@ -31,7 +31,7 @@ internal class SizeFUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_WidthHeight()
 	{
 		const float w = 10f, h = 20f;
 		var size = new SizeF(w, h);

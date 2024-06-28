@@ -31,7 +31,7 @@ internal class PointUnitTest
 	}
 
 	[Test]
-	public void Constructor_Int()
+	public void Constructor_LeftTop()
 	{
 		const int x = 10, y = -20;
 		Point point = new(x, y);
