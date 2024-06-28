@@ -38,7 +38,7 @@ internal class RectangleUnitTest
 	}
 
 	[Test]
-	public void Constructor_FloatSize()
+	public void Constructor_SizeInt()
 	{
 		const int x = 5, y = 10, w = 100, h = 200;
 		var size = new Size(w, h);
@@ -53,7 +53,7 @@ internal class RectangleUnitTest
 	}
 
 	[Test]
-	public void Constructor_PointFloat()
+	public void Constructor_PointInt()
 	{
 		const int x = 5, y = 10, w = 100, h = 200;
 		var point = new Point(x, y);

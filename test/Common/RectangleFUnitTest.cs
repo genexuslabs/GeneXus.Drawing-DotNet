@@ -38,7 +38,7 @@ internal class RectangleFUnitTest
 	}
 
 	[Test]
-	public void Constructor_FloatSize()
+	public void Constructor_SizeFloat()
 	{
 		const float x = 5f, y = 10f, w = 100f, h = 200f;
 		var size = new SizeF(w, h);
