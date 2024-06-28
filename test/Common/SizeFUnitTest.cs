@@ -21,7 +21,7 @@ internal class SizeFUnitTest
 	[Test]
 	public void Constructor_Properties()
 	{
-		float w = 10f, h = 20f;
+		const float w = 10f, h = 20f;
 		var size = new SizeF { Width = w, Height = h };
 		Assert.Multiple(() =>
 		{
@@ -33,7 +33,7 @@ internal class SizeFUnitTest
 	[Test]
 	public void Constructor_Float()
 	{
-		float w = 10f, h = 20f;
+		const float w = 10f, h = 20f;
 		var size = new SizeF(w, h);
 		Assert.Multiple(() =>
 		{

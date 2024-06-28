@@ -21,8 +21,7 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Properties()
 	{
-		const int x = 10;
-		const int y = 20;
+		const int x = 10, y = 20;
 		Point point = new() { X = x, Y = y };
 		Assert.Multiple(() =>
 		{
@@ -34,8 +33,7 @@ internal class PointUnitTest
 	[Test]
 	public void Constructor_Int()
 	{
-		const int x = 10;
-		const int y = -20;
+		const int x = 10, y = -20;
 		Point point = new(x, y);
 		Assert.Multiple(() =>
 		{

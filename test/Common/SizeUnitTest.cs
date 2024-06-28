@@ -21,8 +21,7 @@ internal class SizeUnitTest
 	[Test]
 	public void Constructor_Properties()
 	{
-		const int w = 10;
-		const int h = 20;
+		const int w = 10, h = 20;
 		Size size = new() { Width = w, Height = h };
 		Assert.Multiple(() =>
 		{
@@ -34,8 +33,7 @@ internal class SizeUnitTest
 	[Test]
 	public void Constructor_Int()
 	{
-		const int w = 10;
-		const int h = 20;
+		const int w = 10, h = 20;
 		Size size = new(w, h);
 		Assert.Multiple(() =>
 		{

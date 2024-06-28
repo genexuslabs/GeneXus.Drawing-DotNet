@@ -10,7 +10,7 @@ internal class RectangleUnitTest
 	[Test]
 	public void Constructor_Int()
 	{
-		int x = 5, y = 10, w = 100, h = 200;
+		const int x = 5, y = 10, w = 100, h = 200;
 		var rect = new Rectangle(x, y, w, h);
 		Assert.Multiple(() =>
 		{
@@ -24,7 +24,7 @@ internal class RectangleUnitTest
 	[Test]
 	public void Constructor_PointSize()
 	{
-		int x = 5, y = 10, w = 100, h = 200;
+		const int x = 5, y = 10, w = 100, h = 200;
 		var point = new Point(x, y);
 		var size = new Size(w, h);
 		var rect = new Rectangle(point, size);
@@ -40,7 +40,7 @@ internal class RectangleUnitTest
 	[Test]
 	public void Constructor_FloatSize()
 	{
-		int x = 5, y = 10, w = 100, h = 200;
+		const int x = 5, y = 10, w = 100, h = 200;
 		var size = new Size(w, h);
 		var rect = new Rectangle(x, y, size);
 		Assert.Multiple(() =>
@@ -55,7 +55,7 @@ internal class RectangleUnitTest
 	[Test]
 	public void Constructor_PointFloat()
 	{
-		int x = 5, y = 10, w = 100, h = 200;
+		const int x = 5, y = 10, w = 100, h = 200;
 		var point = new Point(x, y);
 		var rect = new Rectangle(point, w, h);
 		Assert.Multiple(() =>
