@@ -197,29 +197,11 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets a value indicating whether the <see cref='Font'/> is a member of SystemFonts.
 	/// </summary>
-	public bool IsSystemFont
-	{
-		get
-		{
-			var fontFullName = ToString();
-			return SystemFonts.Any(sf => fontFullName.Equals(sf.ToString()));
-		}
-	}
+	public bool IsSystemFont => false; // there are no system fonts like it is explained in https://learn.microsoft.com/en-us/dotnet/api/system.drawing.systemfonts?view=net-8.0
 
 	/// <summary>
-	/// Gets a system <see cref='Font'/> collection.
 	/// </summary>
-	public static ICollection<Font> SystemFonts
-	{
-		get
 		{
-			s_SystemFonts ??= GetFonts(SYSTEM_FONT_PATH);
-			return s_SystemFonts;
-		}
-	}
-
-	private static ICollection<Font> s_SystemFonts = null;
-
 	/// <summary>
 	/// Gets the unit of measure for this <see cref='Font'/>.
 	/// </summary>
@@ -235,25 +217,6 @@ public class Font : IDisposable, ICloneable
 	/// Returns the line spacing of this <see cref='Font'/>.
 	/// </summary>
 	public float GetHeight() => m_font.Metrics.Descent - m_font.Metrics.Ascent + m_font.Metrics.Leading;
-
-	/// <summary>
-	/// Returns a <see cref='Font'/> collection in the specified location.
-	/// </summary>
-	public static ICollection<Font> GetFonts(string location)
-	{
-		var fonts = new ConcurrentBag<Font>();
-		var files = Directory.EnumerateFiles(location);
-		Parallel.ForEach(files, fontFile =>
-		{
-			if (FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile)))
-			{
-				var family = new FontFamily(fontFile);
-				var font = new Font(family);
-				fonts.Add(font);
-			}
-		});
-		return fonts.ToList();
-	}
 
 	#endregion
 
@@ -292,14 +255,6 @@ public class Font : IDisposable, ICloneable
 		}
 		return 1;
 	}
-
-	#endregion
-
-
-	#region Utilities
-
-	private static readonly string SYSTEM_FONT_PATH = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-	private static readonly string[] FONT_EXTENSIONS = { ".ttf", ".otf", ".eot", ".woff", ".woff2" };
 
 	#endregion
 }
