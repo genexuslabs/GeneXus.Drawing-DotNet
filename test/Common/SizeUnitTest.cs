@@ -21,8 +21,8 @@ internal class SizeUnitTest
 	[Test]
 	public void Constructor_Properties()
 	{
-		float w = 10f, h = 20f;
-		var size = new Size() { Width = w, Height = h };
+		const int w = 10, h = 20;
+		Size size = new() { Width = w, Height = h };
 		Assert.Multiple(() =>
 		{
 			Assert.That(size.Width, Is.EqualTo(w));
@@ -31,10 +31,10 @@ internal class SizeUnitTest
 	}
 
 	[Test]
-	public void Constructor_Float()
+	public void Constructor_WidthHeight()
 	{
-		float w = 10f, h = 20f;
-		var size = new Size(w, h);
+		const int w = 10, h = 20;
+		Size size = new(w, h);
 		Assert.Multiple(() =>
 		{
 			Assert.That(size.Width, Is.EqualTo(w));
@@ -45,8 +45,8 @@ internal class SizeUnitTest
 	[Test]
 	public void Constructor_Point()
 	{
-		var point = new Point(30f, 40f);
-		var size = new Size(point);
+		Point point = new(30, 40);
+		Size size = new(point);
 		Assert.Multiple(() =>
 		{
 			Assert.That(size.Width, Is.EqualTo(point.X));
@@ -57,130 +57,94 @@ internal class SizeUnitTest
 	[Test]
 	public void Operator_Equality()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(10f, 20f);
+		Size size1 = new(10, 20);
+		Size size2 = new(10, 20);
 		Assert.That(size1 == size2, Is.True);
 	}
 
 	[Test]
 	public void Operator_Inequality()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(20f, 30f);
+		Size size1 = new(10, 20);
+		Size size2 = new(20, 30);
 		Assert.That(size1 != size2, Is.True);
 	}
 
 	[Test]
 	public void Operator_Addition()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(5f, 10f);
-		var result = size1 + size2;
+		Size size1 = new(10, 20);
+		Size size2 = new(5, 10);
+		Size result = size1 + size2;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.Width, Is.EqualTo(15f));
-			Assert.That(result.Height, Is.EqualTo(30f));
+			Assert.That(result.Width, Is.EqualTo(15));
+			Assert.That(result.Height, Is.EqualTo(30));
 		});
 	}
 
 	[Test]
 	public void Operator_Substraction()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(5f, 10f);
-		var result = size1 - size2;
+		Size size1 = new(10, 20);
+		Size size2 = new(5, 10);
+		Size result = size1 - size2;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.Width, Is.EqualTo(5f));
-			Assert.That(result.Height, Is.EqualTo(10f));
+			Assert.That(result.Width, Is.EqualTo(5));
+			Assert.That(result.Height, Is.EqualTo(10));
 		});
 	}
 
 	[Test]
 	public void Operator_Multiplication_Right()
 	{
-		var size = new Size(10f, 20f);
-		var result = size * 2;
+		Size size = new(10, 20);
+		Size result = size * 2;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.Width, Is.EqualTo(20f));
-			Assert.That(result.Height, Is.EqualTo(40f));
+			Assert.That(result.Width, Is.EqualTo(20));
+			Assert.That(result.Height, Is.EqualTo(40));
 		});
 	}
 
 	[Test]
 	public void Operator_Multiplication_Left()
 	{
-		var size = new Size(10f, 20f);
-		var result = 2 * size;
+		Size size = new(10, 20);
+		Size result = 2 * size;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.Width, Is.EqualTo(20f));
-			Assert.That(result.Height, Is.EqualTo(40f));
+			Assert.That(result.Width, Is.EqualTo(20));
+			Assert.That(result.Height, Is.EqualTo(40));
 		});
 	}
 
 	[Test]
 	public void Operator_Division()
 	{
-		var size1 = new Size(10f, 20f);
-		var result = size1 / 2;
+		Size size1 = new(10, 20);
+		Size result = size1 / 2;
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.Width, Is.EqualTo(5f));
-			Assert.That(result.Height, Is.EqualTo(10f));
-		});
-	}
-
-	[Test]
-	public void Operator_Round()
-	{
-		var size1 = new Size(10.2f, 20.8f);
-		var result = Size.Round(size1);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.Width, Is.EqualTo(10f));
-			Assert.That(result.Height, Is.EqualTo(21f));
-		});
-	}
-
-	[Test]
-	public void Operator_Truncate()
-	{
-		var size1 = new Size(10.9f, 20.1f);
-		var result = Size.Truncate(size1);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.Width, Is.EqualTo(10f));
-			Assert.That(result.Height, Is.EqualTo(20f));
-		});
-	}
-
-	[Test]
-	public void Operator_Ceiling()
-	{
-		var size1 = new Size(10.2f, 20.6f);
-		var result = Size.Ceiling(size1);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.Width, Is.EqualTo(11f));
-			Assert.That(result.Height, Is.EqualTo(21f));
+			Assert.That(result.Width, Is.EqualTo(5));
+			Assert.That(result.Height, Is.EqualTo(10));
 		});
 	}
 
 	[Test]
 	public void Method_Equals()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(10f, 20f);
-		Assert.That(size1.Equals(size2), Is.True);
+		Size size1 = new(10, 20);
+		Size size2 = new(10, 20);
+		Assert.That(size1, Is.EqualTo(size2));
 	}
 
 	[Test]
 	public void Method_GetHashCode()
 	{
-		var size1 = new Size(10f, 20f);
-		var size2 = new Size(10f, 20f);
+		Size size1 = new(10, 20);
+		Size size2 = new(10, 20);
 		Assert.That(size2.GetHashCode(), Is.EqualTo(size1.GetHashCode()));
 	}
 }

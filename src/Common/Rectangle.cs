@@ -17,7 +17,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// Initializes a new instance of the <see cref='Rectangle'/> struct with the 
 	/// specified location and size.
 	/// </summary>
-	public Rectangle(float x, float y, float width, float height)
+	public Rectangle(int x, int y, int width, int height)
 		: this(new SKRect(x, y, width + x, height + y)) { }
 
 	/// <summary>
@@ -29,13 +29,13 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Rectangle'/> struct with the specified location (x, y) and size.
 	/// </summary>
-	public Rectangle(float x, float y, Size size)
+	public Rectangle(int x, int y, Size size)
 		: this(x, y, size.Width, size.Height) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Rectangle'/> struct with the specified location and size (width, height).
 	/// </summary>
-	public Rectangle(Point location, float width, float height)
+	public Rectangle(Point location, int width, int height)
 		: this(location.X, location.Y, width, height) { }
 
 	/// <summary>
@@ -99,41 +99,41 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// Gets the x-coordinate of the upper-left corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/> .
 	/// </summary>
-	public readonly float Left => m_rect.Left;
+	public readonly int Left => (int)m_rect.Left;
 
 	/// <summary>
 	/// Gets the x-coordinate of the lower-right corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/>.
 	/// </summary>
-	public readonly float Right => m_rect.Right;
+	public readonly int Right => (int)m_rect.Right;
 
 	/// <summary>
 	/// Gets the y-coordinate of the upper-left corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/>.
 	/// </summary>
-	public readonly float Top => m_rect.Top;
+	public readonly int Top => (int)m_rect.Top;
 
 	/// <summary>
 	/// Gets the y-coordinate of the lower-right corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/>.
 	/// </summary>
-	public readonly float Bottom => m_rect.Bottom;
+	public readonly int Bottom => (int)m_rect.Bottom;
 
 	/// <summary>
 	/// Gets or sets the width of the rectangular region defined by this <see cref='Rectangle'/>.
 	/// </summary>
-	public float Width
+	public int Width
 	{
-		readonly get => m_rect.Width;
+		readonly get => (int)m_rect.Width;
 		set => m_rect.Right = m_rect.Left + value;
 	}
 
 	/// <summary>
 	/// Gets or sets the width of the rectangular region defined by this <see cref='Rectangle'/>.
 	/// </summary>
-	public float Height
+	public int Height
 	{
-		readonly get => m_rect.Height;
+		readonly get => (int)m_rect.Height;
 		set => m_rect.Bottom = m_rect.Top + value;
 	}
 
@@ -141,7 +141,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// Gets or sets the x-coordinate of the upper-left corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/>.
 	/// </summary>
-	public float X
+	public int X
 	{
 		readonly get => Left;
 		set
@@ -155,7 +155,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// Gets or sets the y-coordinate of the upper-left corner of the rectangular region defined by this
 	/// <see cref='Rectangle'/>.
 	/// </summary>
-	public float Y
+	public int Y
 	{
 		readonly get => Top;
 		set
@@ -170,7 +170,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// </summary>
 	public Size Size
 	{
-		get => new Size(Width, Height);
+		get => new(Width, Height);
 		set => (Width, Height) = (value.Width, value.Height);
 	}
 
@@ -180,7 +180,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// </summary>
 	public Point Location
 	{
-		get => new Point(X, Y);
+		get => new(X, Y);
 		set => (X, Y) = (value.X, value.Y);
 	}
 
@@ -198,7 +198,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Creates a new <see cref='Rectangle'/> with the specified location and size.
 	/// </summary>
-	public static Rectangle FromLTRB(float left, float top, float right, float bottom) => new(left, top, unchecked(right - left), unchecked(bottom - top));
+	public static Rectangle FromLTRB(int left, int top, int right, int bottom) => new(left, top, unchecked(right - left), unchecked(bottom - top));
 
 	#endregion
 
@@ -215,7 +215,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// Determines if the specified point is contained within the rectangular region defined by this
 	/// <see cref='Rectangle'/> .
 	/// </summary>
-	public readonly bool Contains(float x, float y) => m_rect.Contains(x, y);
+	public readonly bool Contains(int x, int y) => m_rect.Contains(x, y);
 
 	/// <summary>
 	/// Determines if the specified point is contained within the rectangular region defined by this
@@ -260,7 +260,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Inflates this <see cref='Rectangle'/> by the specified amount.
 	/// </summary>
-	public void Inflate(float width, float height) => m_rect.Inflate(width, height);
+	public void Inflate(int width, int height) => m_rect.Inflate(width, height);
 
 	/// <summary>
 	/// Inflates this <see cref='Rectangle'/> by the specified amount.
@@ -270,7 +270,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Creates a <see cref='Rectangle'/> that is inflated by the specified amount.
 	/// </summary>
-	public static Rectangle Inflate(Rectangle rect, float x, float y)
+	public static Rectangle Inflate(Rectangle rect, int x, int y)
 	{
 		var ret = SKRect.Inflate(rect.m_rect, x, y);
 		return new Rectangle(ret);
@@ -279,7 +279,7 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// <summary>
 	/// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
 	/// </summary>
-	public void Offset(float x, float y) => m_rect.Offset(x, y);
+	public void Offset(int x, int y) => m_rect.Offset(x, y);
 
 	/// <summary>
 	/// Adjusts the location of this <see cref='Rectangle'/> by the specified amount.
