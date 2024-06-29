@@ -13,6 +13,7 @@ public class Font : IDisposable, ICloneable
 {
 	internal readonly FontFamily m_family;
 	internal readonly float m_size;
+	private readonly GraphicsUnit _unit;
 
 	internal readonly string m_original = null;
 
@@ -219,6 +220,12 @@ public class Font : IDisposable, ICloneable
 
 	private static ICollection<Font> s_SystemFonts = null;
 
+	/// <summary>
+	/// Gets the unit of measure for this <see cref='Font'/>.
+	/// </summary>
+	/// <returns>A <see cref='GraphicsUnit'/> that represents the unit of measure for this <see cref='Font'/>.</returns>
+	public GraphicsUnit Unit => m_unit;
+	
 	#endregion
 
 
