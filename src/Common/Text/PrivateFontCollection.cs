@@ -9,11 +9,11 @@ public class PrivateFontCollection : FontCollection
 	/// <summary>
 	///  Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
 	/// </summary>
-	public PrivateFontCollection() : base()
+	public PrivateFontCollection()
 	{ }
 
 	/// <summary>
-	///  Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
+	/// Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
 	public void AddFontFile(string filePath)
 	{
@@ -21,7 +21,7 @@ public class PrivateFontCollection : FontCollection
 	}
 
 	/// <summary>
-	///  Adds a font contained in system memory to this <see cref='PrivateFontCollection'/>.
+	/// Adds a font contained in system memory to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
 	public void AddMemoryFont(IntPtr memory, int length)
 	{

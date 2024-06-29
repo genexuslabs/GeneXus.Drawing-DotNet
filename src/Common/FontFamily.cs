@@ -150,7 +150,7 @@ public class FontFamily : IDisposable
 		&& ff.m_index == m_index;
 
 	/// <summary>
-	///  Gets a hash code for this <see cref='FontFamily'/>.
+	/// Gets a hash code for this <see cref='FontFamily'/>.
 	/// </summary>
 	public override int GetHashCode() => Name.GetHashCode();
 
@@ -160,7 +160,7 @@ public class FontFamily : IDisposable
 	#region IDisposable
 
 	/// <summary>
-	///  Cleans up resources for this <see cref='FontFamily'/>.
+	/// Cleans up resources for this <see cref='FontFamily'/>.
 	/// </summary>
 	public void Dispose()
 	{
