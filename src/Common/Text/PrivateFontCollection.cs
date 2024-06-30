@@ -15,10 +15,9 @@ public class PrivateFontCollection : FontCollection
 	/// <summary>
 	///  Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
-	public void AddFontFile(string filename)
+	public void AddFontFile(string filePath)
 	{
-		var fontFamily = new FontFamily(filename);
-		m_families.Add(fontFamily);
+		m_families.Add(FontFamily.FromFile(filePath));
 	}
 
 	/// <summary>
@@ -29,9 +28,8 @@ public class PrivateFontCollection : FontCollection
 		byte[] fontData = new byte[length];
 		Marshal.Copy(memory, fontData, 0, length);
 
-		using var stream = new MemoryStream(fontData);
-
-		var fontFamily = new FontFamily(stream);
+		using MemoryStream stream = new(fontData);
+		FontFamily fontFamily = FontFamily.FromStream(stream);
 		m_families.Add(fontFamily);
 	}
 }
