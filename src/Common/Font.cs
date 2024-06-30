@@ -7,6 +7,7 @@ using SkiaSharp;
 
 namespace GeneXus.Drawing;
 
+[TypeConverter(typeof(FontConverter))]
 [Serializable]
 public class Font : IDisposable, ICloneable
 {
