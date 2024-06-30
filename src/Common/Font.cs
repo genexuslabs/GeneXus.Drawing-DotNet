@@ -11,31 +11,58 @@ namespace GeneXus.Drawing;
 [Serializable]
 public class Font : IDisposable, ICloneable
 {
-	internal readonly FontFamily m_family;
-	internal readonly float m_size;
-	private readonly GraphicsUnit _unit;
+	private readonly FontFamily m_family;
+	private readonly string m_original;
+	private readonly float m_size;
+	private readonly FontStyle m_style;
+	private readonly GraphicsUnit m_unit;
 
-	internal readonly string m_original = null;
+	/// <summary>
+	/// Initializes a new System.Drawing.Font that uses the specified existing <see cref='Font'/>
+	/// and <see cref='FontStyle'/> enumeration.
+	/// </summary>
+	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/></param>
+	/// <param name="newStyle">
+	/// The <see cref='FontStyle'/> to apply to the new S<see cref='Font'/>. Multiple
+	/// values of the <see cref='FontStyle'/> enumeration can be combined with the OR operator.
+	/// </param>
+	public Font(Font prototype, FontStyle newStyle)
+	{
+		m_family = prototype.FontFamily;
+		m_original = prototype.m_original;
+		m_size = prototype.m_size;
+		m_unit = prototype.m_unit;
+		m_style = newStyle;
+	}
 
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> using the specified <see cref='Drawing.FontFamily'/> and size.
 	/// </summary>
-	public Font(FontFamily family, float size = 12)
+	/// <param name="family">The <see cref='FontFamily'/> of the new <see cref='Font'/>.</param>
+	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
+	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
+	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
+	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point)
 	{
 		m_family = family ?? throw new ArgumentException("missing family");
 		m_size = size;
+		m_style = style;
+		m_unit = unit;
 	}
 
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> using the specified family name and size.
 	/// </summary>
-	public Font(string familyName, float size = 12)
-		: this(SystemFonts.Select(f => f.m_family).FirstOrDefault(f => f.MatchFamily(familyName))
-			  ?? throw new ArgumentException("missing font family", nameof(familyName)), size)
+	/// <param name="familyName">A string representation of the <see cref='FontFamily'/> of the new <see cref='Font'/>.</param>
+	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
+	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
+	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
+	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point)
+		: this(FontFamily.Match(familyName), size, style, unit)
 	{
 		m_original = familyName;
 	}
-
+	
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
@@ -46,8 +73,7 @@ public class Font : IDisposable, ICloneable
 	/// </summary>
 	public override string ToString()
 	{
-		string suffix = m_family.m_index > 0 ? $"#{m_family.m_index}" : string.Empty;
-		return $"[{GetType().Name}: Name={Name}{suffix}, Size={Size}]";
+		return $"[{GetType().Name}: Name={Name}, Size={Size}, Style={Style}, Unit={Unit}]";
 	}
 
 
@@ -142,27 +168,7 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets style information for this <see cref='Font'/>.
 	/// </summary>
-	public FontStyle Style
-	{
-		get
-		{
-			FontStyle style = FontStyle.Regular;
-
-			if (Italic)
-				style |= FontStyle.Italic;
-
-			if (Bold)
-				style |= FontStyle.Bold;
-
-			if (Underline)
-				style |= FontStyle.Underline;
-
-			if (Strikeout)
-				style |= FontStyle.Strikeout;
-
-			return style;
-		}
-	}
+	public FontStyle Style => m_style;
 
 	/// <summary>
 	/// Gets the FamilyName associated with this <see cref='Font'/>.
