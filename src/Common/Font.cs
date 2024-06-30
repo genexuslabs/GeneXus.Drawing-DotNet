@@ -172,7 +172,65 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the FaceName associated with this <see cref='Font'/>.
 	/// </summary>
-	public string FaceName => m_family.Face;
+	public string FaceName
+	{
+		get
+		{
+			string widthName = Width switch
+			{
+				1 => "Ultra Condensed",
+				2 => "Extra Condensed",
+				3 => "Condensed",
+				4 => "Semi Condensed",
+				5 => "Normal",
+				6 => "Semi Expanded",
+				7 => "Expanded",
+				8 => "Extra Expanded",
+				9 => "Ultra Expanded",
+				_ => string.Empty
+			};
+			
+			string weightName = Weight switch
+			{
+				< 100 => "Extra Thin",
+				< 275 => "Thin",
+				< 300 => "Extra Light",
+				< 350 => "Light",
+				< 400 => "Semi Light",
+				< 500 => "Normal",
+				< 600 => "Medium",
+				< 700 => "Semi Bold",
+				< 800 => "Bold",
+				< 900 => "Extra Bold",
+				< 950 => "Black",
+				< 999 => "Extra Black",
+				_ => string.Empty
+			};
+			
+			string slantName = Slant switch
+			{
+				SlantType.Normal => "Normal",
+				SlantType.Italic => "Italic",
+				SlantType.Oblique => "Oblique",
+				_ => string.Empty
+			};
+			
+			// Reference: https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/MS/Internal/FontFace/FontDifferentiator.cs,29
+			StringBuilder faceName = new();
+
+			AppendStyle(widthName);
+			AppendStyle(weightName);
+			AppendStyle(slantName);
+
+			return faceName.Append(faceName.Length > 0 ? string.Empty : "Regular").ToString();
+
+			void AppendStyle(string value)
+			{
+				if (value.Equals("Normal", StringComparison.OrdinalIgnoreCase)) return;
+				faceName.Append(faceName.Length > 0 ? " " : string.Empty).Append(value.Replace(" ", string.Empty));
+			}
+		}
+	}
 
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> has the italic style applied.
