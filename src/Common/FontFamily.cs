@@ -145,9 +145,7 @@ public class FontFamily : ICloneable, IDisposable
 	/// Indicates whether the specified object is a <see cref='FontFamily'/> and is identical to this <see cref='FontFamily'/>.
 	/// </summary>
 	public override bool Equals(object obj)
-		=> obj is FontFamily ff
-		&& ff.m_typeface.FamilyName.Equals(m_typeface.FamilyName, StringComparison.OrdinalIgnoreCase)
-		&& ff.m_index == m_index;
+		=> obj is FontFamily f && f.Name.Equals(Name, StringComparison.OrdinalIgnoreCase);
 
 	/// <summary>
 	/// Gets a hash code for this <see cref='FontFamily'/>.
@@ -155,8 +153,17 @@ public class FontFamily : ICloneable, IDisposable
 	public override int GetHashCode() => Name.GetHashCode();
 
 	#endregion
-
-
+	
+	/// <summary>
+	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
+	/// </summary>
+	public override string ToString() => $"[{GetType().Name}: Name={Name}]";
+	
+	/// <summary>
+	/// Cleans up resources for this <see cref='FontFamily'/>.
+	/// </summary>
+	~FontFamily() => Dispose(false);
+	
 	#region IDisposable
 
 	/// <summary>
@@ -168,31 +175,30 @@ public class FontFamily : ICloneable, IDisposable
 		Dispose(true);
 	}
 
-	protected virtual void Dispose(bool disposing)
+	private void Dispose(bool disposing)
 	{
-		m_typeface.Dispose();
-		m_data.Dispose();
+		if (!m_typefacesOwner)
+			return;
+
+		foreach (SKTypeface typeface in m_typefaces)
+			typeface.Dispose();
 	}
 
 	#endregion
-
-
-	#region Operators
-
-	/// <summary>
-	/// Creates a <see cref='SKTypeface'/> with the coordinates of the specified <see cref='FontFamily'/> .
-	/// </summary>
-	public static explicit operator SKTypeface(FontFamily fontFamily) => fontFamily.m_typeface;
-
-	#endregion
-
-
+	
 	#region Properties
 
 	/// <summary>
 	/// Gets the name of this <see cref='FontFamily'/>.
 	/// </summary>
-	public string Name => m_typeface.FamilyName;
+	public string Name => m_systemFamilyName ?? m_typefaces[0].FamilyName; // assume all typefaces have the same name
+	
+	#endregion
+
+
+
+	/// <summary>
+	/// </summary>
 
 	/// <summary>
 	///  Returns an array that contains all of the <see cref='FontFamily'/> objects associated with the current

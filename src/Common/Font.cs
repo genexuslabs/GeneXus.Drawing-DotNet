@@ -121,12 +121,10 @@ public class Font : IDisposable, ICloneable
 
 	#region Properties
 
-	private SKFont m_font => m_family.GetFont(m_size);
-
 	/// <summary>
 	/// Gets the face name of this <see cref='Font'/>.
 	/// </summary>
-	public string Name => $"{m_family.Name} {m_family.Face}";
+	public string Name => m_original ?? m_family.Name;
 
 	/// <summary>
 	/// Gets the name of the <see cref='Font'/> originally specified.
