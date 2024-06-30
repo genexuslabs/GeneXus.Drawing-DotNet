@@ -201,10 +201,48 @@ public class FontFamily : ICloneable, IDisposable
 	/// </summary>
 
 	/// <summary>
-	///  Returns an array that contains all of the <see cref='FontFamily'/> objects associated with the current
-	///  graphics context.
 	/// </summary>
-	public static FontFamily[] Families => new InstalledFontCollection().Families;
+
+	/// <summary>
+	/// </summary>
+
+	/// <summary>
+	/// </summary>
+
+	/// <summary>
+	/// </summary>
+
+	internal SKFont m_font => GetFont(10);
+	internal SKFont GetFont(float size) => m_typeface.ToFont(size);
+
+	/// <summary>
+	/// Indicates whether the specified <see cref='FontFamily'/> is available.
+	/// </summary>
+	/// <param name="style">The <see cref='FontStyle'/> to test.</param>
+	public bool IsStyleAvailable(FontStyle style)
+	{
+		SKTypeface typeface = GetTypeface(style);
+		if (m_systemFamilyName != null && typeface.FamilyName.Equals(m_systemFamilyName))
+			return false; // font not installed
+		
+		bool isBold = (style & FontStyle.Bold) != 0;
+		bool isItalic = (style & FontStyle.Italic) != 0;
+		return typeface.IsBold == isBold && typeface.IsItalic == isItalic;
+	}
+
+	/// <summary>
+	/// Creates an exact copy of this <see cref='FontFamily'/>.
+	/// </summary>
+	public object Clone() => new FontFamily(this);
+	
+	#endregion
+	
+	#region Class Properties
+
+	/// <summary>
+	/// Returns an array that contains all of the <see cref='FontFamily'/> objects of the system
+	/// </summary>
+	public static FontFamily[] Families => InstalledFontCollection.Instance.Families;
 
 	/// <summary>
 	///  Gets a generic monospace <see cref='FontFamily'/>.
@@ -220,52 +258,6 @@ public class FontFamily : ICloneable, IDisposable
 	///  Gets a generic Serif <see cref='FontFamily'/>.
 	/// </summary>
 	public static FontFamily GenericSerif => new(GenericFontFamilies.Serif);
-
-	#endregion
-
-
-	#region Methods
-
-	internal SKFont m_font => GetFont(10);
-	internal SKFont GetFont(float size) => m_typeface.ToFont(size);
-
-	/// <summary>
-	/// Returns the cell ascent of this <see cref='FontFamily'/>.
-	/// </summary>
-	public int GetCellAscent() => (int)Math.Abs(m_font.Metrics.Ascent * GetEmHeight() / m_font.Size);
-
-	/// <summary>
-	/// Creates an exact copy of this <see cref='FontFamily'/>.
-	/// </summary>
-	public object Clone() => new FontFamily(this);
-	
-
-	/// <summary>
-	/// Gets the height, of the em square of this <see cref='FontFamily'/>.
-	/// </summary>
-	public int GetEmHeight() => m_typeface.UnitsPerEm;
-
-	/// Returns the distance between two consecutive lines of text for this <see cref='FontFamily'/> with the
-	/// specified <see cref='FontStyle'/>.
-	/// </summary>
-	public int GetLineSpacing() => (int)Math.Abs(m_font.Spacing * GetEmHeight() / m_font.Size);
-
-	/// <summary>
-	///  Returns the name of this <see cref='FontFamily'/> in the specified language.
-	/// </summary>
-	public string GetName(int language) => Name; // NOTE: Language is not suppored in SkiaSharp
-
-	/// <summary>
-	///  Indicates whether the specified <see cref='FontStyle'/> is available.
-	/// </summary>
-	public bool IsStyleAvailable(FontStyle style) => (new Font(this).Style & style) == style;
-
-	#endregion
-
-
-	internal bool MatchFamily(string familyName) // TODO: Improve this code
-		=> new string[] { Name, $"{Name} {Face}", $"{Name}-{Face}" }.Any(candidateName
-			=> candidateName.Equals(familyName, StringComparison.OrdinalIgnoreCase));
 
 	#endregion
 }
