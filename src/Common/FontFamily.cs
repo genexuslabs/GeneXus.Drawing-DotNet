@@ -9,41 +9,72 @@ namespace GeneXus.Drawing;
 
 public class FontFamily : IDisposable
 {
-	internal readonly int m_index;
-	internal readonly SKData m_data;
-	internal readonly SKTypeface m_typeface;
+	private readonly string m_systemFamilyName; // To look in the default fonts
+	private readonly SKTypeface[] m_typefaces; // This were loaded from a file
+	private readonly bool m_typefacesOwner; // To know if we need to dispose the typefaces
 
-	internal FontFamily(SKData skData, int index)
+	private FontFamily(SKTypeface[] typefaces)
 	{
-		m_index = index;
-		m_data = skData;
-		m_typeface = SKTypeface.FromData(m_data, m_index);
-		if (m_typeface == null) throw new ArgumentException("file does not exist or is an invalid font file");
+		if (typefaces.Length == 0)
+			throw new ArgumentException("At least 1 typeface is required", nameof(typefaces));
+
+		m_typefaces = typefaces;
+		m_typefacesOwner = true; // the typefaces will be disposed with this object
 	}
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified filename name
-	/// and optional index for font collection.
-	/// </summary>
-	public FontFamily(string name, int index = 0)
-		: this(File.Exists(name) ? SKData.Create(name) : new Font(name).FontFamily.m_data, index) { }
+	private FontFamily(FontFamily family)
+	{
+		m_systemFamilyName = family.m_systemFamilyName;
+		m_typefaces = family.m_typefaces;
+	}
+	
+	private FontFamily(FontFamily[] families)
+	{
+		if (families.Length == 0)
+			throw new ArgumentException("At least 1 base family is required", nameof(families));
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref='FontFamily'/> class from the specified stream name
-	/// and optional index for font collection.
-	/// </summary>
-	public FontFamily(Stream stream, int index = 0)
-		: this(SKData.Create(stream), index) { }
+		List<SKTypeface> typefaces = new();
+		foreach (FontFamily family in families)
+		{
+			m_systemFamilyName ??= family.m_systemFamilyName; // assuming all have the same name
+			if (family.m_typefaces != null)
+				typefaces.AddRange(family.m_typefaces);
+		}
 
-	/// <summary>
-	///  Initializes a new instance of the <see cref='FontFamily'/> class in the specified
-	///  <see cref='FontCollection'/> and with the specified name.
-	/// </summary>
-	public FontFamily(string name, FontCollection fontCollection)
-		: this(fontCollection.Families.FirstOrDefault(ff => ff.MatchFamily(name))?.m_data
-			  ?? throw new ArgumentException($"missing family from collection", nameof(name)), 0)
-	{ }
+		if (typefaces.Count > 0)
+			m_typefaces = typefaces.ToArray();
+	}
 
+	public static FontFamily FromFile(string filePath)
+	{
+		SKData data = SKData.Create(filePath) ?? throw new FileNotFoundException();
+		return FromData(data);
+	}
+
+	public static FontFamily FromStream(Stream stream)
+	{
+		SKData data = SKData.Create(stream);
+		return FromData(data);
+	}
+	
+	private static FontFamily FromData(SKData data)
+	{
+		int index = 0;
+		List<SKTypeface> list = new();
+		while (true)
+		{
+			SKTypeface typeface = SKFontManager.Default.CreateTypeface(data, index++);
+			if (typeface == null)
+				break;
+			list.Add(typeface);
+		}
+
+		if (list.Count == 0)
+			throw new ArgumentException("No font found");
+		
+		return new FontFamily(list.ToArray());
+	}
+	
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
 	/// </summary>
@@ -72,15 +103,41 @@ public class FontFamily : IDisposable
 	}
 
 	/// <summary>
-	///  Cleans up resources for this <see cref='FontFamily'/>.
+	/// Initializes a new <see cref='FontFamily'/> with the specified name.
 	/// </summary>
-	~FontFamily() => Dispose(false);
-
+	/// <param name="name">The name of the new <see cref='FontFamily'/>.</param>
+	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not installed.</exception>
+	public FontFamily(string name)
+	{
+		m_systemFamilyName = name;
+	}
+	
 	/// <summary>
-	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
+	/// Initializes a new <see cref='FontFamily'/> in the specified <see cref='FontCollection'/> with the specified name.
 	/// </summary>
-	public override string ToString() => $"[{GetType().Name}: Name={m_typeface.FamilyName}]";
+	/// <param name="name">The name of the new <see cref='FontFamily'/>.</param>
+	/// <param name="collection">The <see cref='FontCollection'/> that contains this <see cref='FontFamily'/>.</param>
+	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not in the collection.</exception>
+	public FontFamily(string name, FontCollection collection)
+		: this(Match(name, collection.Families) ?? throw new ArgumentException("missing family from collection", nameof(name))) { }
 
+	private static FontFamily[] Match(string name, FontFamily[] families)
+	{
+		FontFamily[] matched = families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray();
+		return matched.Length == 0 ? null : matched;
+	}
+	
+	internal static FontFamily Match(string name)
+	{
+		FontFamily[] matched = Match(name, Families);
+		if (matched == null)
+			return GenericSansSerif;
+		
+		if (matched.Length == 1)
+			return matched[0];
+		
+		return new FontFamily(matched);
+	}
 
 	#region IEqualitable
 
