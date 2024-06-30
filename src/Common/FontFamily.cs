@@ -45,10 +45,31 @@ public class FontFamily : IDisposable
 	{ }
 
 	/// <summary>
-	///  Initializes a new instance of the <see cref='FontFamily'/> class from the specified generic font family.
+	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
 	/// </summary>
+	/// <param name="genericFamily">
+	/// The <see cref='GenericFontFamilies'/> from which to create the new <see cref='FontFamily'/>.
+	/// </param>
 	public FontFamily(GenericFontFamilies genericFamily)
-		: this(GetGenericFontFamily(genericFamily).m_data, 0) { }
+		: this(GetGenericFontFamily(genericFamily)) { }
+
+	private static FontFamily GetGenericFontFamily(GenericFontFamilies genericFamily)
+	{
+		string[] candidates = genericFamily switch // NOTE: Define a set of predefined fonts
+		{
+			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
+			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
+			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
+			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
+		};
+		foreach (string candidate in candidates)
+		{
+			FontFamily family = Families.FirstOrDefault(f => f.Name.Equals(candidate, StringComparison.OrdinalIgnoreCase));
+			if (family != null)
+				return family;
+		}
+		throw new ArgumentException("Generic font family is not installed", nameof(genericFamily));
+	}
 
 	/// <summary>
 	///  Cleans up resources for this <see cref='FontFamily'/>.
@@ -177,21 +198,6 @@ public class FontFamily : IDisposable
 
 	#endregion
 
-
-	private static FontFamily GetGenericFontFamily(GenericFontFamilies genericFamily)
-	{
-		var candidates = genericFamily switch // NOTE: Define a set of predefined fonts
-		{
-			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
-			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
-			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
-			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
-		};
-		foreach (var candidate in candidates)
-			if (Font.SystemFonts.FirstOrDefault(f => f.FamilyName.Equals(candidate, StringComparison.OrdinalIgnoreCase)) is Font font)
-				return font.FontFamily;
-		throw new ArgumentException($"invalid generic font family", nameof(genericFamily));
-	}
 
 	internal bool MatchFamily(string familyName) // TODO: Improve this code
 		=> new string[] { Name, $"{Name} {Face}", $"{Name}-{Face}" }.Any(candidateName
