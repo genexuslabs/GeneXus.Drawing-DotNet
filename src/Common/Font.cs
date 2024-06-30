@@ -96,15 +96,14 @@ public class Font : IDisposable, ICloneable
 	#region IClonable
 
 	/// <summary>
-	///  Creates an exact copy of this <see cref='Font'/>.
+	/// Creates an exact copy of this <see cref='Font'/>.
 	/// </summary>
 	public object Clone()
 	{
-		var index = m_family.m_index;
-		var bytes = m_family.m_data.ToArray();
-		var data = SKData.CreateCopy(bytes);
-		var family = new FontFamily(data, index);
-		return new Font(family);
+		if (m_original != null)
+			return new Font(m_original, m_size, m_style, m_unit);
+		else
+			return new Font((FontFamily)m_family.Clone(), m_size, m_style, m_unit);
 	}
 
 	#endregion

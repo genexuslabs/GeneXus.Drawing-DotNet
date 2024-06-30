@@ -7,7 +7,7 @@ using SkiaSharp;
 
 namespace GeneXus.Drawing;
 
-public class FontFamily : IDisposable
+public class FontFamily : ICloneable, IDisposable
 {
 	private readonly string m_systemFamilyName; // To look in the default fonts
 	private readonly SKTypeface[] m_typefaces; // This were loaded from a file
@@ -229,9 +229,10 @@ public class FontFamily : IDisposable
 	public int GetCellAscent() => (int)Math.Abs(m_font.Metrics.Ascent * GetEmHeight() / m_font.Size);
 
 	/// <summary>
-	/// Returns the cell descent of this <see cref='FontFamily'/>.
+	/// Creates an exact copy of this <see cref='FontFamily'/>.
 	/// </summary>
-	public int GetCellDescent() => (int)Math.Abs(m_font.Metrics.Descent * GetEmHeight() / m_font.Size);
+	public object Clone() => new FontFamily(this);
+	
 
 	/// <summary>
 	/// Gets the height, of the em square of this <see cref='FontFamily'/>.
