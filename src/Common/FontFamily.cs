@@ -2,8 +2,8 @@ using GeneXus.Drawing.Text;
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using SkiaSharp;
+using System.Collections.Generic;
 
 namespace GeneXus.Drawing;
 
@@ -194,26 +194,82 @@ public class FontFamily : ICloneable, IDisposable
 	public string Name => m_systemFamilyName ?? m_typefaces[0].FamilyName; // assume all typefaces have the same name
 	
 	#endregion
+	
+	#region Methods
 
+	internal SKTypeface GetTypeface(FontStyle style)
+	{
+		bool isBold = (style & FontStyle.Bold) != 0;
+		bool isItalic = (style & FontStyle.Italic) != 0;
 
+		SKTypeface typeface = m_typefaces?.FirstOrDefault(t => t.IsBold == isBold && t.IsItalic == isItalic);
+		if (typeface != null)
+			return typeface;
+
+		if (m_systemFamilyName != null)
+		{
+			SKFontStyle skFontStyle = isBold ?
+				isItalic ? SKFontStyle.BoldItalic : SKFontStyle.Bold :
+				isItalic ? SKFontStyle.Italic : SKFontStyle.Normal;
+			return SKFontManager.Default.MatchFamily(m_systemFamilyName, skFontStyle);
+		}
+
+		if (m_typefaces == null)
+			throw new InvalidOperationException("_systemFamilyName and _typefaces can't be both null");
+
+		return m_typefaces[0];
+	}
 
 	/// <summary>
+	/// Returns the cell ascent, in design units, of the <see cref='FontFamily'/> of the specified style.
 	/// </summary>
+	/// <param name="style">A <see cref='FontStyle'/> that contains style information for the font.</param>
+	/// <returns>The cell ascent for this <see cref='FontFamily'/> that uses the specified <see cref='FontStyle'/>.</returns>
+	public int GetCellAscent(FontStyle style)
+	{
+		SKTypeface typeface = GetTypeface(style);
+		SKFont font = typeface.ToFont(10);
+		return (int)Math.Round(Math.Abs(font.Metrics.Ascent * typeface.UnitsPerEm / font.Size));
+	}
 
 	/// <summary>
+	/// Returns the cell descent, in design units, of the <see cref='FontFamily'/> of the specified style.
 	/// </summary>
+	/// <param name="style">A <see cref='FontStyle'/> that contains style information for the font.</param>
+	/// <returns>The cell descent for this <see cref='FontFamily'/> that uses the specified <see cref='FontStyle'/>.</returns>
+	public int GetCellDescent(FontStyle style)
+	{
+		SKTypeface typeface = GetTypeface(style);
+		SKFont font = typeface.ToFont(10);
+		return (int)Math.Round(Math.Abs(font.Metrics.Descent * typeface.UnitsPerEm / font.Size));
+	}
 
 	/// <summary>
+	/// Gets the height, in font design units, of the em square for the specified style.
 	/// </summary>
+	/// <param name="style">A <see cref='FontStyle'/> for which to get the em height.</param>
+	/// <returns>The height of the em square.</returns>
+	public int GetEmHeight(FontStyle style) => GetTypeface(style).UnitsPerEm;
 
 	/// <summary>
+	/// Returns the line spacing, in design units, of the <see cref='FontFamily'/> of the specified style.
+	/// The line spacing is the vertical distance between the base lines of two consecutive lines of text.
 	/// </summary>
+	/// <param name="style">The <see cref='FontStyle'/> to apply.</param>
+	/// <returns>The distance between two consecutive lines of text.</returns>
+	public int GetLineSpacing(FontStyle style)
+	{
+		SKTypeface typeface = GetTypeface(style);
+		SKFont font = typeface.ToFont(10);
+		return (int)Math.Round(Math.Abs(font.Spacing * typeface.UnitsPerEm / font.Size));
+	}
 
 	/// <summary>
+	/// Returns the name of this <see cref='FontFamily'/> in the specified language.
 	/// </summary>
-
-	internal SKFont m_font => GetFont(10);
-	internal SKFont GetFont(float size) => m_typeface.ToFont(size);
+	/// <param name="language">The language in which the name is returned.</param>
+	/// <returns>A <see cref='String'/> that represents the name, in the specified language, of this <see cref='FontFamily'/>.</returns>
+	public string GetName(int language) => Name; // NOTE: Language is not supported in SkiaSharp
 
 	/// <summary>
 	/// Indicates whether the specified <see cref='FontFamily'/> is available.

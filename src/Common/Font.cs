@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -114,7 +113,9 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a <see cref='SKFont'/> with the coordinates of the specified <see cref='Font'/> .
 	/// </summary>
-	public static explicit operator SKFont(Font font) => font.m_family.GetFont(font.m_size);
+	public static explicit operator SKFont(Font font) => font.Typeface.ToFont(font.m_size);
+
+	private SKTypeface Typeface => m_family.GetTypeface(m_style);
 
 	#endregion
 
@@ -139,12 +140,12 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the weight of this <see cref='Font'/>.
 	/// </summary>
-	public int Weight => m_family.Weight;
+	public int Weight => Typeface.FontWeight;
 
 	/// <summary>
 	/// Gets the width of this <see cref='Font'/>.
 	/// </summary>
-	public int Width => m_family.Width;
+	public int Width => Typeface.FontWidth;
 
 	/// <summary>
 	/// Gets the line spacing of this <see cref='Font'/>.
@@ -160,7 +161,13 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the slant of this <see cref='Font'/>.
 	/// </summary>
-	public SlantType Slant => m_family.Slant;
+	public SlantType Slant => Typeface.FontSlant switch
+	{
+		SKFontStyleSlant.Oblique => SlantType.Oblique,
+		SKFontStyleSlant.Italic => SlantType.Italic,
+		SKFontStyleSlant.Upright => SlantType.Normal,
+		_ => throw new Exception("missing slant type")
+	};
 
 	/// <summary>
 	/// Gets style information for this <see cref='Font'/>.
@@ -238,22 +245,24 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> has the italic style applied.
 	/// </summary>
-	public bool Italic => m_family.m_typeface.IsItalic;
+	public bool Italic => Typeface.IsItalic;
 
 	/// <summary>
 	/// Gets a value that indicates whether this <see cref='Font'/> is bold.
 	/// </summary>
-	public bool Bold => m_family.m_typeface.IsBold;
+	public bool Bold => Typeface.IsBold;
 
+	private SKFontMetrics Metrics => Typeface.ToFont(m_size).Metrics;
+	
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Font'/> is underlined.
 	/// </summary>
-	public bool Underline => m_font.Metrics.UnderlineThickness > 0 && m_font.Metrics.UnderlinePosition == 0f;
+	public bool Underline => Metrics is { UnderlineThickness: > 0, UnderlinePosition: 0f };
 
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Font'/> is strikeout (has a line through it).
 	/// </summary>
-	public bool Strikeout => m_font.Metrics.StrikeoutThickness > 0 && m_font.Metrics.StrikeoutPosition == 0f;
+	public bool Strikeout => Metrics is { StrikeoutThickness: > 0, StrikeoutPosition: 0f };
 
 	/// <summary>
 	/// Gets a value indicating whether the <see cref='Font'/> is a member of SystemFonts.
@@ -277,7 +286,7 @@ public class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Returns the line spacing of this <see cref='Font'/>.
 	/// </summary>
-	public float GetHeight() => m_font.Metrics.Descent - m_font.Metrics.Ascent + m_font.Metrics.Leading;
+	public float GetHeight() => Metrics.Descent - Metrics.Ascent + Metrics.Leading;
 
 	#endregion
 
