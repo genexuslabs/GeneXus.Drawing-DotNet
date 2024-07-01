@@ -99,4 +99,20 @@ internal class BitmapUnitTest
 		var pixelColor = bitmap.GetPixel(50, 50);
 		Assert.That(pixelColor, Is.EqualTo(Color.Red));
 	}
+
+	[Test]
+	public void Method_MakeTransparent()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
+		using var bitmap = new Bitmap(filePath);
+		var color = Color.FromArgb(1, 77, 135);
+		bitmap.MakeTransparent(color);
+		Assert.Multiple(() =>
+		{
+			for (int x = 0; x < bitmap.Width; x++)
+				for (int y = 0; y < bitmap.Height; y++)
+					if (bitmap.GetPixel(x, y) is Color pixel && pixel.R == color.R && pixel.G == color.G && pixel.B == color.B)
+						Assert.That(pixel.A, Is.Zero);
+		});
+	}
 }
