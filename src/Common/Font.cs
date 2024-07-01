@@ -276,17 +276,17 @@ public class Font : IDisposable, ICloneable
 	/// <returns>The em-size, in points, of this <see cref='Font'/></returns>
 	[Browsable(false)]
 	public float SizeInPoints => m_unit switch
-		{
-			GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
-			GraphicsUnit.Display => m_size * 72 / 96, // Assuming display unit is pixels with 96 DPI, but this can vary
-			GraphicsUnit.Pixel => m_size * 72 / 96, // Assuming 96 DPI for screen, so 1 pixel = 1/96 inch
-			GraphicsUnit.Point => m_size, // Already in points
-			GraphicsUnit.Inch => m_size * 72, // 1 inch = 72 points
-			GraphicsUnit.Document => m_size * 72 / 300, // 1 document unit = 1/300 inch
-			GraphicsUnit.Millimeter => m_size * 72 / 25.4f, // 1 millimeter = 1/25.4 inch
-			_ => throw new ArgumentException("Invalid GraphicsUnit")
-		};
-	
+	{
+		GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
+		GraphicsUnit.Display => m_size * 72 / 96, // Assuming display unit is pixels with 96 DPI, but this can vary
+		GraphicsUnit.Pixel => m_size * 72 / 96, // Assuming 96 DPI for screen, so 1 pixel = 1/96 inch
+		GraphicsUnit.Point => m_size, // Already in points
+		GraphicsUnit.Inch => m_size * 72, // 1 inch = 72 points
+		GraphicsUnit.Document => m_size * 72 / 300, // 1 document unit = 1/300 inch
+		GraphicsUnit.Millimeter => m_size * 72 / 25.4f, // 1 millimeter = 1/25.4 inch
+		_ => throw new ArgumentException("Invalid GraphicsUnit")
+	};
+
 	/// <summary>
 	/// Gets the unit of measure for this <see cref='Font'/>.
 	/// </summary>

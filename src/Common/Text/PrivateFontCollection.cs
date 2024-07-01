@@ -7,7 +7,7 @@ namespace GeneXus.Drawing.Text;
 public class PrivateFontCollection : FontCollection
 {
 	/// <summary>
-	///  Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
+	/// Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
 	/// </summary>
 	public PrivateFontCollection()
 	{ }

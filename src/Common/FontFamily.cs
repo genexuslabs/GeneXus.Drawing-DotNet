@@ -140,6 +140,18 @@ public class FontFamily : ICloneable, IDisposable
 		return new FontFamily(matched);
 	}
 
+
+	/// <summary>
+	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
+	/// </summary>
+	public override string ToString() => $"[{GetType().Name}: Name={Name}]";
+
+	/// <summary>
+	/// Cleans up resources for this <see cref='FontFamily'/>.
+	/// </summary>
+	~FontFamily() => Dispose(false);
+
+
 	#region IEqualitable
 
 	/// <summary>
@@ -154,17 +166,18 @@ public class FontFamily : ICloneable, IDisposable
 	public override int GetHashCode() => Name.GetHashCode();
 
 	#endregion
-	
+
+
+	#region IClonable
+
 	/// <summary>
-	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
+	/// Creates an exact copy of this <see cref='FontFamily'/>.
 	/// </summary>
-	public override string ToString() => $"[{GetType().Name}: Name={Name}]";
-	
-	/// <summary>
-	/// Cleans up resources for this <see cref='FontFamily'/>.
-	/// </summary>
-	~FontFamily() => Dispose(false);
-	
+	public object Clone() => new FontFamily(this);
+
+	#endregion
+
+
 	#region IDisposable
 
 	/// <summary>
@@ -187,6 +200,7 @@ public class FontFamily : ICloneable, IDisposable
 
 	#endregion
 	
+
 	#region Properties
 
 	/// <summary>
@@ -196,6 +210,7 @@ public class FontFamily : ICloneable, IDisposable
 	
 	#endregion
 	
+
 	#region Methods
 
 	internal SKTypeface GetTypeface(FontStyle style)
@@ -286,14 +301,10 @@ public class FontFamily : ICloneable, IDisposable
 		bool isItalic = (style & FontStyle.Italic) != 0;
 		return typeface.IsBold == isBold && typeface.IsItalic == isItalic;
 	}
-
-	/// <summary>
-	/// Creates an exact copy of this <see cref='FontFamily'/>.
-	/// </summary>
-	public object Clone() => new FontFamily(this);
 	
 	#endregion
 	
+
 	#region Class Properties
 
 	/// <summary>
