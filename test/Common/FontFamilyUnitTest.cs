@@ -66,6 +66,9 @@ internal class FontFamilyUnitTest
 	public void Method_GetFontFamilies()
 	{
 		string dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
+		if (string.IsNullOrEmpty(dirPath))
+			return; // it is empty in some linux
+
 		IEnumerable<FontFamily> fonts = InstalledFontCollection.GetFontFamilies(dirPath);
 		Assert.That(fonts, Is.Not.Empty);
 	}
@@ -74,12 +77,12 @@ internal class FontFamilyUnitTest
 	public void Constructor_GenericFont()
 	{
 		using FontFamily monospace = new(GenericFontFamilies.Monospace);
-		Assert.That(monospace.Name, Is.AnyOf("Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console").IgnoreCase);
+		Assert.That(monospace.Name, Is.AnyOf("Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console", "DejaVu Sans Mono").IgnoreCase);
 
 		using FontFamily sanserif = new(GenericFontFamilies.SansSerif);
-		Assert.That(sanserif.Name, Is.AnyOf("Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans").IgnoreCase);
+		Assert.That(sanserif.Name, Is.AnyOf("Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "DejaVu Sans").IgnoreCase);
 
 		using FontFamily serif = new(GenericFontFamilies.Serif);
-		Assert.That(serif.Name, Is.AnyOf("Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville").IgnoreCase);
+		Assert.That(serif.Name, Is.AnyOf("Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville", "DejaVu Serif").IgnoreCase);
 	}
 }

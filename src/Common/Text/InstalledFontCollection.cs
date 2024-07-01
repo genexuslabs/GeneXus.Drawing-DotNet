@@ -18,7 +18,9 @@ public class InstalledFontCollection : FontCollection
 	/// </summary>
 	private InstalledFontCollection()
 	{
-		m_families.AddRange(GetFontFamilies(SYSTEM_FONT_PATH));
+		string fontPath = SYSTEM_FONT_PATH; // this may be empty in some linux
+		if (!string.IsNullOrEmpty(fontPath))
+			m_families.AddRange(GetFontFamilies(SYSTEM_FONT_PATH));
 		m_families.AddRange(GetDefaultFontFamilies());
 	}
 	

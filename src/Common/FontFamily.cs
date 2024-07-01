@@ -88,11 +88,12 @@ public class FontFamily : ICloneable, IDisposable
 	{
 		string[] candidates = genericFamily switch // NOTE: Define a set of predefined fonts
 		{
-			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console" },
-			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans" },
-			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville" },
+			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console", "DejaVu Sans Mono" },
+			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "DejaVu Sans" },
+			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville", "DejaVu Serif" },
 			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
 		};
+
 		foreach (string candidate in candidates)
 		{
 			FontFamily family = Families.FirstOrDefault(f => f.Name.Equals(candidate, StringComparison.OrdinalIgnoreCase));
