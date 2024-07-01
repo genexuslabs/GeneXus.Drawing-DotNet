@@ -9,7 +9,7 @@ namespace GeneXus.Drawing;
 
 [TypeConverter(typeof(FontConverter))]
 [Serializable]
-public class Font : IDisposable, ICloneable
+public sealed class Font : IDisposable, ICloneable
 {
 	private readonly FontFamily m_family;
 	private readonly string m_original;
@@ -88,7 +88,7 @@ public class Font : IDisposable, ICloneable
 		Dispose(true);
 	}
 
-	protected virtual void Dispose(bool disposing) => m_family.Dispose();
+	private void Dispose(bool disposing) => m_family.Dispose();
 
 	#endregion
 

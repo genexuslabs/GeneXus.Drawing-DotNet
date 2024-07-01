@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace GeneXus.Drawing;
 
-public class FontFamily : ICloneable, IDisposable
+public sealed class FontFamily : ICloneable, IDisposable
 {
 	private readonly string m_systemFamilyName; // To look in the default fonts
 	private readonly SKTypeface[] m_typefaces; // This were loaded from a file
