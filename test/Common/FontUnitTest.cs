@@ -39,7 +39,7 @@ internal class FontUnitTest
 		//	    int ttcIndex = args.getCollectionIndex();
 		//	    if (ttcIndex != 0)
 		//		   return nullptr;
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && fileName.Equals("AvenirNext-Collection.ttc") && fontStyle != FontStyle.Regular)
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && fileName.Equals("AvenirNext-Collection.ttc") && fontStyle != FontStyle.Bold) // bold is index 0 so it works
 			return;
 
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && fileName.StartsWith("EncodeSans-"))
