@@ -45,13 +45,13 @@ public sealed class FontFamily : ICloneable, IDisposable
 			m_typefaces = typefaces.ToArray();
 	}
 
-	public static FontFamily FromFile(string filePath)
+	internal static FontFamily FromFile(string filePath)
 	{
 		SKData data = SKData.Create(filePath) ?? throw new FileNotFoundException();
 		return FromData(data);
 	}
 
-	public static FontFamily FromStream(Stream stream)
+	internal static FontFamily FromStream(Stream stream)
 	{
 		SKData data = SKData.Create(stream);
 		return FromData(data);

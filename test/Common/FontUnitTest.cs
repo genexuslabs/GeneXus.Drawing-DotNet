@@ -40,9 +40,10 @@ internal class FontUnitTest
 		//		   return nullptr;
 		
 		string fontPath = Path.Combine(FONT_PATH, fileName);
-		using FontFamily family = FontFamily.FromFile(fontPath);
+		using PrivateFontCollection fontCollection = new();
+		fontCollection.AddFontFile(fontPath);
 
-		using Font font = new(family, 12, fontStyle);
+		using Font font = new(fontCollection.Families[0], 12, fontStyle);
 		Assert.Multiple(() =>
 		{
 			Assert.That(font, Is.Not.Null);
@@ -79,9 +80,10 @@ internal class FontUnitTest
 	public void Method_Clone()
 	{
 		string fontPath = Path.Combine(FONT_PATH, "Montserrat-Regular.ttf");
-		using FontFamily family = FontFamily.FromFile(fontPath);
+		using PrivateFontCollection fontCollection = new();
+		fontCollection.AddFontFile(fontPath);
 
-		using Font font1 = new(family);
+		using Font font1 = new(fontCollection.Families[0]);
 		using Font font2 = font1.Clone() as Font;
 		Assert.That(font1, Is.Not.SameAs(font2));
 	}

@@ -32,7 +32,10 @@ internal class FontFamilyUnitTest
 	public void Constructor_FileName(string fileName, string familyName, FontStyle style, int ascent, int descent, int lineSpacing, int emHeight, int fontIndex = 0)
 	{
 		string fontPath = Path.Combine(FONT_PATH, fileName);
-		using FontFamily family = FontFamily.FromFile(fontPath);
+		using PrivateFontCollection fontCollection = new();
+		fontCollection.AddFontFile(fontPath);
+
+		FontFamily family = fontCollection.Families[0];
 		Assert.Multiple(() =>
 		{
 			Assert.That(family.Name, Is.EqualTo(familyName));
