@@ -110,6 +110,13 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not installed.</exception>
 	public FontFamily(string name)
 	{
+		if (string.IsNullOrEmpty(name))
+			throw new ArgumentException("Name can't be empty", nameof(name));
+		
+		using SKTypeface typeface = SKFontManager.Default.MatchFamily(name);
+		if (!typeface.FamilyName.Equals(name)) // MatchFamily() always returns a typeface even when the requested family name is not found
+			throw new ArgumentException("Font is not installed", nameof(name));
+		
 		m_systemFamilyName = name;
 	}
 	
@@ -139,7 +146,6 @@ public sealed class FontFamily : ICloneable, IDisposable
 		
 		return new FontFamily(matched);
 	}
-
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
