@@ -37,6 +37,7 @@ public enum GraphicsUnit
 	Document = 5,
 
 	/// <summary>
-	///  Specifies the millimeter as the unit of measure.
+	/// Specifies the millimeter as the unit of measure.
 	/// </summary>
+	Millimeter = 6
 }
