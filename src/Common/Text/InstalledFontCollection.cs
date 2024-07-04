@@ -14,28 +14,20 @@ public class InstalledFontCollection : FontCollection
 	public static readonly FontCollection Instance = new InstalledFontCollection();
 	
 	/// <summary>
-	///  Initializes a new instance of the <see cref='InstalledFontCollection'/> class.
+	/// Initializes a new instance of the <see cref='InstalledFontCollection'/> class.
 	/// </summary>
-	private InstalledFontCollection()
+	public InstalledFontCollection()
 	{
 		string fontPath = SYSTEM_FONT_PATH; // this may be empty in some linux
 		if (!string.IsNullOrEmpty(fontPath))
-			m_families.AddRange(GetFontFamilies(SYSTEM_FONT_PATH));
-		m_families.AddRange(GetDefaultFontFamilies());
-	}
-	
-	/// <summary>
-	/// Returns a <see cref='FontFamily'/> collection in the specified location.
-	/// </summary>
-	public static IEnumerable<FontFamily> GetFontFamilies(string location)
-	{
-		return (from fontFile in Directory.EnumerateFiles(location)
-			where FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile))
-			select FontFamily.FromFile(fontFile)).ToList();
-	}
+		{
+			IEnumerable<FontFamily> systemFontFamilies = Directory.EnumerateFiles(SYSTEM_FONT_PATH)
+				.Where(fontFile => FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile)))
+				.Select(FontFamily.FromFile).ToList();
+			m_families.AddRange(systemFontFamilies);
+		}
 
-	private static IEnumerable<FontFamily> GetDefaultFontFamilies()
-	{
-		return SKFontManager.Default.FontFamilies.Select(name => new FontFamily(name));
+		IEnumerable<FontFamily> defaultFontFamilies = SKFontManager.Default.FontFamilies.Select(name => new FontFamily(name));
+		m_families.AddRange(defaultFontFamilies);
 	}
 }

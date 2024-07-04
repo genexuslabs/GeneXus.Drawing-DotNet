@@ -68,17 +68,6 @@ internal class FontFamilyUnitTest
 			Assert.That(family.IsStyleAvailable(FontStyle.Bold), Is.True);
 		});
 	}
-
-	[Test]
-	public void Method_GetFontFamilies()
-	{
-		string dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-		if (string.IsNullOrEmpty(dirPath))
-			return; // it is empty in some linux
-
-		IEnumerable<FontFamily> fonts = InstalledFontCollection.GetFontFamilies(dirPath);
-		Assert.That(fonts, Is.Not.Empty);
-	}
 	
 	[Test]
 	public void Constructor_GenericFont()
