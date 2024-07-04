@@ -1,4 +1,4 @@
-namespace GeneXus.Drawing;
+﻿namespace GeneXus.Drawing;
 
 /// <summary>
 /// Specifies the unit of measure for the given data
@@ -8,36 +8,35 @@ public enum GraphicsUnit
 	/// <summary>
 	/// Specifies the world coordinate system unit as the unit of measure.
 	/// </summary>
-	World,
+	World = 0,
 
 	/// <summary>
 	/// Specifies the unit of measure of the display device. Typically pixels for video
 	/// displays, and 1/100 inch for printers.
 	/// </summary>
-	Display,
+	Display = 1,
 
 	/// <summary>
 	/// Specifies a device pixel as the unit of measure.
 	/// </summary>
-	Pixel,
+	Pixel = 2,
 
 	/// <summary>
 	/// Specifies a printer's point (1/72 inch) as the unit of measure.
 	/// </summary>
-	Point,
+	Point = 3,
 
 	/// <summary>
 	/// Specifies the inch as the unit of measure.
 	/// </summary>
-	Inch,
+	Inch = 4,
 
 	/// <summary>
 	/// Specifies the document unit (1/300 inch) as the unit of measure.
 	/// </summary>
-	Document,
+	Document = 5,
 
 	/// <summary>
-	/// Specifies the millimeter as the unit of measure.
+	///  Specifies the millimeter as the unit of measure.
 	/// </summary>
-	Millimeter
 }
