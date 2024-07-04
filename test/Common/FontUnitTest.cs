@@ -95,6 +95,34 @@ internal class FontUnitTest
 	}
 
 	[Test]
+	[TestCase("Montserrat-Regular.ttf", FontStyle.Regular, "[Font: Name=Montserrat, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("Montserrat-Italic.ttf", FontStyle.Italic, "[Font: Name=Montserrat, Size=12, Style=Italic, Unit=Point]")]
+	[TestCase("Montserrat-Bold.ttf", FontStyle.Bold, "[Font: Name=Montserrat, Size=12, Style=Bold, Unit=Point]")]
+	[TestCase("Graphik-Regular.otf", FontStyle.Regular, "[Font: Name=Graphik, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("Graphik-Italic.otf", FontStyle.Italic, "[Font: Name=Graphik, Size=12, Style=Italic, Unit=Point]")]
+	[TestCase("Graphik-Bold.otf", FontStyle.Bold, "[Font: Name=Graphik, Size=12, Style=Bold, Unit=Point]")]
+	[TestCase("EncodeSans-Regular.ttf", FontStyle.Regular, "[Font: Name=Encode Sans, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("EncodeSans-Condensed.ttf", FontStyle.Regular, "[Font: Name=Encode Sans Condensed, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("EncodeSans-Expanded.ttf", FontStyle.Regular, "[Font: Name=Encode Sans Expanded, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("AvenirNext-Collection.ttc", FontStyle.Regular, "[Font: Name=Avenir Next #5, Size=12, Style=Regular, Unit=Point]")]
+	[TestCase("AvenirNext-Collection.ttc", FontStyle.Italic, "[Font: Name=Avenir Next #4, Size=12, Style=Italic, Unit=Point]")]
+	[TestCase("AvenirNext-Collection.ttc", FontStyle.Bold, "[Font: Name=Avenir Next, Size=12, Style=Bold, Unit=Point]")]
+	public void Method_ToString(string fileName, FontStyle fontStyle, string expected)
+	{
+		// skip problematic cases, details in Constructor_Family()
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && fileName.Equals("AvenirNext-Collection.ttc") && fontStyle != FontStyle.Bold
+			|| RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && fileName.StartsWith("EncodeSans-"))
+			return;
+
+		string fontPath = Path.Combine(FONT_PATH, fileName);
+		using PrivateFontCollection fontCollection = new();
+		fontCollection.AddFontFile(fontPath);
+
+		using Font font = new(fontCollection.Families[0], 12, fontStyle);
+		Assert.That(font.ToString(), Is.EqualTo(expected));
+	}
+
+	[Test]
 	public void Extra_GetFontCount_FileName()
 	{
 		string fontPath = Path.Combine(FONT_PATH, "AvenirNext-Collection.ttc");

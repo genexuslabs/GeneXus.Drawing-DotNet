@@ -241,6 +241,11 @@ public sealed class FontFamily : ICloneable, IDisposable
 
 		return m_typefaces[0];
 	}
+	
+	internal int GetTypefaceIndex(FontStyle style)
+	{
+		return m_typefaces == null ? 0 : Array.IndexOf(m_typefaces, GetTypeface(style));
+	}
 
 	/// <summary>
 	/// Returns the cell ascent, in design units, of the <see cref='FontFamily'/> of the specified style.

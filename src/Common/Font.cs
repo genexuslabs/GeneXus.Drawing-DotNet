@@ -73,7 +73,9 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	public override string ToString()
 	{
-		return $"[{GetType().Name}: Name={Name}, Size={Size}, Style={Style}, Unit={Unit}]";
+		int index = m_family.GetTypefaceIndex(m_style);
+		string suffix = index > 0 ? $" #{index}" : string.Empty; // show index for debug purposes
+		return $"[{GetType().Name}: Name={Name}{suffix}, Size={Size}, Style={Style}, Unit={Unit}]";
 	}
 
 
