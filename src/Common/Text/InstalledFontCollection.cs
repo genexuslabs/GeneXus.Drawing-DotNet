@@ -1,40 +1,29 @@
 using SkiaSharp;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace GeneXus.Drawing.Text;
 
 public sealed class InstalledFontCollection : FontCollection
 {
-	private static readonly string SYSTEM_FONT_PATH = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
-	private static readonly string[] FONT_EXTENSIONS = { ".ttf", ".otf", ".eot", ".woff", ".woff2" };
-	
 	/// <summary>
 	/// Initializes a new instance of the <see cref='InstalledFontCollection'/> class.
 	/// </summary>
-	public InstalledFontCollection()
+	public InstalledFontCollection() 
 	{
-		string fontPath = SYSTEM_FONT_PATH; // this may be empty in some Linux
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && string.IsNullOrEmpty(fontPath))
+		foreach (string name in SKFontManager.Default.FontFamilies)
 		{
-			// common font directories in Linux
-			fontPath = "/usr/share/fonts";
-			if (!Directory.Exists(fontPath))
-				fontPath = "~/.local/share/fonts";
-		}
+			List<SKTypeface> typefaces = new();
+			foreach (SKFontStyle style in SKFontManager.Default.GetFontStyles(name))
+			{
+				var typeface = SKFontManager.Default.MatchFamily(name, style);
+				typefaces.Add(typeface);
+			}
 
-		if (Directory.Exists(fontPath))
-		{
-			IEnumerable<FontFamily> systemFontFamilies = Directory.EnumerateFiles(fontPath, "*.*", SearchOption.AllDirectories)
-				.Where(fontFile => FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile)))
-				.Select(FontFamily.FromFile).ToList();
-			m_families.AddRange(systemFontFamilies);
-		}
+			if (typefaces.Count == 0)
+				continue;
 
-		IEnumerable<FontFamily> defaultFontFamilies = SKFontManager.Default.FontFamilies.Select(name => new FontFamily(name));
-		m_families.AddRange(defaultFontFamilies);
+			FontFamily fontFamily = new(name, typefaces.ToArray(), true);
+			m_families.Add(fontFamily);
+		}
 	}
 }

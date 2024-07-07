@@ -9,8 +9,10 @@ public sealed class PrivateFontCollection : FontCollection
 	/// <summary>
 	/// Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
 	/// </summary>
-	public PrivateFontCollection()
-	{ }
+	public PrivateFontCollection() { }
+
+
+	#region Methods
 
 	/// <summary>
 	/// Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
@@ -32,4 +34,6 @@ public sealed class PrivateFontCollection : FontCollection
 		FontFamily fontFamily = FontFamily.FromStream(stream);
 		m_families.Add(fontFamily);
 	}
+
+	#endregion
 }
