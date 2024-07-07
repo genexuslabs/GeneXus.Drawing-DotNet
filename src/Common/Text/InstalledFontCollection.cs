@@ -12,8 +12,6 @@ public class InstalledFontCollection : FontCollection
 	private static readonly string SYSTEM_FONT_PATH = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
 	private static readonly string[] FONT_EXTENSIONS = { ".ttf", ".otf", ".eot", ".woff", ".woff2" };
 	
-	public static readonly FontCollection Instance = new InstalledFontCollection();
-	
 	/// <summary>
 	/// Initializes a new instance of the <see cref='InstalledFontCollection'/> class.
 	/// </summary>

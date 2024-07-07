@@ -326,7 +326,8 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <summary>
 	/// Returns an array that contains all of the <see cref='FontFamily'/> objects of the system
 	/// </summary>
-	public static FontFamily[] Families => InstalledFontCollection.Instance.Families;
+	public static FontFamily[] Families => s_Families ??= new InstalledFontCollection().Families;
+	private static FontFamily[] s_Families; // cache to load the fonts once
 
 	/// <summary>
 	///  Gets a generic monospace <see cref='FontFamily'/>.
