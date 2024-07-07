@@ -1,8 +1,9 @@
-﻿using SkiaSharp;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace GeneXus.Drawing.Text;
 
@@ -18,10 +19,18 @@ public class InstalledFontCollection : FontCollection
 	/// </summary>
 	public InstalledFontCollection()
 	{
-		string fontPath = SYSTEM_FONT_PATH; // this may be empty in some linux
-		if (!string.IsNullOrEmpty(fontPath))
+		string fontPath = SYSTEM_FONT_PATH; // this may be empty in some Linux
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && string.IsNullOrEmpty(fontPath))
 		{
-			IEnumerable<FontFamily> systemFontFamilies = Directory.EnumerateFiles(SYSTEM_FONT_PATH)
+			// common font directories in Linux
+			fontPath = "/usr/share/fonts";
+			if (!Directory.Exists(fontPath))
+				fontPath = "~/.local/share/fonts";
+		}
+
+		if (Directory.Exists(fontPath))
+		{
+			IEnumerable<FontFamily> systemFontFamilies = Directory.EnumerateFiles(fontPath, "*.*", SearchOption.AllDirectories)
 				.Where(fontFile => FONT_EXTENSIONS.Contains(Path.GetExtension(fontFile)))
 				.Select(FontFamily.FromFile).ToList();
 			m_families.AddRange(systemFontFamilies);
