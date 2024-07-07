@@ -332,7 +332,6 @@ public sealed class FontFamily : ICloneable, IDisposable
 
 	internal static IEnumerable<FontFamily> Match(string name, FontFamily[] families)
 		=> families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-}
 
 	#endregion
 }
