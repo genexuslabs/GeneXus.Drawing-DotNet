@@ -280,8 +280,8 @@ public sealed class Font : IDisposable, ICloneable
 	public float SizeInPoints => m_unit switch
 	{
 		GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
-		GraphicsUnit.Display => m_size * 72 / 96, // Assuming display unit is pixels with 96 DPI, but this can vary
-		GraphicsUnit.Pixel => m_size * 72 / 96, // Assuming 96 DPI for screen, so 1 pixel = 1/96 inch
+		GraphicsUnit.Display => m_size * 72 / DPI, // Assuming display unit is pixels
+		GraphicsUnit.Pixel => m_size * 72 / DPI, // 72 points per inch / Dots Per Inch
 		GraphicsUnit.Point => m_size, // Already in points
 		GraphicsUnit.Inch => m_size * 72, // 1 inch = 72 points
 		GraphicsUnit.Document => m_size * 72 / 300, // 1 document unit = 1/300 inch
@@ -289,6 +289,15 @@ public sealed class Font : IDisposable, ICloneable
 		_ => throw new ArgumentException("Invalid GraphicsUnit")
 	};
 
+	private static int DPI
+	{
+		get
+		{
+			using var surface = SKSurface.Create(new SKImageInfo(50, 50));
+			return (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
+		}
+	}
+	
 	/// <summary>
 	/// Gets the unit of measure for this <see cref='Font'/>.
 	/// </summary>
