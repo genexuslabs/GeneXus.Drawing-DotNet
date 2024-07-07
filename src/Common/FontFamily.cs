@@ -13,21 +13,19 @@ public sealed class FontFamily : ICloneable, IDisposable
 	private readonly SKTypeface[] m_typefaces; // This were loaded from a file
 	private readonly bool m_typefacesOwner; // To know if we need to dispose the typefaces
 
-	private FontFamily(SKTypeface[] typefaces)
+	internal FontFamily(string name, SKTypeface[] typefaces, bool owner)
 	{
 		if (typefaces.Length == 0)
-			throw new ArgumentException("At least 1 typeface is required", nameof(typefaces));
+			throw new ArgumentException("at least 1 typeface is required", nameof(typefaces));
 
+		m_systemFamilyName = name;
 		m_typefaces = typefaces;
-		m_typefacesOwner = true; // the typefaces will be disposed with this object
+		m_typefacesOwner = owner; // if the typefaces will be disposed with this object
 	}
 
 	private FontFamily(FontFamily family)
-	{
-		m_systemFamilyName = family.m_systemFamilyName;
-		m_typefaces = family.m_typefaces;
-	}
-	
+		: this(family.m_systemFamilyName, family.m_typefaces, family.m_typefacesOwner) { }
+
 	private FontFamily(FontFamily[] families)
 	{
 		if (families.Length == 0)
@@ -60,17 +58,8 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <param name="name">The name of the new <see cref='FontFamily'/>.</param>
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not installed.</exception>
 	public FontFamily(string name)
-	{
-		if (string.IsNullOrEmpty(name))
-			throw new ArgumentException("Name can't be empty", nameof(name));
-		
-		using SKTypeface typeface = SKFontManager.Default.MatchFamily(name);
-		if (!typeface.FamilyName.Equals(name)) // MatchFamily() always returns a typeface even when the requested family name is not found
-			throw new ArgumentException("Font is not installed", nameof(name));
-		
-		m_systemFamilyName = name;
-	}
-	
+		: this(name, new InstalledFontCollection()) { }
+
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> in the specified <see cref='FontCollection'/> with the specified name.
 	/// </summary>
@@ -78,8 +67,8 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <param name="collection">The <see cref='FontCollection'/> that contains this <see cref='FontFamily'/>.</param>
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not in the collection.</exception>
 	public FontFamily(string name, FontCollection collection)
-		: this(Match(name, collection.Families) ?? throw new ArgumentException("missing family from collection", nameof(name))) { }
-	
+		: this(FromFontCollection(name, collection)) { }
+
 	private static FontFamily[] Match(string name, FontFamily[] families)
 	{
 		FontFamily[] matched = families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -196,8 +185,8 @@ public sealed class FontFamily : ICloneable, IDisposable
 
 		if (list.Count == 0)
 			throw new ArgumentException("No typefaces were found.", nameof(data));
-		
-		return new FontFamily(list.ToArray());
+
+		return new FontFamily(null, list.ToArray(), true);
 	}
 
 	private static FontFamily FromGenericFontFamily(GenericFontFamilies genericFamily)
@@ -217,6 +206,30 @@ public sealed class FontFamily : ICloneable, IDisposable
 				return family;
 		}
 		throw new ArgumentException("Generic font family is not installed", nameof(genericFamily));
+	}
+
+	private static FontFamily FromFontCollection(string name, FontCollection collection)
+	{
+		if (string.IsNullOrEmpty(name))
+			throw new ArgumentException("name is empty", nameof(name));
+
+		if (collection.Families.Length == 0)
+			throw new ArgumentException("at least 1 base family is required", nameof(collection));
+
+		string systemFamilyName = null;
+
+		List<SKTypeface> typefaces = new();
+		foreach (FontFamily family in Match(name, collection.Families))
+		{
+			systemFamilyName ??= family.m_systemFamilyName; // assuming all have the same name
+			if (family.m_typefaces != null)
+				typefaces.AddRange(family.m_typefaces);
+		}
+
+		if (typefaces.Count == 0)
+			throw new ArgumentException("font is missing from collection", nameof(name));
+
+		return new FontFamily(systemFamilyName, typefaces.ToArray(), true);
 	}
 
 	#endregion
