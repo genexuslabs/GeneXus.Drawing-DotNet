@@ -44,36 +44,6 @@ public sealed class FontFamily : ICloneable, IDisposable
 		if (typefaces.Count > 0)
 			m_typefaces = typefaces.ToArray();
 	}
-
-	internal static FontFamily FromFile(string filePath)
-	{
-		SKData data = SKData.Create(filePath) ?? throw new FileNotFoundException();
-		return FromData(data);
-	}
-
-	internal static FontFamily FromStream(Stream stream)
-	{
-		SKData data = SKData.Create(stream);
-		return FromData(data);
-	}
-	
-	private static FontFamily FromData(SKData data)
-	{
-		int index = 0;
-		List<SKTypeface> list = new();
-		while (true)
-		{
-			SKTypeface typeface = SKFontManager.Default.CreateTypeface(data, index++);
-			if (typeface == null)
-				break;
-			list.Add(typeface);
-		}
-
-		if (list.Count == 0)
-			throw new ArgumentException("No typefaces were found.", nameof(data));
-		
-		return new FontFamily(list.ToArray());
-	}
 	
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
@@ -128,7 +98,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not in the collection.</exception>
 	public FontFamily(string name, FontCollection collection)
 		: this(Match(name, collection.Families) ?? throw new ArgumentException("missing family from collection", nameof(name))) { }
-
+	
 	private static FontFamily[] Match(string name, FontFamily[] families)
 	{
 		FontFamily[] matched = families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray();
@@ -216,7 +186,42 @@ public sealed class FontFamily : ICloneable, IDisposable
 	
 	#endregion
 	
+	
+	#region Factory
 
+	internal static FontFamily FromFile(string filePath)
+	{
+		SKData data = SKData.Create(filePath) ?? throw new FileNotFoundException();
+		return FromData(data);
+	}
+
+	internal static FontFamily FromStream(Stream stream)
+	{
+		SKData data = SKData.Create(stream);
+		return FromData(data);
+	}
+	
+	private static FontFamily FromData(SKData data)
+	{
+		int index = 0;
+		List<SKTypeface> list = new();
+		while (true)
+		{
+			SKTypeface typeface = SKFontManager.Default.CreateTypeface(data, index++);
+			if (typeface == null)
+				break;
+			list.Add(typeface);
+		}
+
+		if (list.Count == 0)
+			throw new ArgumentException("No typefaces were found.", nameof(data));
+		
+		return new FontFamily(list.ToArray());
+	}
+	
+	#endregion
+
+	
 	#region Methods
 
 	internal SKTypeface GetTypeface(FontStyle style)
