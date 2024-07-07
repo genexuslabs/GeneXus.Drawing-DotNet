@@ -25,23 +25,6 @@ public sealed class FontFamily : ICloneable, IDisposable
 
 	private FontFamily(FontFamily family)
 		: this(family.m_systemFamilyName, family.m_typefaces, family.m_typefacesOwner) { }
-
-	private FontFamily(FontFamily[] families)
-	{
-		if (families.Length == 0)
-			throw new ArgumentException("At least 1 base family is required", nameof(families));
-
-		List<SKTypeface> typefaces = new();
-		foreach (FontFamily family in families)
-		{
-			m_systemFamilyName ??= family.m_systemFamilyName; // assuming all have the same name
-			if (family.m_typefaces != null)
-				typefaces.AddRange(family.m_typefaces);
-		}
-
-		if (typefaces.Count > 0)
-			m_typefaces = typefaces.ToArray();
-	}
 	
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
@@ -68,24 +51,6 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not in the collection.</exception>
 	public FontFamily(string name, FontCollection collection)
 		: this(FromFontCollection(name, collection)) { }
-
-	private static FontFamily[] Match(string name, FontFamily[] families)
-	{
-		FontFamily[] matched = families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).ToArray();
-		return matched.Length == 0 ? null : matched;
-	}
-	
-	internal static FontFamily Match(string name)
-	{
-		FontFamily[] matched = Match(name, Families);
-		if (matched == null)
-			return GenericSansSerif;
-		
-		if (matched.Length == 1)
-			return matched[0];
-		
-		return new FontFamily(matched);
-	}
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
@@ -356,6 +321,18 @@ public sealed class FontFamily : ICloneable, IDisposable
 	///  Gets a generic Serif <see cref='FontFamily'/>.
 	/// </summary>
 	public static FontFamily GenericSerif => new(GenericFontFamilies.Serif);
+
+	#endregion
+
+
+	#region Utilities
+
+	internal static IEnumerable<FontFamily> Match(string name)
+			=> Match(name, Families);
+
+	internal static IEnumerable<FontFamily> Match(string name, FontFamily[] families)
+		=> families.Where(f => f.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+}
 
 	#endregion
 }
