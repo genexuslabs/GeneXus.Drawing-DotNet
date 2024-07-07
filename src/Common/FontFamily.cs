@@ -52,26 +52,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// The <see cref='GenericFontFamilies'/> from which to create the new <see cref='FontFamily'/>.
 	/// </param>
 	public FontFamily(GenericFontFamilies genericFamily)
-		: this(GetGenericFontFamily(genericFamily)) { }
-
-	private static FontFamily GetGenericFontFamily(GenericFontFamilies genericFamily)
-	{
-		string[] candidates = genericFamily switch // NOTE: Define a set of predefined fonts
-		{
-			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console", "DejaVu Sans Mono" },
-			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "DejaVu Sans" },
-			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville", "DejaVu Serif" },
-			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
-		};
-
-		foreach (string candidate in candidates)
-		{
-			FontFamily family = Families.FirstOrDefault(f => f.Name.Equals(candidate, StringComparison.OrdinalIgnoreCase));
-			if (family != null)
-				return family;
-		}
-		throw new ArgumentException("Generic font family is not installed", nameof(genericFamily));
-	}
+		: this(FromGenericFontFamily(genericFamily)) { }
 
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> with the specified name.
@@ -218,10 +199,29 @@ public sealed class FontFamily : ICloneable, IDisposable
 		
 		return new FontFamily(list.ToArray());
 	}
-	
+
+	private static FontFamily FromGenericFontFamily(GenericFontFamilies genericFamily)
+	{
+		string[] candidates = genericFamily switch // NOTE: Define a set of predefined fonts
+		{
+			GenericFontFamilies.Monospace => new[] { "Courier New", "Consolas", "Courier", "Menlo", "Monaco", "Lucida Console", "DejaVu Sans Mono" },
+			GenericFontFamilies.SansSerif => new[] { "Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "DejaVu Sans" },
+			GenericFontFamilies.Serif => new[] { "Times New Roman", "Georgia", "Garamond", "Palatino", "Book Antiqua", "Baskerville", "DejaVu Serif" },
+			_ => throw new ArgumentException($"invalid generic font value {genericFamily}", nameof(genericFamily))
+		};
+
+		foreach (string candidate in candidates)
+		{
+			FontFamily family = Families.FirstOrDefault(f => f.Name.Equals(candidate, StringComparison.OrdinalIgnoreCase));
+			if (family != null)
+				return family;
+		}
+		throw new ArgumentException("Generic font family is not installed", nameof(genericFamily));
+	}
+
 	#endregion
 
-	
+
 	#region Methods
 
 	internal SKTypeface GetTypeface(FontStyle style)
