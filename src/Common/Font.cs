@@ -11,14 +11,10 @@ namespace GeneXus.Drawing;
 [Serializable]
 public sealed class Font : IDisposable, ICloneable
 {
-	private readonly FontFamily m_family;
 	private readonly string m_original;
-	private readonly float m_size;
-	private readonly FontStyle m_style;
-	private readonly GraphicsUnit m_unit;
 
 	/// <summary>
-	/// Initializes a new System.Drawing.Font that uses the specified existing <see cref='Font'/>
+	/// Initializes a new <see cref='Font'/> that uses the specified existing <see cref='Font'/>
 	/// and <see cref='FontStyle'/> enumeration.
 	/// </summary>
 	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/></param>
@@ -27,12 +23,9 @@ public sealed class Font : IDisposable, ICloneable
 	/// values of the <see cref='FontStyle'/> enumeration can be combined with the OR operator.
 	/// </param>
 	public Font(Font prototype, FontStyle newStyle)
+		: this((FontFamily)prototype.FontFamily.Clone(), prototype.Size, newStyle, prototype.Unit)
 	{
-		m_family = prototype.FontFamily;
 		m_original = prototype.m_original;
-		m_size = prototype.m_size;
-		m_unit = prototype.m_unit;
-		m_style = newStyle;
 	}
 
 	/// <summary>
@@ -42,13 +35,24 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point)
+	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 	{
-		m_family = family ?? throw new ArgumentException("missing family");
-		m_size = size;
-		m_style = style;
-		m_unit = unit;
+		FontFamily = family ?? throw new ArgumentException("missing family");
+		Size = size;
+		Style = style;
+		Unit = unit;
+		GdiCharSet = gdiCharSet;
+		GdiVerticalFont = gdiVerticalFont;
 	}
+
+	/// <summary>
+	/// Initializes a new <see cref='Font'/> using the specified <see cref='Drawing.FontFamily'/> and size.
+	/// </summary>
+	/// <param name="family">The <see cref='FontFamily'/> of the new <see cref='Font'/>.</param>
+	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
+	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
+	public Font(FontFamily family, float size, GraphicsUnit unit)
+		: this(family, size, FontStyle.Regular, unit) { }
 
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> using the specified family name and size.
@@ -57,12 +61,23 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point)
-		: this(FontFamily.Match(familyName), size, style, unit)
+	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
+	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
+		: this(FontFamily.Match(familyName).FirstOrDefault() ?? FontFamily.GenericSansSerif, size, style, unit, gdiCharSet, gdiVerticalFont)
 	{
 		m_original = familyName;
 	}
-	
+
+	/// <summary>
+	/// Initializes a new <see cref='Font'/> using the specified family name and size.
+	/// </summary>
+	/// <param name="familyName">A string representation of the <see cref='FontFamily'/> of the new <see cref='Font'/>.</param>
+	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
+	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
+	public Font(string familyName, float size, GraphicsUnit unit)
+		: this(familyName, size, FontStyle.Regular, unit) { }
+
 	/// <summary>
 	///  Cleans up resources for this <see cref='Font'/>.
 	/// </summary>
@@ -73,7 +88,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	public override string ToString()
 	{
-		int index = m_family.GetTypefaceIndex(m_style);
+		int index = FontFamily.GetTypefaceIndex(Style);
 		string suffix = index > 0 ? $" #{index}" : string.Empty; // show index for debug purposes
 		return $"[{GetType().Name}: Name={Name}{suffix}, Size={Size}, Style={Style}, Unit={Unit}]";
 	}
@@ -90,7 +105,7 @@ public sealed class Font : IDisposable, ICloneable
 		Dispose(true);
 	}
 
-	private void Dispose(bool disposing) => m_family.Dispose();
+	private void Dispose(bool disposing) => FontFamily.Dispose();
 
 	#endregion
 
@@ -100,13 +115,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Creates an exact copy of this <see cref='Font'/>.
 	/// </summary>
-	public object Clone()
-	{
-		if (m_original != null)
-			return new Font(m_original, m_size, m_style, m_unit);
-		else
-			return new Font((FontFamily)m_family.Clone(), m_size, m_style, m_unit);
-	}
+	public object Clone() => new Font(this, Style);
 
 	#endregion
 
@@ -116,9 +125,9 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a <see cref='SKFont'/> with the coordinates of the specified <see cref='Font'/> .
 	/// </summary>
-	public static explicit operator SKFont(Font font) => font.Typeface.ToFont(font.m_size);
+	public static explicit operator SKFont(Font font) => font.Typeface.ToFont(font.Size);
 
-	private SKTypeface Typeface => m_family.GetTypeface(m_style);
+	private SKTypeface Typeface => FontFamily.GetTypeface(Style);
 
 	#endregion
 
@@ -128,7 +137,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the face name of this <see cref='Font'/>.
 	/// </summary>
-	public string Name => m_original ?? m_family.Name;
+	public string Name => OriginalFontName ?? FontFamily.Name;
 
 	/// <summary>
 	/// Gets the name of the <see cref='Font'/> originally specified.
@@ -138,7 +147,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the <see cref='Drawing.FontFamily'/> associated with this Font.
 	/// </summary>
-	public FontFamily FontFamily => m_family;
+	public FontFamily FontFamily { get; private set; }
 
 	/// <summary>
 	/// Gets the weight of this <see cref='Font'/>.
@@ -159,7 +168,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the size of this <see cref='Font'/>.
 	/// </summary>
-	public float Size => m_size;
+	public float Size { get; private set; }
 
 	/// <summary>
 	/// Gets the slant of this <see cref='Font'/>.
@@ -175,12 +184,12 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets style information for this <see cref='Font'/>.
 	/// </summary>
-	public FontStyle Style => m_style;
+	public FontStyle Style { get; private set; }
 
 	/// <summary>
 	/// Gets the FamilyName associated with this <see cref='Font'/>.
 	/// </summary>
-	public string FamilyName => m_family.Name;
+	public string FamilyName => FontFamily.Name;
 
 	/// <summary>
 	/// Gets the FaceName associated with this <see cref='Font'/>.
@@ -202,7 +211,7 @@ public sealed class Font : IDisposable, ICloneable
 				9 => "Ultra Expanded",
 				_ => string.Empty
 			};
-			
+
 			string weightName = Weight switch
 			{
 				< 100 => "Extra Thin",
@@ -219,7 +228,7 @@ public sealed class Font : IDisposable, ICloneable
 				< 999 => "Extra Black",
 				_ => string.Empty
 			};
-			
+
 			string slantName = Slant switch
 			{
 				SlantType.Normal => "Normal",
@@ -227,7 +236,7 @@ public sealed class Font : IDisposable, ICloneable
 				SlantType.Oblique => "Oblique",
 				_ => string.Empty
 			};
-			
+
 			// Reference: https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/MS/Internal/FontFace/FontDifferentiator.cs,29
 			StringBuilder faceName = new();
 
@@ -255,8 +264,6 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	public bool Bold => Typeface.IsBold;
 
-	private SKFontMetrics Metrics => Typeface.ToFont(m_size).Metrics;
-	
 	/// <summary>
 	/// Gets a value indicating whether this <see cref='Font'/> is underlined.
 	/// </summary>
@@ -273,37 +280,49 @@ public sealed class Font : IDisposable, ICloneable
 	public bool IsSystemFont => false; // there are no system fonts like it is explained in https://learn.microsoft.com/en-us/dotnet/api/system.drawing.systemfonts?view=net-8.0
 
 	/// <summary>
+	/// Gets the name of this <see cref='Font'/>.
+	/// </summary>
+	[Browsable(false)]
+	public string SystemFontName => string.Empty;
+
+	/// <summary>
 	/// Gets the em-size, in points, of this <see cref='Font'/>.
 	/// </summary>
 	/// <returns>The em-size, in points, of this <see cref='Font'/></returns>
 	[Browsable(false)]
-	public float SizeInPoints => m_unit switch
+	public float SizeInPoints => Unit switch
 	{
 		GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
-		GraphicsUnit.Display => m_size * 72 / DPI, // Assuming display unit is pixels
-		GraphicsUnit.Pixel => m_size * 72 / DPI, // 72 points per inch / Dots Per Inch
-		GraphicsUnit.Point => m_size, // Already in points
-		GraphicsUnit.Inch => m_size * 72, // 1 inch = 72 points
-		GraphicsUnit.Document => m_size * 72 / 300, // 1 document unit = 1/300 inch
-		GraphicsUnit.Millimeter => m_size * 72 / 25.4f, // 1 millimeter = 1/25.4 inch
+		GraphicsUnit.Display => Size * 72 / DPI, // Assuming display unit is pixels with 96 DPI, but this can vary
+		GraphicsUnit.Pixel => Size * 72 /DPI, // Assuming 96 DPI for screen, so 1 pixel = 1/96 inch
+		GraphicsUnit.Point => Size, // Already in points
+		GraphicsUnit.Inch => Size * 72, // 1 inch = 72 points
+		GraphicsUnit.Document => Size * 72 / 300, // 1 document unit = 1/300 inch
+		GraphicsUnit.Millimeter => Size * 72 / 25.4f, // 1 millimeter = 1/25.4 inch
 		_ => throw new ArgumentException("Invalid GraphicsUnit")
 	};
-
-	private static int DPI
-	{
-		get
-		{
-			using var surface = SKSurface.Create(new SKImageInfo(50, 50));
-			return (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
-		}
-	}
 	
 	/// <summary>
 	/// Gets the unit of measure for this <see cref='Font'/>.
 	/// </summary>
 	/// <returns>A <see cref='GraphicsUnit'/> that represents the unit of measure for this <see cref='Font'/>.</returns>
-	public GraphicsUnit Unit => m_unit;
-	
+	public GraphicsUnit Unit { get; private set; }
+
+	/// <summary>
+	/// Returns the GDI char set for this instance of a font. This will only
+	/// be valid if this font was created from a classic GDI font definition,
+	/// like a LOGFONT or HFONT, or it was passed into the constructor.
+	/// </summary>
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public byte GdiCharSet { get; private set; }
+
+	/// <summary>
+	/// Determines if this font was created to represent a GDI vertical font. This will only be valid if this font
+	/// was created from a classic GDIfont definition, like a LOGFONT or HFONT, or it was passed into the constructor.
+	/// </summary>
+	[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+	public bool GdiVerticalFont { get; private set; }
+
 	#endregion
 
 
@@ -312,7 +331,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Returns the line spacing of this <see cref='Font'/>.
 	/// </summary>
-	public float GetHeight() => Metrics.Descent - Metrics.Ascent + Metrics.Leading;
+	public float GetHeight()
+		=> Metrics.Descent - Metrics.Ascent + Metrics.Leading;
 
 	#endregion
 
@@ -350,6 +370,42 @@ public sealed class Font : IDisposable, ICloneable
 			return count;
 		}
 		return 1;
+	}
+
+	#endregion
+
+
+	#region Utilties
+
+	private enum FONT_CHARSET
+	{
+		ANSI_CHARSET = 0x00,
+		DEFAULT_CHARSET = 0x01,
+		SYMBOL_CHARSET = 0x02,
+		SHIFTJIS_CHARSET = 0x80,
+		HANGUL_CHARSET = 0x81,
+		GB2312_CHARSET = 0x86,
+		CHINESEBIG5_CHARSET = 0x88,
+		GREEK_CHARSET = 0xA1,
+		TURKISH_CHARSET = 0xA2,
+		HEBREW_CHARSET = 0xB1,
+		ARABIC_CHARSET = 0xB2,
+		BALTIC_CHARSET = 0xBA,
+		RUSSIAN_CHARSET = 0xCC,
+		THAI_CHARSET = 0xDE,
+		EE_CHARSET = 0xEE,
+		OEM_CHARSET = 0xFF
+	}
+
+	private SKFontMetrics Metrics => Typeface.ToFont(Size).Metrics;
+
+	private static int DPI
+	{
+		get
+		{
+			using var surface = SKSurface.Create(new SKImageInfo(50, 50));
+			return (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
+		}
 	}
 
 	#endregion
