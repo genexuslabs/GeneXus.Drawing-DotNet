@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace GeneXus.Drawing.Text;
 
-public class PrivateFontCollection : FontCollection
+public sealed class PrivateFontCollection : FontCollection
 {
 	/// <summary>
 	/// Initializes a new instance of the <see cref='PrivateFontCollection'/> class.

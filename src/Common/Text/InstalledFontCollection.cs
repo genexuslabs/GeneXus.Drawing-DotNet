@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace GeneXus.Drawing.Text;
 
-public class InstalledFontCollection : FontCollection
+public sealed class InstalledFontCollection : FontCollection
 {
 	private static readonly string SYSTEM_FONT_PATH = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);
 	private static readonly string[] FONT_EXTENSIONS = { ".ttf", ".otf", ".eot", ".woff", ".woff2" };
