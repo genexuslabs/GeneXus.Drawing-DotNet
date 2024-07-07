@@ -30,7 +30,7 @@ internal class FontFamilyUnitTest
 	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", FontStyle.Regular, 1000, 366, 1366, 1000)]
 	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", FontStyle.Italic, 1000, 366, 1366, 1000)]
 	[TestCase("AvenirNext-Collection.ttc", "Avenir Next", FontStyle.Bold, 1000, 366, 1366, 1000)]
-	public void Constructor_FileName(string fileName, string familyName, FontStyle style, int ascent, int descent, int lineSpacing, int emHeight, int fontIndex = 0)
+	public void Constructor_FileName(string fileName, string familyName, FontStyle style, int ascent, int descent, int lineSpacing, int emHeight)
 	{
 		if (fileName.StartsWith("EncodeSans-") && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			familyName = "Encode Sans"; // in Windows it doesn't read the correct family name for this font with skia
