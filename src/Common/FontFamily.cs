@@ -70,7 +70,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 		}
 
 		if (list.Count == 0)
-			throw new ArgumentException("No font found");
+			throw new ArgumentException("No typefaces were found.", nameof(data));
 		
 		return new FontFamily(list.ToArray());
 	}
