@@ -33,6 +33,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
+	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
 	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 	{
 		FontFamily = family ?? throw new ArgumentException("missing family");
