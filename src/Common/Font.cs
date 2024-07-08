@@ -293,8 +293,8 @@ public sealed class Font : IDisposable, ICloneable
 	public float SizeInPoints => Unit switch
 	{
 		GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
-		GraphicsUnit.Display => Size * 72 / DPI, // Assuming display unit is pixels with 96 DPI, but this can vary
-		GraphicsUnit.Pixel => Size * 72 /DPI, // Assuming 96 DPI for screen, so 1 pixel = 1/96 inch
+		GraphicsUnit.Display => Size * 72 / DPI, // Assuming display unit is pixels
+		GraphicsUnit.Pixel => Size * 72 / DPI, // 1 pixel = 72 points per inch / Dots Per Inch
 		GraphicsUnit.Point => Size, // Already in points
 		GraphicsUnit.Inch => Size * 72, // 1 inch = 72 points
 		GraphicsUnit.Document => Size * 72 / 300, // 1 document unit = 1/300 inch
