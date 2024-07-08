@@ -11,8 +11,6 @@ namespace GeneXus.Drawing;
 [Serializable]
 public sealed class Font : IDisposable, ICloneable
 {
-	private readonly string m_original;
-
 	/// <summary>
 	/// Initializes a new <see cref='Font'/> that uses the specified existing <see cref='Font'/>
 	/// and <see cref='FontStyle'/> enumeration.
@@ -25,7 +23,7 @@ public sealed class Font : IDisposable, ICloneable
 	public Font(Font prototype, FontStyle newStyle)
 		: this((FontFamily)prototype.FontFamily.Clone(), prototype.Size, newStyle, prototype.Unit)
 	{
-		m_original = prototype.m_original;
+		OriginalFontName = prototype.OriginalFontName;
 	}
 
 	/// <summary>
@@ -66,7 +64,7 @@ public sealed class Font : IDisposable, ICloneable
 	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 		: this(FontFamily.Match(familyName).FirstOrDefault() ?? FontFamily.GenericSansSerif, size, style, unit, gdiCharSet, gdiVerticalFont)
 	{
-		m_original = familyName;
+		OriginalFontName = familyName;
 	}
 
 	/// <summary>
@@ -142,7 +140,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the name of the <see cref='Font'/> originally specified.
 	/// </summary>
-	public string OriginalFontName => m_original;
+	public string OriginalFontName { get; private set; }
 
 	/// <summary>
 	/// Gets the <see cref='Drawing.FontFamily'/> associated with this Font.
