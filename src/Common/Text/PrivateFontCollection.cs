@@ -4,34 +4,36 @@ using System.Runtime.InteropServices;
 
 namespace GeneXus.Drawing.Text;
 
-public class PrivateFontCollection : FontCollection
+public sealed class PrivateFontCollection : FontCollection
 {
 	/// <summary>
-	///  Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
+	/// Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
 	/// </summary>
-	public PrivateFontCollection() : base()
-	{ }
+	public PrivateFontCollection() { }
+
+
+	#region Methods
 
 	/// <summary>
-	///  Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
+	/// Adds a font from the specified file to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
-	public void AddFontFile(string filename)
+	public void AddFontFile(string filePath)
 	{
-		var fontFamily = new FontFamily(filename);
-		m_families.Add(fontFamily);
+		m_families.Add(FontFamily.FromFile(filePath));
 	}
 
 	/// <summary>
-	///  Adds a font contained in system memory to this <see cref='PrivateFontCollection'/>.
+	/// Adds a font contained in system memory to this <see cref='PrivateFontCollection'/>.
 	/// </summary>
 	public void AddMemoryFont(IntPtr memory, int length)
 	{
 		byte[] fontData = new byte[length];
 		Marshal.Copy(memory, fontData, 0, length);
 
-		using var stream = new MemoryStream(fontData);
-
-		var fontFamily = new FontFamily(stream);
+		using MemoryStream stream = new(fontData);
+		FontFamily fontFamily = FontFamily.FromStream(stream);
 		m_families.Add(fontFamily);
 	}
+
+	#endregion
 }

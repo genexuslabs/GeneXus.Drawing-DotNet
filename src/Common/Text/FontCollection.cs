@@ -5,14 +5,14 @@ namespace GeneXus.Drawing.Text;
 
 public abstract class FontCollection : IDisposable
 {
-	protected List<FontFamily> m_families = new List<FontFamily>();
+	protected readonly List<FontFamily> m_families = new();
 
 	/// <summary>
 	///  Cleans up resources for this <see cref='FontCollection'/>.
 	/// </summary>
 	~FontCollection() => Dispose(false);
 
-
+	
 	#region IDisposable
 
 	/// <summary>
@@ -24,7 +24,7 @@ public abstract class FontCollection : IDisposable
 		Dispose(true);
 	}
 
-	protected virtual void Dispose(bool disposing)
+	private void Dispose(bool disposing)
 	{
 		foreach (FontFamily ff in m_families)
 			ff.Dispose();
@@ -34,7 +34,7 @@ public abstract class FontCollection : IDisposable
 	#endregion
 
 
-	#region Propertie
+	#region Properties
 
 	/// <summary>
 	///  Gets the array of <see cref='FontFamily'/> objects associated with this <see cref='FontCollection'/>.
