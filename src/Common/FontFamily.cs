@@ -24,7 +24,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 	}
 
 	private FontFamily(FontFamily family)
-		: this(family.m_systemFamilyName, family.m_typefaces, family.m_typefacesOwner) { }
+		: this(family.m_systemFamilyName, family.m_typefaces, false) { }
 	
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
