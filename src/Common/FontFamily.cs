@@ -25,6 +25,9 @@ public sealed class FontFamily : ICloneable, IDisposable
 
 	private FontFamily(FontFamily family)
 		: this(family.m_systemFamilyName, family.m_typefaces, false) { }
+
+	private FontFamily(string name, FontFamily[] families)
+		: this(FromFontCollection(name, families)) { }
 	
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> from the specified generic font family.
@@ -41,7 +44,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <param name="name">The name of the new <see cref='FontFamily'/>.</param>
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not installed.</exception>
 	public FontFamily(string name)
-		: this(name, new InstalledFontCollection()) { }
+		: this(name, Families) { }
 
 	/// <summary>
 	/// Initializes a new <see cref='FontFamily'/> in the specified <see cref='FontCollection'/> with the specified name.
@@ -50,7 +53,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 	/// <param name="collection">The <see cref='FontCollection'/> that contains this <see cref='FontFamily'/>.</param>
 	/// <exception cref='ArgumentException'><see cref='name'/> is an empty string or the font is not in the collection.</exception>
 	public FontFamily(string name, FontCollection collection)
-		: this(FromFontCollection(name, collection)) { }
+		: this(name, collection.Families) { }
 
 	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='FontFamily'/>.
@@ -173,18 +176,18 @@ public sealed class FontFamily : ICloneable, IDisposable
 		throw new ArgumentException("Generic font family is not installed", nameof(genericFamily));
 	}
 
-	private static FontFamily FromFontCollection(string name, FontCollection collection)
+	private static FontFamily FromFontCollection(string name, FontFamily[] families)
 	{
 		if (string.IsNullOrEmpty(name))
 			throw new ArgumentException("name is empty", nameof(name));
 
-		if (collection.Families.Length == 0)
-			throw new ArgumentException("at least 1 base family is required", nameof(collection));
+		if (families.Length == 0)
+			throw new ArgumentException("at least 1 base family is required", nameof(families));
 
 		string systemFamilyName = null;
 
 		List<SKTypeface> typefaces = new();
-		foreach (FontFamily family in Match(name, collection.Families))
+		foreach (FontFamily family in Match(name, families))
 		{
 			systemFamilyName ??= family.m_systemFamilyName; // assuming all have the same name
 			if (family.m_typefaces != null)
