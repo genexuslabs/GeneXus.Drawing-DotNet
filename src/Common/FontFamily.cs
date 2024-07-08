@@ -194,7 +194,7 @@ public sealed class FontFamily : ICloneable, IDisposable
 		if (typefaces.Count == 0)
 			throw new ArgumentException("font is missing from collection", nameof(name));
 
-		return new FontFamily(systemFamilyName, typefaces.ToArray(), true);
+		return new FontFamily(systemFamilyName, typefaces.ToArray(), false);
 	}
 
 	#endregion
