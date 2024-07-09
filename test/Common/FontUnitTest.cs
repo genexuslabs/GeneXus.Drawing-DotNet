@@ -59,6 +59,7 @@ internal class FontUnitTest
 			Assert.That(font.Height, Is.EqualTo(fontHeight));
 			Assert.That(font.Size, Is.EqualTo(12));
 			Assert.That(font.SizeInPoints, Is.EqualTo(9));
+			Assert.That(font.Unit, Is.EqualTo(GraphicsUnit.Pixel));
 			Assert.That(font.Slant, Is.EqualTo(fontSlant));
 			Assert.That(font.Italic, Is.EqualTo(fontSlant != SlantType.Normal));
 			Assert.That(font.Bold, Is.EqualTo(fontWeight >= 600));
