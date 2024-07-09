@@ -320,7 +320,6 @@ public sealed class Font : IDisposable, ICloneable
 	/// Returns the line spacing, in pixels, of this <see cref='Font'/>.
 	/// </summary>
 	public float GetHeight()
-		// => Metrics.Bottom - Metrics.Top + Metrics.Leading;
 		=> GetHeight(DPI);
 
 	/// <summary>
