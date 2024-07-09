@@ -127,8 +127,6 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	public static explicit operator SKFont(Font font) => font.Typeface.ToFont(font.Size);
 
-	private SKTypeface Typeface => FontFamily.GetTypeface(Style);
-
 	#endregion
 
 
@@ -396,6 +394,8 @@ public sealed class Font : IDisposable, ICloneable
 		EE_CHARSET = 0xEE,
 		OEM_CHARSET = 0xFF
 	}
+
+	private SKTypeface Typeface => FontFamily.GetTypeface(Style);
 
 	private SKFontMetrics Metrics => Typeface.ToFont(Size).Metrics;
 
