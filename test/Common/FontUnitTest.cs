@@ -49,7 +49,7 @@ internal class FontUnitTest
 		using PrivateFontCollection fontCollection = new();
 		fontCollection.AddFontFile(fontPath);
 
-		using Font font = new(fontCollection.Families[0], 12, fontStyle);
+		using Font font = new(fontCollection.Families[0], 12, fontStyle, GraphicsUnit.Pixel);
 		Assert.Multiple(() =>
 		{
 			Assert.That(font, Is.Not.Null);
@@ -57,6 +57,8 @@ internal class FontUnitTest
 			Assert.That(font.Weight, Is.EqualTo(fontWeight));
 			Assert.That(font.Width, Is.EqualTo(fontWidth));
 			Assert.That(font.Height, Is.EqualTo(fontHeight));
+			Assert.That(font.Size, Is.EqualTo(12));
+			Assert.That(font.SizeInPoints, Is.EqualTo(9));
 			Assert.That(font.Slant, Is.EqualTo(fontSlant));
 			Assert.That(font.Italic, Is.EqualTo(fontSlant != SlantType.Normal));
 			Assert.That(font.Bold, Is.EqualTo(fontWeight >= 600));
