@@ -17,7 +17,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/></param>
 	/// <param name="newStyle">
-	/// The <see cref='FontStyle'/> to apply to the new S<see cref='Font'/>. Multiple
+	/// The <see cref='FontStyle'/> to apply to the new <see cref='Font'/>. Multiple
 	/// values of the <see cref='FontStyle'/> enumeration can be combined with the OR operator.
 	/// </param>
 	public Font(Font prototype, FontStyle newStyle)
@@ -33,8 +33,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
-	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
+	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font..</param>
 	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 	{
 		FontFamily = family ?? throw new ArgumentException("missing family");
@@ -61,8 +61,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
-	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
+	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font.</param>
 	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 		: this(FontFamily.Match(familyName).FirstOrDefault() ?? FontFamily.GenericSansSerif, size, style, unit, gdiCharSet, gdiVerticalFont)
 	{
@@ -404,7 +404,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Creates a GDI logical font (LOGFONT) structure from this <see cref="Font"/> and Graphics.
 	/// </summary>
-	/// <param name="logFont">An <see cref="object"/> to represent the LOGFONT structure that this method creates.</param>
+	/// <param name="logFont">An <see cref="Object"/> to represent the LOGFONT structure that this method creates.</param>
 	/// <param name="graphics">A Graphics that provides additional information for the LOGFONT structure.</param>
 	public void ToLogFont(object logFont, object graphics)
 		=> throw new NotSupportedException("unsupported by skia.");
