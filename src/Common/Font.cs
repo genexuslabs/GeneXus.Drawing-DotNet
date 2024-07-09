@@ -317,10 +317,30 @@ public sealed class Font : IDisposable, ICloneable
 	#region Methods
 
 	/// <summary>
-	/// Returns the line spacing of this <see cref='Font'/>.
+	/// Returns the line spacing, in pixels, of this <see cref='Font'/>.
 	/// </summary>
 	public float GetHeight()
-		=> Metrics.Descent - Metrics.Ascent + Metrics.Leading;
+		// => Metrics.Bottom - Metrics.Top + Metrics.Leading;
+		=> GetHeight(DPI);
+
+	/// <summary>
+	/// Returns the line spacing, in the current unit of a specified Graphics, of this <see cref='Font'/>.
+    /// </summary>
+	public float GetHeight(object graphics)
+		=> throw new NotImplementedException(); // TODO: will be replaced by GetHeight(graphics.PageUnit, graphics.DpiY) when Graphics class had been implemented
+
+	/// <summary>
+	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution.
+	/// </summary>
+	public float GetHeight(float dpi)
+		=> GetHeight(Unit, dpi);
+
+	/// <summary>
+	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution
+	/// and with the specified <see cref='GraphicsUnit'>.
+	/// </summary>
+	private float GetHeight(GraphicsUnit unit, float dpi)
+		=> (Metrics.Descent - Metrics.Ascent + Metrics.Leading) * GetFactor(dpi, unit, GraphicsUnit.Pixel);
 
 	#endregion
 
