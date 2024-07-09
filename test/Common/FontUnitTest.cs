@@ -125,6 +125,22 @@ internal class FontUnitTest
 	}
 
 	[Test]
+	[TestCase(GraphicsUnit.Pixel, 13.79883f, 13.79883f)]
+	[TestCase(GraphicsUnit.Point, 18.39844f, 15.33203f)]
+	[TestCase(GraphicsUnit.Inch, 1324.688f, 1103.906f)]
+	[TestCase(GraphicsUnit.Millimeter, 52.15305f, 43.46087f)]
+	[TestCase(GraphicsUnit.Document, 4.415625f, 3.679687f)]
+	public void Method_GetHeight(GraphicsUnit unit, float height, float height80)
+	{
+		using Font font = new("Arial", 12, unit);
+		Assert.Multiple(() => 
+		{
+			Assert.That(font.GetHeight(), Is.EqualTo(height).Within(0.001f));
+			Assert.That(font.GetHeight(80), Is.EqualTo(height80).Within(0.001f));
+		});
+	}
+
+	[Test]
 	public void Extra_GetFontCount_FileName()
 	{
 		string fontPath = Path.Combine(FONT_PATH, "AvenirNext-Collection.ttc");
