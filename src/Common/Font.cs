@@ -420,9 +420,9 @@ public sealed class Font : IDisposable, ICloneable
 
 	private static float GetFactor(float dpi, GraphicsUnit sourceUnit, GraphicsUnit targetUnit)
 	{
-		float sourceToInch = GetPointFactor(sourceUnit, dpi);
-        float targetToInch = GetPointFactor(targetUnit, dpi);
-        return sourceToInch / targetToInch;
+		float sourceFactor = GetPointFactor(sourceUnit, dpi);
+        float targetFactor = GetPointFactor(targetUnit, dpi);
+        return sourceFactor / targetFactor;
 
 		static float GetPointFactor(GraphicsUnit unit, float dpi) => unit switch
 		{
