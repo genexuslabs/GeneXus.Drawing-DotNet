@@ -346,14 +346,14 @@ public sealed class Font : IDisposable, ICloneable
     /// </summary>
     /// <returns>The newly created <see cref="Font"/>.</returns>
 	public static Font FromHdc(IntPtr hdc)
-		=> throw new NotImplementedException("unsupported by skia.");
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <summary>
     /// Creates a <see cref='Font'/> from the specified Windows handle.
     /// </summary>
 	/// <returns>The newly created <see cref="Font"/>.</returns>
     public static Font FromHfont(IntPtr hfont)
-		=> throw new NotImplementedException("unsupported by skia.");
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <inheritdoc cref="FromLogFont(object)"/>
     public static Font FromLogFont(in object logFont)
@@ -378,13 +378,13 @@ public sealed class Font : IDisposable, ICloneable
     /// <param name="hdc">Handle to a device context (HDC).</param>
     /// <returns>The newly created <see cref="Font"/>.</returns>
     public static Font FromLogFont(object logFont, IntPtr hdc)
-		=> throw new NotImplementedException("unsupported by skia.");
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <summary>
     /// Returns a handle to this <see cref='Font'/>.
     /// </summary>
     public IntPtr ToHfont()
-		=> throw new NotImplementedException("unsupported by skia.");
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <inheritdoc cref="ToLogFont(object)"/>
     public void ToLogFont(out object logFont)
@@ -407,7 +407,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="logFont">An <see cref="object"/> to represent the LOGFONT structure that this method creates.</param>
 	/// <param name="graphics">A Graphics that provides additional information for the LOGFONT structure.</param>
 	public void ToLogFont(object logFont, object graphics)
-		=> throw new NotImplementedException("unsupported by skia.");
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	#endregion
 
