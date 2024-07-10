@@ -324,7 +324,7 @@ public sealed class Font : IDisposable, ICloneable
 
 	/// <summary>
 	/// Returns the line spacing, in the current unit of a specified Graphics, of this <see cref='Font'/>.
-    /// </summary>
+	/// </summary>
 	public float GetHeight(object graphics)
 		=> throw new NotImplementedException(); // TODO: will be replaced by GetHeight(graphics.PageUnit, graphics.DpiY) when Graphics class had been implemented
 
@@ -342,63 +342,63 @@ public sealed class Font : IDisposable, ICloneable
 		=> (Metrics.Descent - Metrics.Ascent + Metrics.Leading) * GetFactor(dpi, unit, GraphicsUnit.Pixel);
 
 	/// <summary>
-    /// Creates a <see cref="Font"/> from the specified handle to a device context (HDC).
-    /// </summary>
-    /// <returns>The newly created <see cref="Font"/>.</returns>
+	/// Creates a <see cref="Font"/> from the specified handle to a device context (HDC).
+	/// </summary>
+	/// <returns>The newly created <see cref="Font"/>.</returns>
 	public static Font FromHdc(IntPtr hdc)
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <summary>
-    /// Creates a <see cref='Font'/> from the specified Windows handle.
-    /// </summary>
+	/// Creates a <see cref='Font'/> from the specified Windows handle.
+	/// </summary>
 	/// <returns>The newly created <see cref="Font"/>.</returns>
-    public static Font FromHfont(IntPtr hfont)
+	public static Font FromHfont(IntPtr hfont)
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <inheritdoc cref="FromLogFont(object)"/>
-    public static Font FromLogFont(in Interop.LOGFONT logFont)
+	public static Font FromLogFont(in Interop.LOGFONT logFont)
 		=> FromLogFont(logFont, IntPtr.Zero);
 
 	/// <inheritdoc cref="FromLogFont(object, IntPtr)"/>
-    public static Font FromLogFont(in Interop.LOGFONT logFont, IntPtr hdc)
+	public static Font FromLogFont(in Interop.LOGFONT logFont, IntPtr hdc)
 		=> FromLogFont(logFont as object, hdc);
 
 	/// <summary>
-    /// Creates a <see cref="Font"/> from the given <see cref="Interop.LOGFONT"/> using the screen device context.
-    /// </summary>
-    /// <param name="logFont">A boxed <see cref="Interop.LOGFONT"/>.</param>
-    /// <returns>The newly created <see cref="Font"/>.</returns>
-    public static Font FromLogFont(object logFont)
+	/// Creates a <see cref="Font"/> from the given <see cref="Interop.LOGFONT"/> using the screen device context.
+	/// </summary>
+	/// <param name="logFont">A boxed <see cref="Interop.LOGFONT"/>.</param>
+	/// <returns>The newly created <see cref="Font"/>.</returns>
+	public static Font FromLogFont(object logFont)
 		=> FromLogFont(logFont, IntPtr.Zero);
 
 	/// <summary>
-    /// Creates a <see cref="Font"/> from the given <see cref="Interop.LOGFONT"/> using the given device context.
-    /// </summary>
-    /// <param name="logFont">A boxed <see cref="Interop.LOGFONT"/>.</param>
-    /// <param name="hdc">Handle to a device context (HDC).</param>
-    /// <returns>The newly created <see cref="Font"/>.</returns>
-    public static Font FromLogFont(object logFont, IntPtr hdc)
+	/// Creates a <see cref="Font"/> from the given <see cref="Interop.LOGFONT"/> using the given device context.
+	/// </summary>
+	/// <param name="logFont">A boxed <see cref="Interop.LOGFONT"/>.</param>
+	/// <param name="hdc">Handle to a device context (HDC).</param>
+	/// <returns>The newly created <see cref="Font"/>.</returns>
+	public static Font FromLogFont(object logFont, IntPtr hdc)
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <summary>
-    /// Returns a handle to this <see cref='Font'/>.
-    /// </summary>
-    public IntPtr ToHfont()
+	/// Returns a handle to this <see cref='Font'/>.
+	/// </summary>
+	public IntPtr ToHfont()
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	/// <inheritdoc cref="ToLogFont(object)"/>
-    public void ToLogFont(out Interop.LOGFONT logFont)
+	public void ToLogFont(out Interop.LOGFONT logFont)
 		=> ToLogFont(out logFont, null);
 
 	/// <inheritdoc cref="ToLogFont(object, object)"/>
-    public void ToLogFont(out Interop.LOGFONT logFont, object graphics)
+	public void ToLogFont(out Interop.LOGFONT logFont, object graphics)
 		=> ToLogFont(logFont = new Interop.LOGFONT(), graphics);
 
 	/// <summary>
 	/// Creates a GDI logical font (<see cref="Interop.LOGFONT"/>) structure from this <see cref="Font"/>.
 	/// </summary>
 	/// <param name="logFont">An <see cref="Object"/> to represent the <see cref="Interop.LOGFONT"/> structure that this method creates.</param>
-    public void ToLogFont(object logFont)
+	public void ToLogFont(object logFont)
 		=> ToLogFont(logFont, null);
 
 	/// <summary>
@@ -468,8 +468,8 @@ public sealed class Font : IDisposable, ICloneable
 	private static float GetFactor(float dpi, GraphicsUnit sourceUnit, GraphicsUnit targetUnit)
 	{
 		float sourceFactor = GetPointFactor(sourceUnit, dpi);
-        float targetFactor = GetPointFactor(targetUnit, dpi);
-        return sourceFactor / targetFactor;
+		float targetFactor = GetPointFactor(targetUnit, dpi);
+		return sourceFactor / targetFactor;
 
 		static float GetPointFactor(GraphicsUnit unit, float dpi) => unit switch
 		{
