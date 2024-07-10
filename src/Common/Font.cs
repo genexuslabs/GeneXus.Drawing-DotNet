@@ -15,9 +15,9 @@ public sealed class Font : IDisposable, ICloneable
 	/// Initializes a new <see cref='Font'/> that uses the specified existing <see cref='Font'/>
 	/// and <see cref='FontStyle'/> enumeration.
 	/// </summary>
-	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/></param>
+	/// <param name="prototype">The existing <see cref='Font'/> from which to create the new <see cref='Font'/>.</param>
 	/// <param name="newStyle">
-	/// The <see cref='FontStyle'/> to apply to the new S<see cref='Font'/>. Multiple
+	/// The <see cref='FontStyle'/> to apply to the new <see cref='Font'/>. Multiple
 	/// values of the <see cref='FontStyle'/> enumeration can be combined with the OR operator.
 	/// </param>
 	public Font(Font prototype, FontStyle newStyle)
@@ -33,8 +33,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
-	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
+	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font.</param>
 	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 	{
 		FontFamily = family ?? throw new ArgumentException("missing family");
@@ -61,8 +61,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="size">The size of the new font in the units specified by the <paramref name="unit"/> parameter.</param>
 	/// <param name="style">The <see cref='FontStyle'/> of the new font.</param>
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
-	/// <param name="gdiCharSet">A  <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
-	/// <param name="gdiVerticalFont">A  <see cref='Boolean'/> value indicating whether the new  <see cref='Font'/> is derived from a GDI vertical font..</param>
+	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
+	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font.</param>
 	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 		: this(FontFamily.Match(familyName).FirstOrDefault() ?? FontFamily.GenericSansSerif, size, style, unit, gdiCharSet, gdiVerticalFont)
 	{
@@ -286,7 +286,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Gets the em-size, in points, of this <see cref='Font'/>.
 	/// </summary>
-	/// <returns>The em-size, in points, of this <see cref='Font'/></returns>
+	/// <returns>The em-size, in points, of this <see cref='Font'/>.</returns>
 	[Browsable(false)]
 	public float SizeInPoints => Size * GetFactor(DPI, Unit, GraphicsUnit.Point);
 	
@@ -340,6 +340,74 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	private float GetHeight(GraphicsUnit unit, float dpi)
 		=> (Metrics.Descent - Metrics.Ascent + Metrics.Leading) * GetFactor(dpi, unit, GraphicsUnit.Pixel);
+
+	/// <summary>
+    /// Creates a <see cref="Font"/> from the specified handle to a device context (HDC).
+    /// </summary>
+    /// <returns>The newly created <see cref="Font"/>.</returns>
+	public static Font FromHdc(IntPtr hdc)
+		=> throw new NotSupportedException("unsupported by skia.");
+
+	/// <summary>
+    /// Creates a <see cref='Font'/> from the specified Windows handle.
+    /// </summary>
+	/// <returns>The newly created <see cref="Font"/>.</returns>
+    public static Font FromHfont(IntPtr hfont)
+		=> throw new NotSupportedException("unsupported by skia.");
+
+	/// <inheritdoc cref="FromLogFont(object)"/>
+    public static Font FromLogFont(in object logFont)
+		=> FromLogFont(logFont, IntPtr.Zero);
+
+	/// <inheritdoc cref="FromLogFont(object, IntPtr)"/>
+    public static Font FromLogFont(in object logFont, IntPtr hdc)
+		=> FromLogFont(logFont, hdc);
+
+	/// <summary>
+    /// Creates a <see cref="Font"/> from the given LOGFONT using the screen device context.
+    /// </summary>
+    /// <param name="logFont">A boxed LOGFONT.</param>
+    /// <returns>The newly created <see cref="Font"/>.</returns>
+    public static Font FromLogFont(object logFont)
+		=> FromLogFont(logFont, IntPtr.Zero);
+
+	/// <summary>
+    /// Creates a <see cref="Font"/> from the given LOGFONT using the given device context.
+    /// </summary>
+    /// <param name="logFont">A boxed LOGFONT.</param>
+    /// <param name="hdc">Handle to a device context (HDC).</param>
+    /// <returns>The newly created <see cref="Font"/>.</returns>
+    public static Font FromLogFont(object logFont, IntPtr hdc)
+		=> throw new NotSupportedException("unsupported by skia.");
+
+	/// <summary>
+    /// Returns a handle to this <see cref='Font'/>.
+    /// </summary>
+    public IntPtr ToHfont()
+		=> throw new NotSupportedException("unsupported by skia.");
+
+	/// <inheritdoc cref="ToLogFont(object)"/>
+    public void ToLogFont(out object logFont)
+		=> ToLogFont(out logFont, null);
+
+	/// <inheritdoc cref="ToLogFont(object, object)"/>
+    public void ToLogFont(out object logFont, object graphics)
+		=> ToLogFont(logFont = new object(), graphics);
+
+	/// <summary>
+	/// Creates a GDI logical font (LOGFONT) structure from this <see cref="Font"/>.
+	/// </summary>
+	/// <param name="logFont">An <see cref="Object"/> to represent the LOGFONT structure that this method creates.</param>
+    public void ToLogFont(object logFont)
+		=> ToLogFont(logFont, null);
+
+	/// <summary>
+	/// Creates a GDI logical font (LOGFONT) structure from this <see cref="Font"/> and Graphics.
+	/// </summary>
+	/// <param name="logFont">An <see cref="Object"/> to represent the LOGFONT structure that this method creates.</param>
+	/// <param name="graphics">A Graphics that provides additional information for the LOGFONT structure.</param>
+	public void ToLogFont(object logFont, object graphics)
+		=> throw new NotSupportedException("unsupported by skia.");
 
 	#endregion
 
