@@ -35,7 +35,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
 	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
 	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font.</param>
-	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
+	public Font(FontFamily family, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = Interop.GDI_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 	{
 		FontFamily = family ?? throw new ArgumentException("missing family");
 		Size = size;
@@ -63,7 +63,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// <param name="unit">The <see cref='GraphicsUnit'/> of the new font.</param>
 	/// <param name="gdiCharSet">A <see cref='Byte'/> that specifies a GDI character set to use for this font.</param>
 	/// <param name="gdiVerticalFont">A <see cref='Boolean'/> value indicating whether the new <see cref='Font'/> is derived from a GDI vertical font.</param>
-	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = (byte)FONT_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
+	public Font(string familyName, float size = 12, FontStyle style = FontStyle.Regular, GraphicsUnit unit = GraphicsUnit.Point, byte gdiCharSet = Interop.GDI_CHARSET.DEFAULT_CHARSET, bool gdiVerticalFont = false)
 		: this(FontFamily.Match(familyName).FirstOrDefault() ?? FontFamily.GenericSansSerif, size, style, unit, gdiCharSet, gdiVerticalFont)
 	{
 		OriginalFontName = familyName;
@@ -451,26 +451,6 @@ public sealed class Font : IDisposable, ICloneable
 
 
 	#region Utilties
-
-	private enum FONT_CHARSET
-	{
-		ANSI_CHARSET = 0x00,
-		DEFAULT_CHARSET = 0x01,
-		SYMBOL_CHARSET = 0x02,
-		SHIFTJIS_CHARSET = 0x80,
-		HANGUL_CHARSET = 0x81,
-		GB2312_CHARSET = 0x86,
-		CHINESEBIG5_CHARSET = 0x88,
-		GREEK_CHARSET = 0xA1,
-		TURKISH_CHARSET = 0xA2,
-		HEBREW_CHARSET = 0xB1,
-		ARABIC_CHARSET = 0xB2,
-		BALTIC_CHARSET = 0xBA,
-		RUSSIAN_CHARSET = 0xCC,
-		THAI_CHARSET = 0xDE,
-		EE_CHARSET = 0xEE,
-		OEM_CHARSET = 0xFF
-	}
 
 	private SKTypeface Typeface => FontFamily.GetTypeface(Style);
 
