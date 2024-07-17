@@ -524,15 +524,20 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  when this path is transformed by the specified <see cref='Matrix'/>.
 	/// </summary>
 	public RectangleF GetBounds(Matrix matrix)
-		=> GetBounds(matrix, null);
+		=> GetBounds(matrix, new Pen(Brushes.Transparent));
 
 	/// <summary>
 	///  Returns a rectangle that bounds this <see cref='GraphicsPath'/>
 	///  when the current path is transformed by the specified <see cref='Matrix'/> and 
 	///  drawn with the specified <see cref='Pen'/>.
 	/// </summary>
-	public RectangleF GetBounds(Matrix matrix, object pen)
-        => throw new NotImplementedException();
+	public RectangleF GetBounds(Matrix matrix, Pen pen)
+	{
+		var transformed = new GraphicsPath(m_path);
+		transformed.Transform(matrix);
+		var bounds = pen.m_paint.GetFillPath(transformed.m_path).Bounds;
+		return new RectangleF(bounds);
+	}
 
 	/// <summary>
 	///  Gets the last point in the <see cref='PathPoints'/> array of this <see cref='GraphicsPath'/>.
@@ -545,7 +550,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  this <see cref='GraphicsPath'/> when drawn with the specified <see cref='Pen'/> and 
 	///  using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(float x, float y, object pen, object g = null)
+	public bool IsOutlineVisible(float x, float y, Pen pen, object g = null)
 		=> IsOutlineVisible(new PointF(x, y), pen, g);
 
 	/// <summary>
@@ -553,15 +558,15 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  within (under) the outline of this <see cref='GraphicsPath'/> when drawn 
 	///  with the specified <see cref='Pen'/> and using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(PointF point, object pen, object g = null)
-		=> IsOutlineVisible(point.m_point, null, null);
+	public bool IsOutlineVisible(PointF point, Pen pen, object g = null)
+		=> IsOutlineVisible(point.m_point, pen.m_paint, null);
 
 	/// <summary>
 	///  Indicates whether the specified point is contained within (under) the outline of 
 	///  this <see cref='GraphicsPath'/> when drawn with the specified <see cref='Pen'/> and 
 	///  using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(int x, int y, object pen, object g = null)
+	public bool IsOutlineVisible(int x, int y, Pen pen, object g = null)
 		=> IsOutlineVisible(new Point(x, y), pen, g);
 
 	/// <summary>
@@ -569,8 +574,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  within (under) the outline of this <see cref='GraphicsPath'/> when drawn 
 	///  with the specified <see cref='Pen'/> and using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(Point point, object pen, object g = null)
-		=> IsOutlineVisible(point.m_point, new SKPaint(), null);
+	public bool IsOutlineVisible(Point point, Pen pen, object g = null)
+		=> IsOutlineVisible(point.m_point, pen.m_paint, null);
 
 	/// <summary>
 	///  Indicates whether the specified point's coordinate is contained 
@@ -649,7 +654,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  filled when this path is drawn by the specified <see cref="Pen"/> and flatness
 	///  value for curves.
 	/// </summary>
-	public void Widen(object pen, Matrix matrix = null, float flatness = 0.25f)
+	public void Widen(Pen pen, Matrix matrix = null, float flatness = 0.25f)
 		=> throw new NotImplementedException();
 
 	#endregion
