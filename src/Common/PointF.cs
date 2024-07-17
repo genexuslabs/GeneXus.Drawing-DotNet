@@ -8,7 +8,7 @@ public struct PointF : IEquatable<PointF>
 {
 	internal SKPoint m_point;
 
-	private PointF(SKPoint point)
+	internal PointF(SKPoint point)
 	{
 		m_point = point;
 	}
