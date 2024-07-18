@@ -168,8 +168,8 @@ public sealed class Region : IDisposable
 	///  Gets a <see cref='Rectangle'/> structure that represents a rectangle that bounds this <see cref='Region'/> 
 	///  on the drawing surface of a <see cref='Graphics'/> object.
 	/// </summary>
-	public Rectangle GetBounds(Graphics g)
-		=> new(SKRect.Intersect(m_region.Bounds, g.m_canvas.LocalClipBounds));
+	public RectangleF GetBounds(Graphics g)
+		=> g == null ? new(m_region.Bounds) : new(SKRect.Intersect(m_region.Bounds, g.m_canvas.LocalClipBounds));
 
 	/// <summary>
 	///  Returns a Windows handle to this <see cref='Region'/> in the specified graphics context.
