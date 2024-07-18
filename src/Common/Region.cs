@@ -169,7 +169,12 @@ public sealed class Region : IDisposable
 	///  on the drawing surface of a <see cref='Graphics'/> object.
 	/// </summary>
 	public RectangleF GetBounds(Graphics g)
-		=> g == null ? new(m_region.Bounds) : new(SKRect.Intersect(m_region.Bounds, g.m_canvas.LocalClipBounds));
+	{
+		var bounds = SKRect.Create(m_region.Bounds.Location, m_region.Bounds.Size);
+		if (g != null)
+			bounds.IntersectsWith(g.m_canvas.LocalClipBounds);
+		return new(bounds);
+	}
 
 	/// <summary>
 	///  Returns a Windows handle to this <see cref='Region'/> in the specified graphics context.
@@ -220,16 +225,16 @@ public sealed class Region : IDisposable
 	}
 
 	/// <summary>
-	///  Returns an array of <see cref='Rectangle'/> structures that approximate this <see cref='Region'/> after 
+	///  Returns an array of <see cref='RectangleF'/> structures that approximate this <see cref='Region'/> after 
 	///  the specified matrix transformation is applied.
 	/// </summary>
-	public Rectangle[] GetRegionScans(Matrix matrix) // TODO: apply Matrix
+	public RectangleF[] GetRegionScans(Matrix matrix) // TODO: apply Matrix
 	{
 		Transform(matrix);
 		using var iterator = m_region.CreateRectIterator();
-		var rects = new List<Rectangle>();
+		var rects = new List<RectangleF>();
 		while (iterator.Next(out var rect))
-			rects.Add(new Rectangle(rect));
+			rects.Add(new RectangleF(rect));
 		return rects.ToArray();
 	}
 
@@ -262,14 +267,24 @@ public sealed class Region : IDisposable
 	///  of a <see cref='Graphics'/> object.
 	/// </summary>
 	public bool IsEmpty(Graphics g)
-		=> m_region.IsEmpty; // TODO: consider g
+	{
+		var region = new SKRegion(m_region);
+		if (g != null)
+			region.Intersects(g.Clip.m_region);
+		return region.IsEmpty;
+	}
 
 	/// <summary>
 	///  Tests whether this <see cref='Region'/> has an infinite interior on the specified drawing surface 
 	///  of a <see cref='Graphic'/> object.
 	/// </summary>
 	public bool IsInfinite(Graphics g)
-		=> m_region.IsRect && m_region.Bounds.Width == int.MaxValue && m_region.Bounds.Width == int.MaxValue;  // TODO: consider g
+	{
+		var region = new SKRegion(m_region);
+		if (g != null)
+			region.Intersects(g.Clip.m_region);
+		return !region.IsRect;
+	}
 
 	/// <summary>
 	///  Tests whether any portion of the specified rectangle is contained within this <see cref='Region'/> when drawn 
@@ -325,7 +340,18 @@ public sealed class Region : IDisposable
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
 	public bool IsVisible(Point point, Graphics g = null)
-		=> m_region.Contains(SKPointI.Round(point.m_point));  // TODO: consider g
+	{
+		var region = new SKRegion(m_region);
+		if (g != null)
+		{
+			var points = new[] { point };
+			g.Transform.TransformPoints(points);
+			point = points[0];
+
+			region.Intersects(g.Clip.m_region);
+		}
+		return region.Contains(point.X, point.Y);
+	}
 
 	/// <summary>
 	///  Initializes this <see cref='Region'/> to an empty interior.
