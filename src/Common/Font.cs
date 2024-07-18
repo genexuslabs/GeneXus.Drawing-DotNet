@@ -325,8 +325,8 @@ public sealed class Font : IDisposable, ICloneable
 	/// <summary>
 	/// Returns the line spacing, in the current unit of a specified Graphics, of this <see cref='Font'/>.
 	/// </summary>
-	public float GetHeight(object graphics)
-		=> throw new NotImplementedException(); // TODO: will be replaced by GetHeight(graphics.PageUnit, graphics.DpiY) when Graphics class had been implemented
+	public float GetHeight(Graphics graphics)
+		=> GetHeight(graphics.PageUnit, graphics.DpiY);
 
 	/// <summary>
 	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution.
@@ -391,7 +391,7 @@ public sealed class Font : IDisposable, ICloneable
 		=> ToLogFont(out logFont, null);
 
 	/// <inheritdoc cref="ToLogFont(object, object)"/>
-	public void ToLogFont(out Interop.LOGFONT logFont, object graphics)
+	public void ToLogFont(out Interop.LOGFONT logFont, Graphics graphics)
 		=> ToLogFont(logFont = new Interop.LOGFONT(), graphics);
 
 	/// <summary>
@@ -406,7 +406,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	/// <param name="logFont">An <see cref="Object"/> to represent the <see cref="Interop.LOGFONT"/> structure that this method creates.</param>
 	/// <param name="graphics">A Graphics that provides additional information for the <see cref="Interop.LOGFONT"/> structure.</param>
-	public void ToLogFont(object logFont, object graphics)
+	public void ToLogFont(object logFont, Graphics graphics)
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	#endregion

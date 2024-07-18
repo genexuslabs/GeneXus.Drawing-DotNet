@@ -168,13 +168,13 @@ public sealed class Region : IDisposable
 	///  Gets a <see cref='Rectangle'/> structure that represents a rectangle that bounds this <see cref='Region'/> 
 	///  on the drawing surface of a <see cref='Graphics'/> object.
 	/// </summary>
-	public Rectangle GetBounds(object g)
-		=> new(m_region.Bounds); // TODO: consider g
+	public Rectangle GetBounds(Graphics g)
+		=> new(SKRect.Intersect(m_region.Bounds, g.m_canvas.LocalClipBounds));
 
 	/// <summary>
 	///  Returns a Windows handle to this <see cref='Region'/> in the specified graphics context.
 	/// </summary>
-	public IntPtr GetHrgn(object g)
+	public IntPtr GetHrgn(Graphics g)
 		=> throw new NotSupportedException("windows specific");
 
 	/// <summary>
@@ -261,71 +261,71 @@ public sealed class Region : IDisposable
 	///  Tests whether this <see cref='Region'/> has an empty interior on the specified drawing surface 
 	///  of a <see cref='Graphics'/> object.
 	/// </summary>
-	public bool IsEmpty(object g) // TODO: consider g
-		=> m_region.IsEmpty;
+	public bool IsEmpty(Graphics g)
+		=> m_region.IsEmpty; // TODO: consider g
 
 	/// <summary>
 	///  Tests whether this <see cref='Region'/> has an infinite interior on the specified drawing surface 
 	///  of a <see cref='Graphic'/> object.
 	/// </summary>
-	public bool IsInfinite(object g)
-		=> m_region.IsRect && m_region.Bounds.Width == int.MaxValue && m_region.Bounds.Width == int.MaxValue;
+	public bool IsInfinite(Graphics g)
+		=> m_region.IsRect && m_region.Bounds.Width == int.MaxValue && m_region.Bounds.Width == int.MaxValue;  // TODO: consider g
 
 	/// <summary>
 	///  Tests whether any portion of the specified rectangle is contained within this <see cref='Region'/> when drawn 
 	///  using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(int x, int y, int width, int height, object g = null)
+	public bool IsVisible(int x, int y, int width, int height, Graphics g = null)
 		=> IsVisible(new Rectangle(x, y, width, height), g);
 
 	/// <summary>
 	///  Tests whether any portion of the specified rectangle is contained within this <see cref='Region'/> when drawn 
 	///  using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(float x, float y, float width, float height, object g = null)
+	public bool IsVisible(float x, float y, float width, float height, Graphics g = null)
 		=> IsVisible(new RectangleF(x, y, width, height), g);
 
 	/// <summary>
 	///  Tests whether any portion of the specified <see cref='RectangleF'/> structure is contained within 
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(RectangleF rect, object g = null)
+	public bool IsVisible(RectangleF rect, Graphics g = null)
 		=> IsVisible(RectangleF.Truncate(rect), g);
 
 	/// <summary>
 	///  Tests whether any portion of the specified <see cref='Rectangle'/> structure is contained within 
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(Rectangle rect, object g = null)
-		=> m_region.Contains(SKRectI.Round(rect.m_rect));
+	public bool IsVisible(Rectangle rect, Graphics g = null)
+		=> m_region.Contains(SKRectI.Round(rect.m_rect));  // TODO: consider g
 
 	/// <summary>
 	///  Tests whether the specified point is contained within this <see cref='Region'/> when drawn 
 	///  using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(int x, int y, object g = null)
+	public bool IsVisible(int x, int y, Graphics g = null)
 		=> IsVisible(new Point(x, y), g);
 
 	/// <summary>
 	///  Tests whether the specified point is contained within this <see cref='Region'/> when drawn 
 	///  using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(float x, float y, object g = null)
+	public bool IsVisible(float x, float y, Graphics g = null)
 		=> IsVisible(new PointF(x, y), g);
 
 	/// <summary>
 	///  Tests whether the specified <see cref='PointF'/> structure is contained within 
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(PointF point, object g = null)
+	public bool IsVisible(PointF point, Graphics g = null)
 		=> IsVisible(PointF.Truncate(point), g);
 
 	/// <summary>
 	///  Tests whether the specified <see cref='Point'/> structure is contained within 
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
-	public bool IsVisible(Point point, object g = null)
-		=> m_region.Contains(SKPointI.Round(point.m_point));
+	public bool IsVisible(Point point, Graphics g = null)
+		=> m_region.Contains(SKPointI.Round(point.m_point));  // TODO: consider g
 
 	/// <summary>
 	///  Initializes this <see cref='Region'/> to an empty interior.

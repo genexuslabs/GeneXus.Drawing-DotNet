@@ -53,8 +53,8 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size 
 	/// and with the resolution of the specified <see cref='Graphics'/> object.
 	/// </summary>
-	//public Bitmap(int width, int height, object g) // TODO: Implement Graphics
-	//	: this(width, height) => throw new NotImplementedException();
+	public Bitmap(int width, int height, Graphics g) // TODO: Implement Graphics
+		: this(width, height) => throw new NotImplementedException();
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size and format.

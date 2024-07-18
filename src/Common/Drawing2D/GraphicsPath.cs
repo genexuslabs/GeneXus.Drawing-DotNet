@@ -322,8 +322,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		=> AddEllipse(new RectangleF(x, y, width, height));
 
 	/// <summary>
-	///   Adds an ellipse to the current path bounded by
-	///   a <see cref='Rectangle'/> structure.
+	///  Adds an ellipse to the current path bounded by
+	///  a <see cref='Rectangle'/> structure.
 	/// </summary>
 	public void AddEllipse(RectangleF rect)
 		=> AddEllipse(rect.m_rect);
@@ -550,7 +550,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  this <see cref='GraphicsPath'/> when drawn with the specified <see cref='Pen'/> and 
 	///  using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(float x, float y, Pen pen, object g = null)
+	public bool IsOutlineVisible(float x, float y, Pen pen, Graphics g = null)
 		=> IsOutlineVisible(new PointF(x, y), pen, g);
 
 	/// <summary>
@@ -558,15 +558,15 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  within (under) the outline of this <see cref='GraphicsPath'/> when drawn 
 	///  with the specified <see cref='Pen'/> and using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(PointF point, Pen pen, object g = null)
-		=> IsOutlineVisible(point.m_point, pen.m_paint, null);
+	public bool IsOutlineVisible(PointF point, Pen pen, Graphics g = null)
+		=> IsOutlineVisible(point.m_point, pen.m_paint, g?.m_canvas.LocalClipBounds);
 
 	/// <summary>
 	///  Indicates whether the specified point is contained within (under) the outline of 
 	///  this <see cref='GraphicsPath'/> when drawn with the specified <see cref='Pen'/> and 
 	///  using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(int x, int y, Pen pen, object g = null)
+	public bool IsOutlineVisible(int x, int y, Pen pen, Graphics g = null)
 		=> IsOutlineVisible(new Point(x, y), pen, g);
 
 	/// <summary>
@@ -574,36 +574,36 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  within (under) the outline of this <see cref='GraphicsPath'/> when drawn 
 	///  with the specified <see cref='Pen'/> and using the specified <see cref='Graphics'/>.
 	/// </summary>
-	public bool IsOutlineVisible(Point point, Pen pen, object g = null)
-		=> IsOutlineVisible(point.m_point, pen.m_paint, null);
+	public bool IsOutlineVisible(Point point, Pen pen, Graphics g = null)
+		=> IsOutlineVisible(point.m_point, pen.m_paint, g?.m_canvas.LocalClipBounds);
 
 	/// <summary>
 	///  Indicates whether the specified point's coordinate is contained 
 	///  within this <see cref='GraphicsPath'/>.
 	/// </summary>
-	public bool IsVisible(float x, float y, object g = null)
+	public bool IsVisible(float x, float y, Graphics g = null)
 		=> IsVisible(new PointF(x, y), g);
 
 	/// <summary>
 	///  Indicates whether the specified <see cref='PointF'/> structure is 
 	///  contained within this <see cref='GraphicsPath'/>.
 	/// </summary>
-	public bool IsVisible(PointF point, object g = null) // TODO: consider Graphics
-		=> IsVisible(point.m_point, null);
+	public bool IsVisible(PointF point, Graphics g = null)
+		=> IsVisible(point.m_point, g?.m_canvas.LocalClipBounds);
 
 	/// <summary>
 	///  Indicates whether the specified point's coordinate is contained 
 	///  within this <see cref='GraphicsPath'/>.
 	/// </summary>
-	public bool IsVisible(int x, int y, object g = null)
+	public bool IsVisible(int x, int y, Graphics g = null)
 		=> IsVisible(new Point(x, y), g);
 
 	/// <summary>
 	///  Indicates whether the specified <see cref='Point'/> structure is 
 	///  contained within this <see cref='GraphicsPath'/>.
 	/// </summary>
-	public bool IsVisible(Point point, object g = null) // TODO: consider Graphics
-		=> IsVisible(point.m_point, null);
+	public bool IsVisible(Point point, Graphics g = null) // TODO: consider Graphics
+		=> IsVisible(point.m_point, g?.m_canvas.LocalClipBounds);
 
 	/// <summary>
 	///  Empties the <see cref="PathPoints"/> and <see cref="PathTypes"/> arrays 
