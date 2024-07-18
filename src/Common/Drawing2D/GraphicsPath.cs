@@ -602,7 +602,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  Indicates whether the specified <see cref='Point'/> structure is 
 	///  contained within this <see cref='GraphicsPath'/>.
 	/// </summary>
-	public bool IsVisible(Point point, Graphics g = null) // TODO: consider Graphics
+	public bool IsVisible(Point point, Graphics g = null)
 		=> IsVisible(point.m_point, g?.m_canvas.LocalClipBounds);
 
 	/// <summary>

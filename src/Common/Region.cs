@@ -312,7 +312,12 @@ public sealed class Region : IDisposable
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
 	public bool IsVisible(Rectangle rect, Graphics g = null)
-		=> m_region.Contains(SKRectI.Round(rect.m_rect));  // TODO: consider g
+	{
+		var region = new SKRegion(m_region);
+		if (g != null)
+			region.Intersects(g.Clip.m_region);
+		return region.Contains(SKRectI.Round(rect.m_rect));
+	}
 
 	/// <summary>
 	///  Tests whether the specified point is contained within this <see cref='Region'/> when drawn 
