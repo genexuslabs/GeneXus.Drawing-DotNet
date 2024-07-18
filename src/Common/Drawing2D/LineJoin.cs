@@ -5,25 +5,25 @@ namespace GeneXus.Drawing.Drawing2D;
 /// </summary>
 public enum LineJoin
 {
-    /// <summary>
-    ///  Specifies a mitered join. This produces a sharp corner or a clipped corner, depending on whether the 
-    ///  length of the miter exceeds the miter limit.
-    /// </summary>
+	/// <summary>
+	///  Specifies a mitered join. This produces a sharp corner or a clipped corner, depending on whether the 
+	///  length of the miter exceeds the miter limit.
+	/// </summary>
 	Miter = 0,
 
-    /// <summary>
-    ///  Specifies a beveled join. This produces a diagonal corner.
-    /// </summary>
+	/// <summary>
+	///  Specifies a beveled join. This produces a diagonal corner.
+	/// </summary>
 	Bevel = 1,
 
-    /// <summary>
-    ///  pecifies a circular join. This produces a smooth, circular arc between the lines.
-    /// </summary>
+	/// <summary>
+	///  pecifies a circular join. This produces a smooth, circular arc between the lines.
+	/// </summary>
 	Round = 2,
 
-    /// <summary>
-    ///  Specifies a mitered join. This produces a sharp corner or a beveled corner, depending on whether the 
-    ///  length of the miter exceeds the miter limit.
-    /// </summary>
+	/// <summary>
+	///  Specifies a mitered join. This produces a sharp corner or a beveled corner, depending on whether the 
+	///  length of the miter exceeds the miter limit.
+	/// </summary>
 	MiterClipped = 3
 }

@@ -48,7 +48,7 @@ public struct CharacterRange : IEquatable<CharacterRange>
 	///  Returns the hash code for this instance.
 	/// </summary>
 	public override readonly int GetHashCode()
-        => Combine(First, Length);
+		=> Combine(First, Length);
 
 	#endregion
 
@@ -68,18 +68,18 @@ public struct CharacterRange : IEquatable<CharacterRange>
 	#endregion
 
 
-    #region Utilities
+	#region Utilities
 
-    private const uint PRIME1 = 2654435761U, PRIME2 = 2246822519U;
+	private const uint PRIME1 = 2654435761U, PRIME2 = 2246822519U;
 
-    private static int Combine(params object[] objects)
-    {
-        uint hash = PRIME1;
-        foreach (var obj in objects)
-            hash = hash * PRIME2 + (uint)obj.GetHashCode();
-        return Convert.ToInt32(hash);
-    }
+	private static int Combine(params object[] objects)
+	{
+		uint hash = PRIME1;
+		foreach (var obj in objects)
+			hash = hash * PRIME2 + (uint)obj.GetHashCode();
+		return Convert.ToInt32(hash);
+	}
 
-    #endregion
+	#endregion
 }
 
