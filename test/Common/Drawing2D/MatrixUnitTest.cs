@@ -1,5 +1,4 @@
 using GeneXus.Drawing.Drawing2D;
-using System;
 using System.Numerics;
 
 namespace GeneXus.Drawing.Test.Drawing2D;

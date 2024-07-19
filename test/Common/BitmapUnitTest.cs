@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using GeneXus.Drawing;
 
 namespace GeneXus.Drawing.Test;
 
