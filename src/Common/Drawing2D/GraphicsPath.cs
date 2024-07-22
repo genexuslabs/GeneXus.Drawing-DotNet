@@ -670,7 +670,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	#endregion
 
 
-	#region Skia
+	#region Helpers
 
 	private void AddArc(SKRect rect, float startAngle, float sweepAngle)
 		=> m_path.AddArc(rect, startAngle, sweepAngle);
