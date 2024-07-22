@@ -524,7 +524,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  when this path is transformed by the specified <see cref='Matrix'/>.
 	/// </summary>
 	public RectangleF GetBounds(Matrix matrix)
-		=> GetBounds(matrix, new Pen(Brushes.Transparent));
+		=> GetBounds(matrix, new Pen(Color.Transparent, 0));
 
 	/// <summary>
 	///  Returns a rectangle that bounds this <see cref='GraphicsPath'/>
@@ -533,10 +533,10 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	/// </summary>
 	public RectangleF GetBounds(Matrix matrix, Pen pen)
 	{
-		var transformed = new GraphicsPath(m_path);
+		using var transformed = new GraphicsPath(m_path);
 		transformed.Transform(matrix);
-		var bounds = pen.m_paint.GetFillPath(transformed.m_path).Bounds;
-		return new RectangleF(bounds);
+		using var fill = pen.m_paint.GetFillPath(transformed.m_path) ?? transformed.m_path;
+		return new RectangleF(fill.Bounds);
 	}
 
 	/// <summary>
