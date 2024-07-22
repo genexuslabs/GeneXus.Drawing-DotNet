@@ -693,11 +693,11 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	}
 
 
-	public void AddCurve(SKPoint[] points, float tension, bool closed) // TODO: implement tension
+	private void AddCurve(SKPoint[] points, float tension, bool closed) // TODO: implement tension
 		=> m_path.AddPoly(points, closed);
 
 
-	public void AddEllipse(SKRect rect)
+	private void AddEllipse(SKRect rect)
 		=> m_path.AddOval(rect);
 
 
