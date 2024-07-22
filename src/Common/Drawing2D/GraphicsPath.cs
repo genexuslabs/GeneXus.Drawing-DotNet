@@ -835,14 +835,15 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	private bool IsOutlineVisible(SKPoint point, SKPaint pen, SKRect? bounds)
 	{
 		bool isBoundContained = bounds?.Contains(point) ?? true;
-		return isBoundContained && pen.GetFillPath(m_path).Contains(point.X, point.Y);
+		var path = pen.GetFillPath(m_path) ?? m_path;
+		return isBoundContained && path.Contains(point.X, point.Y);
 	}
 
 
 	private bool IsVisible(SKPoint point, SKRect? bounds)
 	{
 		bool isBoundContained = bounds?.Contains(point) ?? true;
-		return isBoundContained && m_path.Contains(point.X, point.Y);
+		return isBoundContained && m_path.Bounds.Contains(point.X, point.Y);
 	}
 
 	#endregion
