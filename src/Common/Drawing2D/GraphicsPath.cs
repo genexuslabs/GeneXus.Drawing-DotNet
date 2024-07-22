@@ -346,8 +346,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		=> AddEllipse(new Rectangle(x, y, width, height));
 
 	/// <summary>
-	///   Adds an ellipse to the current path bounded by
-	///   a <see cref='Rectangle'/> structure.
+	///  Adds an ellipse to the current path bounded by
+	///  a <see cref='Rectangle'/> structure.
 	/// </summary>
 	public void AddEllipse(Rectangle rect)
 		=> AddEllipse(rect.m_rect);
