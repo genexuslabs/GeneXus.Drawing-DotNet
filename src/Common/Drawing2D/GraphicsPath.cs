@@ -677,7 +677,11 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 
 	private void AddBezier(SKPoint pt1, SKPoint pt2, SKPoint pt3, SKPoint pt4)
-		=> m_path.CubicTo(pt1, pt2, pt3);
+	{
+		if (m_path.LastPoint != pt1)
+			m_path.MoveTo(pt1);
+		m_path.CubicTo(pt2, pt3, pt4);
+	}
 
 
 	private void AddBeziers(params SKPoint[] points)
