@@ -241,7 +241,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  of the points in the array.
 	/// </summary>
 	public void AddClosedCurve(params PointF[] points)
-		=> AddClosedCurve(points);
+		=> AddClosedCurve(points, 0.5f);
 
 	/// <summary>
 	///  Adds a closed curve to this path defined by an array 
@@ -273,7 +273,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  travels through each of the points in the array.
 	/// </summary>
 	public void AddCurve(params PointF[] points)
-		=> AddCurve(points);
+		=> AddCurve(points, 0.5f);
 
 	/// <summary>
 	///  Adds a spline curve to the current figure defined
@@ -297,7 +297,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  travels through each of the points in the array.
 	/// </summary>
 	public void AddCurve(params Point[] points)
-		=> AddCurve(points);
+		=> AddCurve(points, 0.5f);
 
 	/// <summary>
 	///  Adds a spline curve to the current figure defined
