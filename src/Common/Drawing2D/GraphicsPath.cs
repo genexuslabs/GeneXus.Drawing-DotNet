@@ -694,7 +694,71 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 
 	private void AddCurve(SKPoint[] points, float tension, bool closed) // TODO: implement tension
-		=> m_path.AddPoly(points, closed);
+	{
+		if (points.Length < 2)
+			throw new ArgumentException("At least two points are required", nameof(points));
+
+		tension = Math.Max(0, tension);
+
+		if (m_path.LastPoint != points[0])
+			m_path.MoveTo(points[0]);
+
+		if (points.Length == 2)
+		{
+			m_path.LineTo(points[1]);
+			return;
+		}
+
+		// calculate and add cubic bézier curves
+		for (int i = 0; i < points.Length - 1; i++)
+		{
+			SKPoint p0 = points[i];
+			SKPoint p3 = points[i + 1];
+
+			SKPoint p1, p2;
+
+			if (i == 0)
+			{
+				// first segment
+				p1 = new(p0.X + (closed ? p0.X - p3.X : p3.X - p0.X) * tension / 3, p0.Y + (p3.Y - p0.Y) * tension / 3);
+			}
+			else
+			{
+				SKPoint pPrev = points[i - 1];
+				p1 = new(p0.X + (p3.X - pPrev.X) * tension / 3, p0.Y + (p3.Y - pPrev.Y) * tension / 3);
+			}
+
+			if (i == points.Length - 2)
+			{
+				// last segment
+				p2 = new(p3.X - (closed ? p0.X - p3.X : p3.X - p0.X) * tension / 3, p3.Y - (p3.Y - p0.Y) * tension / 3);
+			}
+			else
+			{
+				SKPoint pNext = points[i + 2];
+				p2 = new(p3.X - (pNext.X - p0.X) * tension / 3, p3.Y - (pNext.Y - p0.Y) * tension / 3);
+			}
+
+			// add cubic bézier curve
+			m_path.CubicTo(p1, p2, p3);
+		}
+
+		if (closed)
+		{
+			// Close the path by adding a segment from the last point to the first point
+			SKPoint p0 = points[points.Length - 1];
+			SKPoint p3 = points[0];
+
+			// Calculate control points for the closing segment
+			SKPoint pPrev = points[points.Length - 2];
+			SKPoint p1 = new(p0.X - (p0.X - pPrev.X) * tension / 3, p0.Y + (p0.Y - pPrev.Y) * tension / 3);
+			SKPoint p2 = new(p3.X - (pPrev.X - p0.X) * tension / 3, p3.Y - (pPrev.Y - p0.Y) * tension / 3);
+
+			// add the closing cubic bézier curve and close path
+			m_path.CubicTo(p1, p2, p3);
+			m_path.Close();
+		}
+	}
 
 
 	private void AddEllipse(SKRect rect)
