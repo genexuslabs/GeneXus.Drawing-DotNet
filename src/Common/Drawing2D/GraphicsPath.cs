@@ -527,72 +527,66 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 		if (m_path.PointCount == 0)
 			return;
-
-		var path = new SKPath(m_path);
-		m_path.Reset();
 		
-		using SKPath.RawIterator iterator = path.CreateRawIterator();
+		var data = PathData;
+		matrix.TransformPoints(data.Points);
 
-		SKPathVerb pathVerb;
-		SKPoint firstPoint = new(0, 0), lastPoint = new(0, 0);
-		SKPoint[] points = new SKPoint[4];
-		while ((pathVerb = iterator.Next(points)) != SKPathVerb.Done)
+		using var path = new GraphicsPath(data.Points, data.Types, FillMode);
+		
+		Reset();
+
+		for (int i = 0; i < path.PointCount; i++)
 		{
-			switch (pathVerb)
+			var type = path.PathTypes[i] & (byte)PathPointType.PathTypeMask;
+			switch((PathPointType)type)
 			{
-				case SKPathVerb.Move:
-					m_path.MoveTo(Transform(points[0]));
-					firstPoint = lastPoint = points[0];
+				case PathPointType.Start:
+					m_path.MoveTo(path.PathPoints[i].m_point);
 					break;
 
-				case SKPathVerb.Line:
-					var linePoints = FlattenLine(points[0], points[1]);
-					foreach (var pt in linePoints)
-						m_path.LineTo(Transform(pt));
-
-					lastPoint = points[1];
+				case PathPointType.Line:
+					m_path.LineTo(path.PathPoints[i].m_point);
 					break;
 
-				case SKPathVerb.Quad:
-					var quadPoints = FlattenQuad(points[0], points[1], points[2]);
-					foreach (var pt in quadPoints)
-						m_path.LineTo(Transform(pt));
+				case PathPointType.Bezier:
+					if (i + 2 >= path.PointCount 
+					|| (path.PathTypes[i + 1] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier 
+					|| (path.PathTypes[i + 2] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier)
+						throw new ArgumentException("invalid Bezier curve definition");
 
-					lastPoint = points[2];
+					int count = (int)Math.Floor(1 / flatness);
+					
+					var pt0 = m_path.LastPoint;
+					var pt1 = path.PathPoints[i + 0].m_point;
+					var pt2 = path.PathPoints[i + 1].m_point;
+					var pt3 = path.PathPoints[i + 2].m_point;
+
+					for (int offset = 0; offset < count; offset++)
+					{
+						double t = (offset + 1.0) / count;
+						double u = 1.0 - t;
+
+						double u2 = Math.Pow(u, 2);
+						double u3 = Math.Pow(u, 3);
+						double t2 = Math.Pow(t, 2);
+						double t3 = Math.Pow(t, 3);
+						
+						double x = u3 * pt0.X + 3 * t * u2 * pt1.X + 3 * t2 * u * pt2.X + t3 * pt3.X;
+						double y = u3 * pt0.Y + 3 * t * u2 * pt1.Y + 3 * t2 * u * pt2.Y + t3 * pt3.Y;
+						
+						var point = new SKPoint((float)x, (float)y);
+						m_path.LineTo(point);
+					}
+
+					i += 2;
 					break;
 
-				case SKPathVerb.Conic:
-					var conicPoints = FlattenConic(points[0], points[1], points[2], iterator.ConicWeight());
-					foreach (var pt in conicPoints)
-						m_path.LineTo(Transform(pt));
-
-					lastPoint = points[2];
-					break;
-
-				case SKPathVerb.Cubic:
-					var cubicPoints = FlattenCubic(points[0], points[1], points[2], points[3]);
-					foreach (var pt in cubicPoints)
-						m_path.LineTo(Transform(pt));
-
-					lastPoint = points[3];
-					break;
-
-				case SKPathVerb.Close:
-					var closePoints = FlattenLine(lastPoint, firstPoint);
-					foreach (var pt in closePoints)
-						m_path.LineTo(Transform(pt));
-
-					firstPoint = lastPoint = new SKPoint(0, 0);
-					m_path.Close();
-					break;
+				default:
+					throw new ArgumentException($"unknown type 0x{type:X2} at index {i}", nameof(data.Types));
 			}
-		}
-		
-		SKPoint Transform(SKPoint point)
-		{
-			var points = new PointF[] { new(point) };
-			matrix.TransformPoints(points);
-			return points[0].m_point;
+
+			if ((path.PathTypes[i] & (byte)PathPointType.CloseSubpath) == (byte)PathPointType.CloseSubpath)
+				m_path.Close();
 		}
 	}
 
@@ -1001,92 +995,6 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	#endregion
 
 
-	#region Flatten
-
-	/*
-	 * NOTE: Code taken from:
-	 * https://learn.microsoft.com/en-us/previous-versions/xamarin/xamarin-forms/user-interface/graphics/skiasharp/curves/information
-	 */
-
-	private static SKPoint[] FlattenLine(SKPoint pt0, SKPoint pt1)
-	{
-		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1));
-		var points = new SKPoint[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			float t = (i + 1f) / count;
-			float x = (1 - t) * pt0.X + t * pt1.X;
-			float y = (1 - t) * pt0.Y + t * pt1.Y;
-			points[i] = new SKPoint(x, y);
-		}
-
-		return points;
-	}
-
-	private static SKPoint[] FlattenCubic(SKPoint pt0, SKPoint pt1, SKPoint pt2, SKPoint pt3)
-	{
-		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2) + EuclideanDistance(pt2, pt3));
-		var points = new SKPoint[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			float t = (i + 1f) / count;
-			float x = (1 - t) * (1 - t) * (1 - t) * pt0.X 
-				+ 3 * t * (1 - t) * (1 - t) * pt1.X 
-				+ 3 * t * t * (1 - t) * pt2.X 
-				+ t * t * t * pt3.X;
-			float y = (1 - t) * (1 - t) * (1 - t) * pt0.Y 
-				+ 3 * t * (1 - t) * (1 - t) * pt1.Y 
-				+ 3 * t * t * (1 - t) * pt2.Y 
-				+ t * t * t * pt3.Y;
-			points[i] = new SKPoint(x, y);
-		}
-
-		return points;
-	}
-
-	private static SKPoint[] FlattenQuad(SKPoint pt0, SKPoint pt1, SKPoint pt2)
-	{
-		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2));
-		var points = new SKPoint[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			float t = (i + 1f) / count;
-			float x = (1 - t) * (1 - t) * pt0.X + 2 * t * (1 - t) * pt1.X + t * t * pt2.X;
-			float y = (1 - t) * (1 - t) * pt0.Y + 2 * t * (1 - t) * pt1.Y + t * t * pt2.Y;
-			points[i] = new SKPoint(x, y);
-		}
-
-		return points;
-	}
-
-	private static SKPoint[] FlattenConic(SKPoint pt0, SKPoint pt1, SKPoint pt2, float weight)
-	{
-		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2));
-		var points = new SKPoint[count];
-
-		for (int i = 0; i < count; i++)
-		{
-			float t = (i + 1f) / count;
-			float denominator = (1 - t) * (1 - t) + 2 * weight * t * (1 - t) + t * t;
-			float x = (1 - t) * (1 - t) * pt0.X + 2 * weight * t * (1 - t) * pt1.X + t * t * pt2.X;
-			float y = (1 - t) * (1 - t) * pt0.Y + 2 * weight * t * (1 - t) * pt1.Y + t * t * pt2.Y;
-			x /= denominator;
-			y /= denominator;
-			points[i] = new SKPoint(x, y);
-		}
-
-		return points;
-	}
-
-	private static double EuclideanDistance(SKPoint pt0, SKPoint pt1)
-		=> Math.Sqrt(Math.Pow(pt1.X - pt0.X, 2) + Math.Pow(pt1.Y - pt0.Y, 2));
-
-	#endregion
-
-
 	#region Utilities
 
 	private static SKPath CreatePath(PointF[] points, byte[] types, FillMode mode)
@@ -1118,8 +1026,10 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					break;
 
 				case PathPointType.Bezier:
-					if (i + 2 >= points.Length || (PathPointType)types[i + 1] != PathPointType.Bezier || (PathPointType)types[i + 2] != PathPointType.Bezier)
-						throw new ArgumentException("Invalid Bezier curve definition.");
+					if (i + 2 >= points.Length 
+					|| (types[i + 1] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier 
+					|| (types[i + 2] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier)
+						throw new ArgumentException("invalid Bezier curve definition.");
 					path.CubicTo(points[i].m_point, points[i + 1].m_point, points[i + 2].m_point);
 					i += 2;
 					break;
