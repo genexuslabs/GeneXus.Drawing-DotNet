@@ -521,7 +521,80 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  line segments.
 	/// </summary>
 	public void Flatten(Matrix matrix, float flatness = 0.25f)
-		=> throw new NotImplementedException("skia unsupported feature");
+	{
+		if (flatness <= 0)
+			throw new ArgumentException($"zero or negative value {flatness}", nameof(flatness));
+
+		if (m_path.PointCount == 0)
+			return;
+
+		var path = new SKPath(m_path);
+		m_path.Reset();
+		
+		using SKPath.RawIterator iterator = path.CreateRawIterator();
+
+		SKPathVerb pathVerb;
+		SKPoint firstPoint = new(0, 0), lastPoint = new(0, 0);
+		SKPoint[] points = new SKPoint[4];
+		while ((pathVerb = iterator.Next(points)) != SKPathVerb.Done)
+		{
+			switch (pathVerb)
+			{
+				case SKPathVerb.Move:
+					m_path.MoveTo(Transform(points[0]));
+					firstPoint = lastPoint = points[0];
+					break;
+
+				case SKPathVerb.Line:
+					var linePoints = FlattenLine(points[0], points[1]);
+					foreach (var pt in linePoints)
+						m_path.LineTo(Transform(pt));
+
+					lastPoint = points[1];
+					break;
+
+				case SKPathVerb.Quad:
+					var quadPoints = FlattenQuad(points[0], points[1], points[2]);
+					foreach (var pt in quadPoints)
+						m_path.LineTo(Transform(pt));
+
+					lastPoint = points[2];
+					break;
+
+				case SKPathVerb.Conic:
+					var conicPoints = FlattenConic(points[0], points[1], points[2], iterator.ConicWeight());
+					foreach (var pt in conicPoints)
+						m_path.LineTo(Transform(pt));
+
+					lastPoint = points[2];
+					break;
+
+				case SKPathVerb.Cubic:
+					var cubicPoints = FlattenCubic(points[0], points[1], points[2], points[3]);
+					foreach (var pt in cubicPoints)
+						m_path.LineTo(Transform(pt));
+
+					lastPoint = points[3];
+					break;
+
+				case SKPathVerb.Close:
+					var closePoints = FlattenLine(lastPoint, firstPoint);
+					foreach (var pt in closePoints)
+						m_path.LineTo(Transform(pt));
+
+					firstPoint = lastPoint = new SKPoint(0, 0);
+					m_path.Close();
+					break;
+			}
+		}
+		
+		SKPoint Transform(SKPoint point)
+		{
+			var points = new PointF[] { new(point) };
+			matrix.TransformPoints(points);
+			return points[0].m_point;
+		}
+	}
 
 	/// <summary>
 	///  Returns a rectangle that bounds this <see cref='GraphicsPath'/>.
@@ -924,6 +997,92 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		bool isBoundContained = bounds?.Contains(point) ?? true;
 		return isBoundContained && m_path.Bounds.Contains(point.X, point.Y);
 	}
+
+	#endregion
+
+
+	#region Flatten
+
+	/*
+	 * NOTE: Code taken from:
+	 * https://learn.microsoft.com/en-us/previous-versions/xamarin/xamarin-forms/user-interface/graphics/skiasharp/curves/information
+	 */
+
+	private static SKPoint[] FlattenLine(SKPoint pt0, SKPoint pt1)
+	{
+		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1));
+		var points = new SKPoint[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			float t = (i + 1f) / count;
+			float x = (1 - t) * pt0.X + t * pt1.X;
+			float y = (1 - t) * pt0.Y + t * pt1.Y;
+			points[i] = new SKPoint(x, y);
+		}
+
+		return points;
+	}
+
+	private static SKPoint[] FlattenCubic(SKPoint pt0, SKPoint pt1, SKPoint pt2, SKPoint pt3)
+	{
+		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2) + EuclideanDistance(pt2, pt3));
+		var points = new SKPoint[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			float t = (i + 1f) / count;
+			float x = (1 - t) * (1 - t) * (1 - t) * pt0.X 
+				+ 3 * t * (1 - t) * (1 - t) * pt1.X 
+				+ 3 * t * t * (1 - t) * pt2.X 
+				+ t * t * t * pt3.X;
+			float y = (1 - t) * (1 - t) * (1 - t) * pt0.Y 
+				+ 3 * t * (1 - t) * (1 - t) * pt1.Y 
+				+ 3 * t * t * (1 - t) * pt2.Y 
+				+ t * t * t * pt3.Y;
+			points[i] = new SKPoint(x, y);
+		}
+
+		return points;
+	}
+
+	private static SKPoint[] FlattenQuad(SKPoint pt0, SKPoint pt1, SKPoint pt2)
+	{
+		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2));
+		var points = new SKPoint[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			float t = (i + 1f) / count;
+			float x = (1 - t) * (1 - t) * pt0.X + 2 * t * (1 - t) * pt1.X + t * t * pt2.X;
+			float y = (1 - t) * (1 - t) * pt0.Y + 2 * t * (1 - t) * pt1.Y + t * t * pt2.Y;
+			points[i] = new SKPoint(x, y);
+		}
+
+		return points;
+	}
+
+	private static SKPoint[] FlattenConic(SKPoint pt0, SKPoint pt1, SKPoint pt2, float weight)
+	{
+		int count = (int)Math.Max(1, EuclideanDistance(pt0, pt1) + EuclideanDistance(pt1, pt2));
+		var points = new SKPoint[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			float t = (i + 1f) / count;
+			float denominator = (1 - t) * (1 - t) + 2 * weight * t * (1 - t) + t * t;
+			float x = (1 - t) * (1 - t) * pt0.X + 2 * weight * t * (1 - t) * pt1.X + t * t * pt2.X;
+			float y = (1 - t) * (1 - t) * pt0.Y + 2 * weight * t * (1 - t) * pt1.Y + t * t * pt2.Y;
+			x /= denominator;
+			y /= denominator;
+			points[i] = new SKPoint(x, y);
+		}
+
+		return points;
+	}
+
+	private static double EuclideanDistance(SKPoint pt0, SKPoint pt1)
+		=> Math.Sqrt(Math.Pow(pt1.X - pt0.X, 2) + Math.Pow(pt1.Y - pt0.Y, 2));
 
 	#endregion
 
