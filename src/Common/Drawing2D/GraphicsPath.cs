@@ -687,14 +687,14 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		=> m_path.AddOval(rect);
 
 
-	public void AddLine(SKPoint pt1, SKPoint pt2)
+	private void AddLine(SKPoint pt1, SKPoint pt2)
 	{
 		m_path.MoveTo(pt1);
 		m_path.LineTo(pt2);
 	}
 
 
-	public void AddPie(SKRect rect, float startAngle, float sweepAngle)
+	private void AddPie(SKRect rect, float startAngle, float sweepAngle)
 	{
 		m_path.AddArc(rect, startAngle, sweepAngle);
 		m_path.LineTo(rect.MidX, rect.MidY);
@@ -702,7 +702,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	}
 
 
-	public void AddPolygon(SKPoint[] points)
+	private void AddPolygon(SKPoint[] points)
 	{
 		if (points.Length < 3)
 			throw new ArgumentException("At least three points are required.");
@@ -710,11 +710,11 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	}
 
 
-	public void AddRectangle(SKRect rect)
+	private void AddRectangle(SKRect rect)
 		=> m_path.AddRect(rect);
 
 
-	public void AddString(string text, FontFamily family, int style, float emSize, SKRect layout, StringFormat format)
+	private void AddString(string text, FontFamily family, int style, float emSize, SKRect layout, StringFormat format)
 	{
 		format ??= new StringFormat();
 
@@ -776,8 +776,10 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 				int relIndex = index - lineIndexOffset;
 				if (isRightToLeft && relIndex == 0 && line[relIndex] == '…')
 					relIndex += 1; // TODO: look for a better fix for this (in rtl)
+
 				float origin = paint.MeasureText(line.Substring(0, relIndex));
 				float length = paint.MeasureText(line.Substring(relIndex, 1));
+				
 				var underline = new SKRect(
 					origin + rtlOffset,
 					lineHeightOffset + underlineOffset,
@@ -830,14 +832,14 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	}
 
 
-	public bool IsOutlineVisible(SKPoint point, SKPaint pen, SKRect? bounds)
+	private bool IsOutlineVisible(SKPoint point, SKPaint pen, SKRect? bounds)
 	{
 		bool isBoundContained = bounds?.Contains(point) ?? true;
 		return isBoundContained && pen.GetFillPath(m_path).Contains(point.X, point.Y);
 	}
 
 
-	public bool IsVisible(SKPoint point, SKRect? bounds)
+	private bool IsVisible(SKPoint point, SKRect? bounds)
 	{
 		bool isBoundContained = bounds?.Contains(point) ?? true;
 		return isBoundContained && m_path.Contains(point.X, point.Y);
