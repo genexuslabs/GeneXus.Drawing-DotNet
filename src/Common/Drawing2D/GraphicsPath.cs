@@ -703,7 +703,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 	private void AddLine(SKPoint pt1, SKPoint pt2)
 	{
-		m_path.MoveTo(pt1);
+		if (m_path.LastPoint != pt1)
+			m_path.MoveTo(pt1);
 		m_path.LineTo(pt2);
 	}
 
