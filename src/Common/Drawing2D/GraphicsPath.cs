@@ -136,18 +136,28 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 			int index = 0;
 			var points = new SKPoint[4];
+
 			SKPathVerb verb;
 			while ((verb = iterator.Next(points)) != SKPathVerb.Done)
 			{
-				types[index] = (byte)(types[index] | verb switch
+				if (verb == SKPathVerb.Close)
 				{
-					SKPathVerb.Move  => (byte)PathPointType.Start,
-					SKPathVerb.Line  => (byte)PathPointType.Line,
-					SKPathVerb.Cubic => (byte)PathPointType.Bezier,
-					SKPathVerb.Close => (byte)PathPointType.CloseSubpath,
+					types[index - 1] |= (byte)PathPointType.CloseSubpath;
+					continue;
+				}
+
+				(int size, byte type) = verb switch
+				{
+					SKPathVerb.Move  => (1, (byte)PathPointType.Start),
+					SKPathVerb.Line  => (2, (byte)PathPointType.Line),
+					SKPathVerb.Conic => (3, (byte)PathPointType.Bezier),
+					SKPathVerb.Cubic => (3, (byte)PathPointType.Bezier),
+					SKPathVerb.Quad  => (4, (byte)PathPointType.Bezier),
 					_ => throw new NotImplementedException($"verb {verb}")
-				});
-				index = Math.Min(++index, types.Length - 1);
+				};
+
+				for (int offset = 0; offset < size && index < types.Length; offset++)
+					types[index++] = type;
 			}
 
 			return types;
@@ -868,7 +878,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 		for (int i = 0; i < points.Length; i++)
 		{
-			switch ((PathPointType)types[i])
+			var type = types[i] & (byte)PathPointType.PathTypeMask;
+			switch ((PathPointType)type)
 			{
 				case PathPointType.Start:
 					path.MoveTo(points[i].m_point);
@@ -885,16 +896,14 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					i += 2;
 					break;
 
-				case PathPointType.CloseSubpath:
-					path.Close();
-					break;
-
-				case PathPointType.PathTypeMask:
-					throw new NotImplementedException();
-
-				case PathPointType.PathMarker:
-					throw new NotImplementedException();
+				default:
+					throw new ArgumentException($"unknown type 0x{type:X2} at index {i}", nameof(types));
 			}
+
+			if ((types[i] & (byte)PathPointType.CloseSubpath) == (byte)PathPointType.CloseSubpath)
+				path.Close();
+
+			// TODO: consider PathPointType.PathMarker, PathPointType.DashMode
 		}
 
 		return path;
