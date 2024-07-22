@@ -711,7 +711,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 	private void AddPie(SKRect rect, float startAngle, float sweepAngle)
 	{
-		m_path.AddArc(rect, startAngle, sweepAngle);
+		m_path.ArcTo(rect, startAngle, sweepAngle, false);
 		m_path.LineTo(rect.MidX, rect.MidY);
 		m_path.Close();
 	}
