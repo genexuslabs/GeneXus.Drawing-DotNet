@@ -262,7 +262,7 @@ public sealed class Matrix : ICloneable, IDisposable
 	///  array of <see cref='PointF'/>.
 	/// </summary>
 	public void TransformPoints(PointF[] points)
-		=> TransformPoints(points, m_matrix, p => new(p), p => p.m_point);
+		=> TransformPoints(points, Transpose(m_matrix), p => new(p), p => p.m_point);
 
 	/// <summary>
 	///  Applies the geometric transform represented by this <see cref='Matrix'/> to a specified 
@@ -348,10 +348,9 @@ public sealed class Matrix : ICloneable, IDisposable
 
 	private static void TransformPoints<T>(T[] points, SKMatrix matrix, Func<SKPoint, T> newPoint, Func<T, SKPoint> getPoint)
 	{
-		var transpose = Transpose(matrix);
 		for (int i = 0; i < points.Length; i++)
 		{
-			var point = transpose.MapPoint(getPoint(points[i]));
+			var point = matrix.MapPoint(getPoint(points[i]));
 			points[i] = newPoint(point);
 		}
 	}
@@ -370,7 +369,7 @@ public sealed class Matrix : ICloneable, IDisposable
 			Persp1 = m_matrix.Persp1,
 			Persp2 = 1
 		};
-		TransformPoints(points, transformMatrix, newPoint, getPoint);
+		TransformPoints(points, Transpose(transformMatrix), newPoint, getPoint);
 	}
 
 	#endregion
