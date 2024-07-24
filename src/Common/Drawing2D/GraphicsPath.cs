@@ -1064,7 +1064,9 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					|| (types[i + 1] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier 
 					|| (types[i + 2] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier)
 						throw new ArgumentException("invalid Bezier curve definition.");
+
 					path.CubicTo(points[i].m_point, points[i + 1].m_point, points[i + 2].m_point);
+					
 					i += 2;
 					break;
 
