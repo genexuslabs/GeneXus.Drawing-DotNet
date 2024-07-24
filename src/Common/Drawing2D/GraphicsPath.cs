@@ -794,7 +794,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	}
 
 
-	private void AddCurve(SKPoint[] points, float tension, bool closed) // TODO: implement tension
+	private void AddCurve(SKPoint[] points, float tension, bool closed)
 	{
 		if (points.Length < 2)
 			throw new ArgumentException("At least two points are required", nameof(points));
