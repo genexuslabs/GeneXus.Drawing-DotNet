@@ -137,36 +137,45 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			int index = 0;
 			var points = new SKPoint[4];
 
-			int size = 0; byte type = 0x00;
-			while (true)
+			SKPathVerb verb;
+			while ((verb = iterator.Next(points))!= SKPathVerb.Done)
 			{
-				var verb = iterator.Next(points);
-
-				if (verb == SKPathVerb.Close)
+				switch (verb)
 				{
-					types[index - 1] |= (byte)PathPointType.CloseSubpath;
-					size = 0;
-					continue;
+					case SKPathVerb.Move:
+						AddType(1, 0, (byte)PathPointType.Start);
+						break;
+
+					case SKPathVerb.Line:
+						AddType(1, 1, (byte)PathPointType.Line);
+						break;
+
+					case SKPathVerb.Conic:
+					case SKPathVerb.Quad:
+						AddType(2, 1, (byte)PathPointType.Bezier);
+						break;
+
+					case SKPathVerb.Cubic:
+						AddType(3, 1, (byte)PathPointType.Bezier);
+						break;
+
+					case SKPathVerb.Close when index > 0:
+						types[index - 1] |= (byte)PathPointType.CloseSubpath;
+						break;
 				}
-
-				for (int i = 0; i < size && index < types.Length; i++)
-					types[index++] = type;
-
-				if (verb == SKPathVerb.Done)
-					break;
-
-				(size, type) = verb switch
-				{
-					SKPathVerb.Move  => (1, (byte)PathPointType.Start),
-					SKPathVerb.Line  => (1, (byte)PathPointType.Line),
-					SKPathVerb.Conic => (3, (byte)PathPointType.Bezier),
-					SKPathVerb.Cubic => (3, (byte)PathPointType.Bezier),
-					SKPathVerb.Quad  => (4, (byte)PathPointType.Bezier),
-					_ => throw new NotImplementedException($"verb {verb}")
-				};
 			}
 
 			return types;
+
+			void AddType(int count, int offset, byte type)
+			{
+				if (index >= m_path.PointCount)
+					return;
+				if (points[offset] != m_path.Points[index])
+					return;
+				for (int i = 0; i < count; i++)
+					types[index++] = type;
+			}
 		}
 	}
 
