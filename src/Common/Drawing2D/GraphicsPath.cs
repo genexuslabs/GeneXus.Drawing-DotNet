@@ -717,7 +717,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	/// </summary>
 	public void Reverse()
 	{
-		var path = new SKPath(m_path);
+		using var path = new SKPath(m_path);
 		m_path.Reset();
 		m_path.AddPathReverse(path);
 	}
