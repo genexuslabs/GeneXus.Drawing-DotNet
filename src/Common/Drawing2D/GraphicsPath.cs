@@ -137,27 +137,33 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			int index = 0;
 			var points = new SKPoint[4];
 
-			SKPathVerb verb;
-			while ((verb = iterator.Next(points)) != SKPathVerb.Done)
+			int size = 0; byte type = 0x00;
+			while (true)
 			{
+				var verb = iterator.Next(points);
+
 				if (verb == SKPathVerb.Close)
 				{
 					types[index - 1] |= (byte)PathPointType.CloseSubpath;
+					size = 0;
 					continue;
 				}
 
-				(int size, byte type) = verb switch
+				for (int i = 0; i < size && index < types.Length; i++)
+					types[index++] = type;
+
+				if (verb == SKPathVerb.Done)
+					break;
+
+				(size, type) = verb switch
 				{
 					SKPathVerb.Move  => (1, (byte)PathPointType.Start),
-					SKPathVerb.Line  => (2, (byte)PathPointType.Line),
+					SKPathVerb.Line  => (1, (byte)PathPointType.Line),
 					SKPathVerb.Conic => (3, (byte)PathPointType.Bezier),
 					SKPathVerb.Cubic => (3, (byte)PathPointType.Bezier),
 					SKPathVerb.Quad  => (4, (byte)PathPointType.Bezier),
 					_ => throw new NotImplementedException($"verb {verb}")
 				};
-
-				for (int offset = 0; offset < size && index < types.Length; offset++)
-					types[index++] = type;
 			}
 
 			return types;
