@@ -743,6 +743,17 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	#endregion
 
 
+	#region Extras
+
+	/// <summary>
+	///  Returns the SVG string associated with this <see cref="GraphicsPath"/>.
+	/// </summary>
+	public string ToSvg()
+		=> m_path.ToSvgPathData();
+
+	#endregion
+
+
 	#region Helpers
 
 	private void AddArc(SKRect rect, float startAngle, float sweepAngle)
