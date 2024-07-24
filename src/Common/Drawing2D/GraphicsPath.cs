@@ -568,36 +568,44 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					|| (path.PathTypes[i + 1] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier 
 					|| (path.PathTypes[i + 2] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier)
 						throw new ArgumentException("invalid Bezier curve definition");
-
-					int count = (int)Math.Floor(1 / flatness);
 					
-					var pt0 = m_path.LastPoint;
+					var pt0 = path.PathPoints[i - 1].m_point;
 					var pt1 = path.PathPoints[i + 0].m_point;
 					var pt2 = path.PathPoints[i + 1].m_point;
 					var pt3 = path.PathPoints[i + 2].m_point;
+					
+					float d1 = SKPoint.Distance(pt0, pt1);
+					float d2 = SKPoint.Distance(pt1, pt2);
+					float d3 = SKPoint.Distance(pt2, pt3);
 
-					for (int offset = 0; offset < count; offset++)
+					int count = (int)Math.Max(1, d1 + d2 + d3);
+					var lastPoint = pt0;
+					for (int offset = 1; offset < count; offset++)
 					{
-						double t = (offset + 1.0) / count;
-						double u = 1.0 - t;
+						float t = (offset + 1f) / count;
+						float u = 1f - t;
 
-						double u2 = Math.Pow(u, 2);
-						double u3 = Math.Pow(u, 3);
-						double t2 = Math.Pow(t, 2);
-						double t3 = Math.Pow(t, 3);
+						float u2 = u * u;
+						float u3 = u * u2;
+						float t2 = t * t;
+						float t3 = t * t2;
 						
-						double x = u3 * pt0.X + 3 * t * u2 * pt1.X + 3 * t2 * u * pt2.X + t3 * pt3.X;
-						double y = u3 * pt0.Y + 3 * t * u2 * pt1.Y + 3 * t2 * u * pt2.Y + t3 * pt3.Y;
+						float x = u3 * pt0.X + 3 * t * u2 * pt1.X + 3 * t2 * u * pt2.X + t3 * pt3.X;
+						float y = u3 * pt0.Y + 3 * t * u2 * pt1.Y + 3 * t2 * u * pt2.Y + t3 * pt3.Y;
 						
-						var point = new SKPoint((float)x, (float)y);
-						m_path.LineTo(point);
+						var currPoint = new SKPoint(x, y);
+						if (SKPoint.Distance(lastPoint, currPoint) > 1 - flatness)
+						{
+							m_path.LineTo(currPoint);
+							lastPoint = currPoint;
+						}
 					}
 
 					i += 2;
 					break;
 
 				default:
-					throw new ArgumentException($"unknown type 0x{type:X2} at index {i}", nameof(data.Types));
+					throw new NotImplementedException($"point type 0x{type:X2} is not supported at index {i}.");
 			}
 
 			if ((path.PathTypes[i] & (byte)PathPointType.CloseSubpath) == (byte)PathPointType.CloseSubpath)
