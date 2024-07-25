@@ -33,6 +33,7 @@ internal class SolidBrushUnitTest
 		using var brush2 = brush1.Clone() as SolidBrush;
 		Assert.Multiple(() =>
 		{
+			Assert.That(brush2, Is.Not.Null);
 			Assert.That(brush2, Is.Not.SameAs(brush1));
 			Assert.That(brush2.Color, Is.EqualTo(brush1.Color));
 		});
