@@ -85,15 +85,15 @@ internal class RecgionUnitTest
 	{
 		var rect = new RectangleF(0, 0, 100, 100);
 
-		using var region = new Region(rect);
-		using var clone = region.Clone();
+		using var region1 = new Region(rect);
+		using var region2 = region1.Clone();
 
 		Assert.Multiple(() =>
 		{
-			Assert.That(clone, Is.Not.Null);
-			Assert.That(clone, Is.TypeOf<Region>());
-			Assert.That(clone, Is.Not.SameAs(region));
-			Assert.That(clone.GetBounds(null), Is.EqualTo(rect));
+			Assert.That(region2, Is.Not.Null);
+			Assert.That(region2, Is.TypeOf<Region>());
+			Assert.That(region2, Is.Not.SameAs(region1));
+			Assert.That(region2.GetBounds(null), Is.EqualTo(rect));
 		});
 	}
 

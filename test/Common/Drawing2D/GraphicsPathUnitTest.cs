@@ -69,21 +69,21 @@ internal class GraphicsPathUnitTest
 	{
 		var fillMode = FillMode.Winding;
 
-		using var path = new GraphicsPath(fillMode);
-		path.AddLine(0, 0, 1, 1);
+		using var path1 = new GraphicsPath(fillMode);
+		path1.AddLine(0, 0, 1, 1);
 
-		var clone = path.Clone();
+		var path2 = path1.Clone();
 		Assert.Multiple(() =>
 		{
-			Assert.That(clone, Is.TypeOf<GraphicsPath>());
-			Assert.That(clone, Is.Not.SameAs(path));
+			Assert.That(path2, Is.TypeOf<GraphicsPath>());
+			Assert.That(path2, Is.Not.SameAs(path1));
 
-			if (clone is GraphicsPath cloned)
+			if (path2 is GraphicsPath cloned)
 			{
-				Assert.That(cloned.FillMode, Is.EqualTo(path.FillMode));
-				Assert.That(cloned.PointCount, Is.EqualTo(path.PointCount));
-				Assert.That(cloned.PathPoints, Is.EqualTo(path.PathPoints));
-				Assert.That(cloned.PathTypes, Is.EqualTo(path.PathTypes));
+				Assert.That(cloned.FillMode, Is.EqualTo(path1.FillMode));
+				Assert.That(cloned.PointCount, Is.EqualTo(path1.PointCount));
+				Assert.That(cloned.PathPoints, Is.EqualTo(path1.PathPoints));
+				Assert.That(cloned.PathTypes, Is.EqualTo(path1.PathTypes));
 
 				cloned.Dispose();
 			}
