@@ -8,7 +8,7 @@ namespace GeneXus.Drawing;
 public class Pen : ICloneable, IDisposable
 {
 	internal SKPaint m_paint;
-	private Brush m_brush = Brushes.Transparent;
+	private Brush m_brush;
 
 	internal Pen(SKPaint paint, float width)
 	{
@@ -116,11 +116,7 @@ public class Pen : ICloneable, IDisposable
 	public Brush Brush
 	{
 		get => m_brush;
-		set
-		{
-			m_paint.Color = value.m_paint.Color;
-			m_brush = value;
-		}
+		set => m_brush = value;
 	}
 
 	/// <summary>
@@ -129,7 +125,11 @@ public class Pen : ICloneable, IDisposable
 	public Color Color
 	{
 		get => new(m_paint.Color);
-		set => m_paint.Color = value.m_color;
+		set 
+		{
+			m_paint.Color = value.m_color;
+			m_brush.m_paint.Color = value.m_color;
+		}
 	}
 
 	/// <summary>
