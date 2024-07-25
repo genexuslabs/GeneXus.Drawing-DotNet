@@ -6,38 +6,54 @@ namespace GeneXus.Drawing;
 
 public sealed class TextureBrush : Brush
 {
-	internal Bitmap m_bitmap;
-	internal Rectangle m_rect;
+	internal Image m_image;
+	internal RectangleF m_bounds;
 	internal WrapMode m_mode;
 
-	private TextureBrush(Rectangle rect, Bitmap bitmap, WrapMode mode)  
-		: base(new SKPaint { Shader = CreateShader(bitmap, rect, mode) }) 
+	private TextureBrush(RectangleF rect, Image image, WrapMode mode)  
+		: base(new SKPaint { }) 
 	{
-		m_rect = rect;
-		m_bitmap = bitmap;
+		m_bounds = rect;
+		m_image = image;
 		m_mode = mode;
+
+		UpdateShader(() => { });
 	}
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
 	///  specified image, wrap mode, and bounding rectangle.
 	/// </summary>
-	public TextureBrush(Bitmap bitmap, Rectangle rect, WrapMode mode = WrapMode.Tile)
-		: this(rect, bitmap, mode) { }
+	public TextureBrush(Image image, RectangleF rect, WrapMode mode = WrapMode.Tile)
+		: this(rect, image, mode) { }
+
+	/// <summary>
+	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
+	///  specified image, wrap mode, and bounding rectangle.
+	/// </summary>
+	public TextureBrush(Image image, Rectangle rect, WrapMode mode = WrapMode.Tile)
+		: this(new RectangleF(rect.m_rect), image, mode) { }
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
 	///  specified image and wrap mode.
 	/// </summary>
-	public TextureBrush(Bitmap bitmap, WrapMode mode = WrapMode.Tile)
-		: this(bitmap, new Rectangle(0, 0, bitmap.Size), mode) { }
+	public TextureBrush(Image image, WrapMode mode = WrapMode.Tile)
+		: this(image, new Rectangle(0, 0, image.Size), mode) { }
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses 
 	///  the specified image, bounding rectangle, and image attributes.
 	/// </summary>
-	public TextureBrush(Bitmap bitmap, Rectangle rect, object imageAttributes)
-		: this(bitmap, rect, WrapMode.Tile) { } // TODO: implement ImageAttributes class
+	public TextureBrush(Image image, RectangleF rect, object imageAttributes)
+		: this(image, rect, WrapMode.Tile) { } // TODO: implement ImageAttributes class
+
+	/// <summary>
+	///  Initializes a new <see cref='TextureBrush'/> object that uses 
+	///  the specified image, bounding rectangle, and image attributes.
+	/// </summary>
+	public TextureBrush(Image image, Rectangle rect, object imageAttributes)
+		: this(image, new RectangleF(rect.m_rect), imageAttributes) { }
 
 
 	#region IClonable
@@ -46,7 +62,7 @@ public sealed class TextureBrush : Brush
 	///  Creates an exact copy of this <see cref='TextureBrush'/>.
 	/// </summary>
 	public override object Clone()
-		=> new TextureBrush(m_rect, m_bitmap, m_mode);
+		=> new TextureBrush(m_bounds, m_image, m_mode);
 
 	#endregion
 
@@ -57,7 +73,7 @@ public sealed class TextureBrush : Brush
 	///  Gets the <see cref='Drawing.Image'/> object associated with 
 	///  this <see cref='TextureBrush'/> object.
 	/// </summary>
-	public Image Image => m_bitmap;
+	public Image Image => m_image;
 
 	/// <summary>
 	///  Gets or sets a copy of the <see cref='Matrix'/>  object 
@@ -73,7 +89,7 @@ public sealed class TextureBrush : Brush
 	public WrapMode WrapMode
 	{
 		get => m_mode;
-		set => m_mode = value; // TODO: update shader when updating this
+		set => UpdateShader(() => m_mode = value);
 	}
 
 	#endregion
@@ -121,15 +137,11 @@ public sealed class TextureBrush : Brush
 
 	#region Utilities
 
-	private static SKShader CreateShader(Bitmap bitmap, Rectangle rect, WrapMode mode)
+	private void UpdateShader(Action action)
 	{
-		/* 
-		 * NOTE: For mapping WrapMode.Clamp
-		 * - SKShaderTileMode.Clamp: Replicate the edge color if the shader draws outside of its original bounds
-		 * - SKShaderTileMode.Decal: Only draw within the original domain, return transparent-black everywhere else.
-		 */
-		
-		(var tmx, var tmy) = mode switch
+		action();
+
+		(var tmx, var tmy) = WrapMode switch
 		{
 			WrapMode.Tile       => (SKShaderTileMode.Repeat, SKShaderTileMode.Repeat),
 			WrapMode.Clamp      => (SKShaderTileMode.Decal,  SKShaderTileMode.Decal),
@@ -139,13 +151,26 @@ public sealed class TextureBrush : Brush
 			_ => throw new NotImplementedException()
 		};
 
-		var info = new SKImageInfo((int)rect.Width, (int)rect.Height);
+		var info = new SKImageInfo((int)m_bounds.Width, (int)m_bounds.Height);
 
 		using var surfece = SKSurface.Create(info);
-		surfece.Canvas.DrawBitmap(bitmap.m_bitmap, rect.m_rect);
+		switch (m_image)
+		{
+			case Bitmap bitmap:
+				surfece.Canvas.DrawBitmap(bitmap.m_bitmap, m_bounds.m_rect);
+				break;
+			
+			case Svg svg:
+				surfece.Canvas.DrawImage(svg.InnerImage, m_bounds.m_rect);
+				break;
+
+			default:
+				throw new NotImplementedException($"image type {m_image.GetType().Name}.");
+		}
 		
 		var src = surfece.Snapshot();
-		return SKShader.CreateImage(src, tmx, tmy);
+
+		m_paint.Shader = SKShader.CreateImage(src, tmx, tmy);
 	}
 
 	#endregion
