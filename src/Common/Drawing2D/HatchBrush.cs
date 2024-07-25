@@ -9,13 +9,26 @@ public sealed class HatchBrush : Brush
 	private readonly Color m_back;
 	private readonly HatchStyle m_style;
 
+	/// <summary>
+	///  Initializes a new instance of the <see cref="HatchBrush"/> class with the 
+	///  specified <see cref="HatchStyle"/> enumeration, foreground color, and background color.
+	/// </summary>
 	public HatchBrush(HatchStyle hatchStyle, Color foreColor, Color backColor)
 		: base(new SKPaint { Shader = CreateShader(hatchStyle, foreColor, backColor) })
 	{
 		m_fore = foreColor;
 		m_back = backColor;
 		m_style = hatchStyle;
+
+		UpdateShader(() => { });
 	}
+
+	/// <summary>
+	///  Initializes a new instance of the <see cref="HatchBrush"/> class with the 
+	///  specified <see cref="HatchStyle"/> enumeration and foreground color.
+	/// </summary>
+	public HatchBrush(HatchStyle hatchStyle, Color foreColor)
+		: this(hatchStyle, foreColor, Color.Transparent) { }
 
 	#region IClonable
 
