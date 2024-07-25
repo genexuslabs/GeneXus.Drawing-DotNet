@@ -164,30 +164,17 @@ public class Pen : ICloneable, IDisposable
 	///  Gets or sets the cap style used at the end of the dashes that make 
 	///  up dashed lines drawn with this <see cref='Pen'/>.
 	/// </summary>
-	public DashCap DashCap
-	{
-
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
-	}
+	public DashCap DashCap { get; set; } = DashCap.Flat;
 
 	/// <summary>
 	///  Gets or sets the distance from the start of a line to the beginning of a dash pattern.
 	/// </summary>
-	public float DashOffset
-	{
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
-	}
+	public float DashOffset { get; set; } = 0.0f;
 
 	/// <summary>
 	///  Gets or sets an array of custom dashes and spaces.
 	/// </summary>
-	public float[] DashPattern
-	{
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
-	}
+	public float[] DashPattern { get; set; } = Array.Empty<float>();
 
 	/// <summary>
 	///  Gets the style of lines drawn with this <see cref='Pen'/>.
@@ -199,26 +186,18 @@ public class Pen : ICloneable, IDisposable
 		LinearGradientBrush => PenType.LinearGradient,
 		PathGradientBrush => PenType.PathGradient,
 		HatchBrush => PenType.HatchFill,
-		_ => throw new NotImplementedException()
+		_ => throw new NotImplementedException($"the {m_brush.GetType().Name} pen type is not implemented.")
 	};
 
 	/// <summary>
 	///  Gets or sets the cap style used at the beginning of lines drawn with this <see cref='Pen'/>.
 	/// </summary>
-	public LineCap StartCap
-	{
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
-	}
+	public LineCap StartCap { get; set; } = LineCap.Flat;
 
 	/// <summary>
 	///  Gets or sets the cap style used at the end of lines drawn with this <see cref='Pen'/>.
 	/// </summary>
-	public LineCap EndCap
-	{
-		get => throw new NotImplementedException();
-		set => throw new NotImplementedException();
-	}
+	public LineCap EndCap { get; set; } = LineCap.Flat;
 
 	/// <summary>
 	///  Gets or sets the join style for the ends of two consecutive lines drawn with this <see cref='Pen'/>.
