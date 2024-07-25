@@ -72,7 +72,28 @@ public class Pen : ICloneable, IDisposable
 	///  Creates an exact copy of this <see cref='Pen'/>.
 	/// </summary>
 	public object Clone() 
-		=> new Pen(m_paint, m_paint.StrokeWidth);
+		=> new Pen(Color, Width)
+		{
+            Alignment = Alignment,
+            Brush = Brush switch 
+			{
+				SolidBrush sb => sb.Clone() as SolidBrush,
+				HatchBrush hb => hb.Clone() as HatchBrush,
+				TextureBrush tb => tb.Clone() as TextureBrush,
+				PathGradientBrush pgb => pgb.Clone() as PathGradientBrush,
+				LinearGradientBrush lgb => lgb.Clone() as LinearGradientBrush,
+				_ => throw new NotImplementedException($"undefined map to {Brush.GetType().Name}.")
+			},
+            CompoundArray = CompoundArray,
+            DashCap = DashCap,
+            DashOffset = DashOffset,
+            DashPattern = DashPattern,
+            StartCap = StartCap,
+            EndCap = EndCap,
+            LineJoin = LineJoin,
+            MiterLimit = MiterLimit,
+            Transform = new Matrix(Transform.m_matrix)
+		};
 
 	#endregion
 
