@@ -74,8 +74,8 @@ public class Pen : ICloneable, IDisposable
 	public object Clone() 
 		=> new Pen(Color, Width)
 		{
-            Alignment = Alignment,
-            Brush = Brush switch 
+			Alignment = Alignment,
+			Brush = Brush switch 
 			{
 				SolidBrush sb => sb.Clone() as SolidBrush,
 				HatchBrush hb => hb.Clone() as HatchBrush,
@@ -84,15 +84,15 @@ public class Pen : ICloneable, IDisposable
 				LinearGradientBrush lgb => lgb.Clone() as LinearGradientBrush,
 				_ => throw new NotImplementedException($"undefined map to {Brush.GetType().Name}.")
 			},
-            CompoundArray = CompoundArray,
-            DashCap = DashCap,
-            DashOffset = DashOffset,
-            DashPattern = DashPattern,
-            StartCap = StartCap,
-            EndCap = EndCap,
-            LineJoin = LineJoin,
-            MiterLimit = MiterLimit,
-            Transform = new Matrix(Transform.m_matrix)
+			CompoundArray = CompoundArray,
+			DashCap = DashCap,
+			DashOffset = DashOffset,
+			DashPattern = DashPattern,
+			StartCap = StartCap,
+			EndCap = EndCap,
+			LineJoin = LineJoin,
+			MiterLimit = MiterLimit,
+			Transform = new Matrix(Transform.m_matrix)
 		};
 
 	#endregion
