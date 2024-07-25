@@ -2,7 +2,6 @@ namespace GeneXus.Drawing.Test;
 
 internal class SolidBrushUnitTest
 {
-
 	[SetUp]
 	public void Setup()
 	{

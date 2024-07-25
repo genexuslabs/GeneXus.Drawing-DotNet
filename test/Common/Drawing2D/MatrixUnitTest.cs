@@ -5,7 +5,6 @@ namespace GeneXus.Drawing.Test.Drawing2D;
 
 internal class MatrixTests
 {
-
 	private const float TOLERANCE = 0.001f;
 
 	[SetUp]
