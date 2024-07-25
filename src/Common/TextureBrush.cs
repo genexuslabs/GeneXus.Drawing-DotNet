@@ -62,7 +62,10 @@ public sealed class TextureBrush : Brush
 	///  Creates an exact copy of this <see cref='TextureBrush'/>.
 	/// </summary>
 	public override object Clone()
-		=> new TextureBrush(m_bounds, m_image, m_mode);
+		=> new TextureBrush(m_bounds, m_image, m_mode)
+		{
+			Transform = Transform.Clone() as Matrix
+		};
 
 	#endregion
 
