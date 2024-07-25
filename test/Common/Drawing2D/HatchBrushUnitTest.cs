@@ -23,7 +23,7 @@ internal class HatchBrushUnitTest
 			Assert.That(brush.ForegroundColor, Is.EqualTo(fore));
 			Assert.That(brush.HatchStyle, Is.EqualTo(style));
 		});
-	}	
+	}
 
 	[Test]
 	public void Method_Clone()
