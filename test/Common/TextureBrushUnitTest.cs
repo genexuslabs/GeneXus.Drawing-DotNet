@@ -32,4 +32,22 @@ internal class TextureBrushUnitTest
 			Assert.That(brush.Transform, Is.EqualTo(matrix));
 		});
 	}
+
+	[Test]
+	public void Method_Clone()
+	{
+		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
+		using var bitmap = new Bitmap(filePath);
+
+		using var brush1 = new TextureBrush(bitmap, new Rectangle(0, 0, 100, 50), WrapMode.Tile) { Transform = new Matrix(1, 2, 3, 4, 5, 6) };
+		using var brush2 = brush1.Clone() as TextureBrush;
+		Assert.Multiple(() =>
+		{
+			Assert.That(brush2, Is.Not.Null);
+			Assert.That(brush2, Is.Not.SameAs(brush1));
+			Assert.That(brush2.Image, Is.EqualTo(brush1.Image));
+			Assert.That(brush2.WrapMode, Is.EqualTo(brush1.WrapMode));
+			Assert.That(brush2.Transform, Is.EqualTo(brush1.Transform));
+		});
+	}
 }
