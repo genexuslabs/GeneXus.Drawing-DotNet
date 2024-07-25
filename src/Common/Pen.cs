@@ -99,14 +99,14 @@ public class Pen : ICloneable, IDisposable
 			SKTextAlign.Center => PenAlignment.Center,
 			SKTextAlign.Left => PenAlignment.Left,
 			SKTextAlign.Right => PenAlignment.Right,
-			_ => throw new NotSupportedException("skia mapping")
+			_ => throw new NotSupportedException($"unsuported value {m_paint.TextAlign}")
 		};
 		set => m_paint.TextAlign = value switch
 		{
 			PenAlignment.Center => SKTextAlign.Center,
 			PenAlignment.Left => SKTextAlign.Left,
 			PenAlignment.Right => SKTextAlign.Right,
-			_ => throw new NotSupportedException("skia mapping")
+			_ => throw new NotSupportedException($"unsuported value {value}")
 		}; 
 	}
 
