@@ -2,7 +2,7 @@ using GeneXus.Drawing.Drawing2D;
 
 namespace GeneXus.Drawing.Test;
 
-internal class PenFUnitTest
+internal class PenUnitTest
 {
 	[SetUp]
 	public void Setup()
