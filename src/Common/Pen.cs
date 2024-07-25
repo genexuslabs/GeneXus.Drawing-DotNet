@@ -15,6 +15,8 @@ public class Pen : ICloneable, IDisposable
 		m_paint = paint ?? throw new ArgumentNullException(nameof(paint));
 		m_paint.Style = SKPaintStyle.Stroke;
 		m_paint.StrokeWidth = width;
+		m_paint.StrokeMiter = 10;
+		m_paint.TextAlign = SKTextAlign.Center;
 	}
 
 	/// <summary>
@@ -136,9 +138,15 @@ public class Pen : ICloneable, IDisposable
 	/// </summary>
 	public float[] CompoundArray
 	{
-		get => throw new NotImplementedException();
-		set => m_paint.PathEffect = SKPathEffect.CreateDash(value, 0);
+		get => m_interval;
+		set
+		{
+			m_interval = value;
+			m_paint.PathEffect = SKPathEffect.CreateDash(m_interval, 0);
+		}
 	}
+
+	private float[] m_interval = Array.Empty<float>();
 
 	/// <summary>
 	///  Gets or sets a custom cap to use at the end of lines drawn 
