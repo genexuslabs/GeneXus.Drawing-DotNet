@@ -14,7 +14,7 @@ public sealed class HatchBrush : Brush
 	///  specified <see cref="HatchStyle"/> enumeration, foreground color, and background color.
 	/// </summary>
 	public HatchBrush(HatchStyle hatchStyle, Color foreColor, Color backColor)
-		: base(new SKPaint { Shader = CreateShader(hatchStyle, foreColor, backColor) })
+		: base(new SKPaint { })
 	{
 		m_fore = foreColor;
 		m_back = backColor;
@@ -63,23 +63,25 @@ public sealed class HatchBrush : Brush
 
 	#region Utilities
 
-	private static SKShader CreateShader(HatchStyle style, Color foreColor, Color backColor)
+	private void UpdateShader(Action action)
 	{
+		action();
+
 		var size = 10f;
 		using var pattern = new SKBitmap((int)size, (int)size);
 
 		using var canvas = new SKCanvas(pattern);
-		canvas.Clear(backColor.m_color);
+		canvas.Clear(m_back.m_color);
 
 		var paint = new SKPaint
 		{
-			Color = foreColor.m_color,
+			Color = m_fore.m_color,
 			Style = SKPaintStyle.Stroke,
 			StrokeWidth = 1,
 			IsAntialias = true
 		};
 
-		switch (style)
+		switch (m_style)
 		{
 			case HatchStyle.Horizontal:
 				canvas.DrawLine(0, size / 2, size, size / 2, paint);
@@ -254,11 +256,11 @@ public sealed class HatchBrush : Brush
 				break;
 
 			case HatchStyle.SmallCheckerBoard:
-				DrawCheckerBoardPattern(canvas, paint, foreColor.m_color, backColor.m_color, size, 2);
+				DrawCheckerBoardPattern(canvas, paint, m_fore.m_color, m_back.m_color, size, 2);
 				break;
 
 			case HatchStyle.LargeCheckerBoard:
-				DrawCheckerBoardPattern(canvas, paint, foreColor.m_color, backColor.m_color, size, 4);
+				DrawCheckerBoardPattern(canvas, paint, m_fore.m_color, m_back.m_color, size, 4);
 				break;
 
 			case HatchStyle.Percent05:
@@ -311,10 +313,10 @@ public sealed class HatchBrush : Brush
 
 			// TODO: add other styles
 			default:
-				throw new NotSupportedException($"Hatch style {style} is not supported.");
+				throw new NotSupportedException($"Hatch style {m_style} is not supported.");
 		}
 
-		return SKShader.CreateBitmap(pattern, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
+		m_paint.Shader = SKShader.CreateBitmap(pattern, SKShaderTileMode.Repeat, SKShaderTileMode.Repeat);
 	}
 
 	private static void DrawPercentagePattern(SKCanvas canvas, SKPaint paint, float size, int percent)
