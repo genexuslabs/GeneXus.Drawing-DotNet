@@ -75,8 +75,9 @@ internal class GraphicsPathUnitTest
 		var path2 = path1.Clone();
 		Assert.Multiple(() =>
 		{
-			Assert.That(path2, Is.TypeOf<GraphicsPath>());
+			Assert.That(path2, Is.Not.Null);
 			Assert.That(path2, Is.Not.SameAs(path1));
+			Assert.That(path2, Is.TypeOf<GraphicsPath>());
 
 			if (path2 is GraphicsPath cloned)
 			{

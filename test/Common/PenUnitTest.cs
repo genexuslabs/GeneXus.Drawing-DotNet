@@ -122,6 +122,8 @@ internal class PenUnitTest
 		using var pen2 = pen1.Clone() as Pen;
 		Assert.Multiple(() =>
 		{
+			Assert.That(pen1, Is.Not.Null);
+			Assert.That(pen1, Is.Not.SameAs(pen2));
 			Assert.That(pen2.Color, Is.EqualTo(pen1.Color));
 			Assert.That(pen2.Width, Is.EqualTo(pen1.Width));
 			Assert.That(pen2.Brush, Is.TypeOf<SolidBrush>());

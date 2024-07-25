@@ -89,6 +89,7 @@ internal class MatrixTests
 		Assert.Multiple(() => 
 		{
 			Assert.That(clone, Is.Not.Null);
+			Assert.That(clone, Is.Not.SameAs(original));
 			Assert.That(clone, Is.EqualTo(original));
 			Assert.That(ReferenceEquals(clone, original), Is.False);
 			Assert.That(clone.Elements, Is.EqualTo(original.Elements));
