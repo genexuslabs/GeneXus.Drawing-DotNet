@@ -296,19 +296,53 @@ public sealed class LinearGradientBrush : Brush
 		}
 
 		var vector = GetGradientVector(m_rect, LinearGradientMode.ForwardDiagonal);
+		var gamma = m_gamma ? 2.2f : 1.0f;
+
 		var start = vector.BegPoint.m_point;
 		var end = vector.EndPoint.m_point;
-		var gamma = m_gamma ? 2.2f : 1.0f;
-		var factors = m_blend?.Factors ?? Enumerable.Repeat(1f, m_colors.Positions.Length).ToArray();
-		var positions = m_colors.Positions
-			.Take(factors.Length)
-			.ToArray();
-		var colors = m_colors.Colors
-			.Zip(factors, ApplyFactor)
-			.Select(color => ApplyGamma(color, gamma).m_color)
-			.ToArray();
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
 		var matrix = m_transform.m_matrix;
+
+		int index;
+
+		var blend = new Dictionary<float, object>();
+		for (index = 0; index < m_blend.Positions.Length; index++)
+		{
+			var pos = m_blend.Positions[index];
+			var fac = m_blend.Factors[index];
+			blend[pos] = fac; // blend factor
+		}
+		for (index = 0; index < m_colors.Positions.Length; index++)
+		{
+			var pos = m_colors.Positions[index];
+			var col = m_colors.Colors[index];
+			blend[pos] = col; // specific color
+		}
+
+		var lastColor = Color.Empty;
+		var blendKeys = blend.Keys.OrderBy(key => key);
+
+		var positions = blendKeys.ToArray();
+		var colors = new SKColor[positions.Length];
+		
+		index = 0;
+		foreach (var key in blendKeys)
+		{
+			var value = blend[key];
+			if (value is Color currColor)
+			{
+				var color = ApplyGamma(currColor, gamma);
+				colors[index++] = color.m_color;
+				lastColor = currColor;
+				continue;
+			}
+			if (value is float factor)
+			{
+				var color = ApplyFactor(lastColor, factor);
+				colors[index++] = color.m_color;
+				continue;
+			}
+		}
 
 		m_paint.Shader = SKShader.CreateLinearGradient(start, end, colors, positions, mode, matrix);
 	}
