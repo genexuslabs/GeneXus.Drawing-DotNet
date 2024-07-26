@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using SkiaSharp;
@@ -216,6 +217,104 @@ public sealed class LinearGradientBrush : Brush
 	public void TranslateTransform(float dx, float dy, MatrixOrder order)
 		=> UpdateShader(() => Transform.Translate(dx, dy, order));
 
+	/// <summary>
+	///  Creates a gradient falloff based on a bell-shaped curve.
+	/// </summary>
+	public void SetSigmaBellShape(float focus, float scale = 1.0f)
+		=> UpdateShader(() =>
+		{
+			if (focus < 0 || focus > 1)
+				throw new ArgumentException("Invalid focus value", nameof(focus));
+			if (scale < 0 || scale > 1)
+				throw new ArgumentException("Invalid scale value", nameof(scale));
+			
+			int count = focus == 0 || focus == 1 ? 256 : 511;
+			m_blend = new(count);
+
+			// TODO: clear preset colors
+
+			float fallOffLenght = 2.0f;
+			if (focus == 0)
+			{
+				m_blend.Positions[0] = focus;
+				m_blend.Factors[0] = scale;
+
+				SigmaBellBlend(focus,  scale, 1 / fallOffLenght, 1f / 2, 1f / 255, 1, count - 1, true);
+
+				m_blend.Positions[count - 1] = 1f;
+				m_blend.Factors[count - 1] = 0f;
+			}
+			else if (focus == 1)
+			{
+				m_blend.Positions[0] = 0f;
+				m_blend.Factors[0] = 0f;
+
+				SigmaBellBlend(focus, scale, 1 / fallOffLenght, 1f / 2, 1f / 255, 1, count - 1, false);
+
+				m_blend.Positions[count - 1] = focus;
+				m_blend.Factors[count - 1] = scale;
+			}
+			else
+			{
+				int middle = count / 2;
+
+				// left part of the sigma bell
+				m_blend.Positions[0] = 0f;
+				m_blend.Factors[0] = 0f;
+
+				SigmaBellBlend(focus, scale, focus / (2 * fallOffLenght), focus / 2, focus / 255, 1, middle - 1, false);
+
+				// middle part of the sigma bell
+				m_blend.Positions[middle - 1] = focus;
+				m_blend.Factors[middle - 1] = scale;
+
+				// right part of the sigma bell
+				SigmaBellBlend(focus, scale, (1 - focus) / (2 * fallOffLenght), (1 + focus) / 2, (1 - focus) / 255, middle, count - 1, true);
+
+				m_blend.Positions[count - 1] = 1f;
+				m_blend.Factors[count - 1] = 0f;
+			}
+		});
+
+	/// <summary>
+	///  Creates a linear gradient with a center color and a linear falloff to a single color on both ends.
+	/// </summary>
+	public void SetBlendTriangularShape(float focus, float scale = 1.0f)
+		=> UpdateShader(() =>
+		{
+			if (focus < 0 || focus > 1)
+				throw new ArgumentException("Invalid focus value", nameof(focus));
+			if (scale < 0 || scale > 1)
+				throw new ArgumentException("Invalid scale value", nameof(scale));
+			
+			int count = focus == 0 || focus == 1 ? 2 : 3;
+			m_blend = new(count);
+
+			if (focus == 0)
+			{
+				m_blend.Positions[0] = 0;
+				m_blend.Factors[1] = scale;
+				m_blend.Positions[1] = 1;
+				m_blend.Factors[1] = 0;
+			}
+			else if (focus == 1)
+			{
+				m_blend.Positions[0] = 0;
+				m_blend.Factors[1] = 0;
+				m_blend.Positions[1] = 1;
+				m_blend.Factors[1] = scale;
+			}
+			else
+			{
+				m_blend.Positions[0] = 0;
+				m_blend.Factors[0] = 0;
+				m_blend.Positions[1] = focus;
+				m_blend.Factors[1] = scale;
+				m_blend.Positions[2] = 1;
+				m_blend.Factors[2] = 0;
+			}
+		});
+
 	#endregion
 
 
@@ -277,6 +376,43 @@ public sealed class LinearGradientBrush : Brush
 		=> length < 2
 			? throw new ArgumentException("at least two items are required.", nameof(length))
 			: Enumerable.Range(0, length).Select(i => 1f * i / (length - 1)).ToArray();
+
+	void SigmaBellBlend(float focus, float scale, float sigma, float mean, float delta, int startIndex, int endIndex, bool invert)
+	{
+		float cb = (1 - Erf(invert ? 1f : 0f, sigma, mean)) / 2;
+		float ct = (1 - Erf(focus, sigma, mean)) / 2;
+		float ch = ct - cb;
+		float pos = delta;
+
+		for (int index = startIndex; index < endIndex; index++)
+		{
+			m_blend.Positions[index] = pos;
+			m_blend.Factors[index] = scale * ((1 - Erf(pos, sigma, mean)) / 2 - cb) / ch;
+			pos += delta;
+		}
+
+		static float Erf(float x, float sigma, float mean, int terms = 6)
+		{
+			/*
+			* Error function (Erf) for Gaussian distribution by Maclaurin series:
+			* erf (z) = (2 / sqrt (pi)) * infinite sum of [(pow (-1, n) * pow (z, 2n+1))/(n! * (2n+1))]
+			*/
+			float constant = 2 / (float)Math.Sqrt(Math.PI);
+			float z = (x - mean) / (sigma * (float)Math.Sqrt(2));
+
+			float series = z;
+
+			float z2 = z * z;
+			float zn = z2;
+			for (int n = 1, fact = 1; n < terms; n++, zn *= -z2, fact *= n)
+			{
+				float term = -z * zn / (fact * (2 * n + 1));
+				series += term;
+			}
+
+			return constant * series;
+		}
+	}
 
 	private void UpdateShader(Action action)
 	{
