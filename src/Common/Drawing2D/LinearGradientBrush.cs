@@ -22,12 +22,16 @@ public sealed class LinearGradientBrush : Brush
 		m_transform = transform;
 
 		m_gamma = false;
-		m_blend = null;
-		m_colors = new()
-		{
-			Colors = colors,
-			Positions = CreateUniformArray(colors.Length)
-		};
+		
+		m_blend = new();
+		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
+		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
+		
+		var uniform = CreateUniformArray(colors.Length);
+
+		m_colors = new(colors.Length);
+		Array.Copy(colors, m_colors.Colors, colors.Length);
+		Array.Copy(uniform, m_colors.Positions, colors.Length);
 
 		UpdateShader(() => { });
 	}
