@@ -262,14 +262,14 @@ public sealed class LinearGradientBrush : Brush
 				m_blend.Positions[0] = 0f;
 				m_blend.Factors[0] = 0f;
 
-				SigmaBellBlend(focus, scale, focus / (2 * fallOffLenght), focus / 2, focus / 255, 1, middle - 1, false);
+				SigmaBellBlend(focus, scale, focus / (2 * fallOffLenght), focus / 2, focus / 255, 1, middle, false);
 
 				// middle part of the sigma bell
-				m_blend.Positions[middle - 1] = focus;
-				m_blend.Factors[middle - 1] = scale;
+				m_blend.Positions[middle] = focus;
+				m_blend.Factors[middle] = scale;
 
 				// right part of the sigma bell
-				SigmaBellBlend(focus, scale, (1 - focus) / (2 * fallOffLenght), (1 + focus) / 2, (1 - focus) / 255, middle, count - 1, true);
+				SigmaBellBlend(focus, scale, (1 - focus) / (2 * fallOffLenght), (1 + focus) / 2, (1 - focus) / 255, middle + 1, count - 1, true);
 
 				m_blend.Positions[count - 1] = 1f;
 				m_blend.Factors[count - 1] = 0f;
@@ -379,35 +379,37 @@ public sealed class LinearGradientBrush : Brush
 
 	void SigmaBellBlend(float focus, float scale, float sigma, float mean, float delta, int startIndex, int endIndex, bool invert)
 	{
-		float cb = (1 - Erf(invert ? 1f : 0f, sigma, mean)) / 2;
-		float ct = (1 - Erf(focus, sigma, mean)) / 2;
-		float ch = ct - cb;
-		float pos = delta;
+		float sg = invert ? -1 : 1;
+		float x0 = invert ? 1f : 0f;
 
-		for (int index = startIndex; index < endIndex; index++)
+		float cb = (1 + sg * Erf(x0, sigma, mean)) / 2;
+		float ct = (1 + sg * Erf(focus, sigma, mean)) / 2;
+		float ch = ct - cb;
+
+		float offset = invert ? focus : 0;
+		float pos = delta + offset;
+
+		for (int index = startIndex; index < endIndex; index++, pos += delta)
 		{
 			m_blend.Positions[index] = pos;
-			m_blend.Factors[index] = scale * ((1 - Erf(pos, sigma, mean)) / 2 - cb) / ch;
-			pos += delta;
+			m_blend.Factors[index] = scale / ch * ((1 + sg * Erf(pos, sigma, mean)) / 2 - cb);
 		}
 
 		static float Erf(float x, float sigma, float mean, int terms = 6)
 		{
 			/*
-			* Error function (Erf) for Gaussian distribution by Maclaurin series:
-			* erf (z) = (2 / sqrt (pi)) * infinite sum of [(pow (-1, n) * pow (z, 2n+1))/(n! * (2n+1))]
-			*/
+			 * Error function (Erf) for Gaussian distribution by Maclaurin series:
+			 * erf (z) = (2 / sqrt (pi)) * infinite sum of [(pow (-1, n) * pow (z, 2n+1))/(n! * (2n+1))]
+			 */
 			float constant = 2 / (float)Math.Sqrt(Math.PI);
 			float z = (x - mean) / (sigma * (float)Math.Sqrt(2));
 
 			float series = z;
-
-			float z2 = z * z;
-			float zn = z2;
-			for (int n = 1, fact = 1; n < terms; n++, zn *= -z2, fact *= n)
+			for (int n = 1, fact = 1; n < terms; n++, fact *= n)
 			{
-				float term = -z * zn / (fact * (2 * n + 1));
-				series += term;
+				int sign = (int)Math.Pow(-1, n);
+				int step = 2 * n + 1;
+				series += sign * (float)Math.Pow(z, step) / (fact * step);
 			}
 
 			return constant * series;
