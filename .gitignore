@@ -3,3 +3,4 @@ bin/
 obj/
 /_packages
 GeneXus.Drawing-DotNet.sln.DotSettings.user
+/Test/Common/res/images/.out
