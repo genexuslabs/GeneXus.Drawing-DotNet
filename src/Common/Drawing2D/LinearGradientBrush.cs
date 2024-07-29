@@ -15,10 +15,10 @@ public sealed class LinearGradientBrush : Brush
 	private ColorBlend m_colors;
 	private bool m_gamma;
 
-	private LinearGradientBrush(GradientVector vector, Color[] colors, WrapMode mode, Matrix transform)
+	private LinearGradientBrush(RectangleF rect, Color[] colors, WrapMode mode, Matrix transform)
 		: base(new SKPaint { })
 	{
-		m_rect = new RectangleF(vector.BegPoint.X, vector.BegPoint.Y, vector.BegPoint.X + vector.EndPoint.X, vector.BegPoint.Y + vector.EndPoint.Y);
+		m_rect = rect;
 		m_mode = mode;
 		m_transform = transform;
 
@@ -27,8 +27,8 @@ public sealed class LinearGradientBrush : Brush
 		m_blend = new();
 		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
 		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
-		
-		var uniform = CreateUniformArray(colors.Length);
+
+		var uniform = GetUniformArray(colors.Length);
 
 		m_colors = new(colors.Length);
 		Array.Copy(colors, m_colors.Colors, colors.Length);
@@ -42,7 +42,7 @@ public sealed class LinearGradientBrush : Brush
 	///  points and colors.
 	/// </summary>
 	public LinearGradientBrush(PointF point1, PointF point2, Color color1, Color color2)
-		: this(GetGradientVector(point1, point2), new[] { color1, color2 }, WrapMode.Tile, new Matrix()) { }
+		: this(GetRectangle(point1, point2), color1, color2, 0, false) { }
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref='LinearGradientBrush'/> class with the specified 
@@ -56,7 +56,7 @@ public sealed class LinearGradientBrush : Brush
 	///  a <see cref='RectangleF'/>, starting and ending colors, and orientation.
 	/// </summary>
 	public LinearGradientBrush(RectangleF rect, Color color1, Color color2, LinearGradientMode mode)
-		: this(GetGradientVector(rect, mode), new[] { color1, color2 }, WrapMode.Tile, new Matrix()) { }
+		: this(rect, color1, color2, GetAngle(mode), false) { }
 
 	/// <summary>
 	///  Creates a new instance of the <see cref='LinearGradientBrush'/> class based on 
@@ -70,7 +70,7 @@ public sealed class LinearGradientBrush : Brush
 	///  a <see cref='RectangleF'/>, starting and ending colors, and an orientation angle.
 	/// </summary>
 	public LinearGradientBrush(RectangleF rect, Color color1, Color color2, float angle, bool isAngleScaleable = false)
-		: this(GetGradientVector(rect, angle, isAngleScaleable), new[] { color1, color2 }, WrapMode.Tile, new Matrix()) { }
+		: this(rect, new[] { color1, color2 }, WrapMode.Tile, GetTransform(rect, angle, isAngleScaleable)) { }
 
 	/// <summary>
 	///  Creates a new instance of the <see cref='LinearGradientBrush'/> class based on
@@ -85,11 +85,13 @@ public sealed class LinearGradientBrush : Brush
 	/// <summary>
 	///  Creates an exact copy of this <see cref='LinearGradientBrush'/>.
 	/// </summary>
-	public override object Clone()
-	{
-		var vector = GetGradientVector(m_rect, LinearGradientMode.ForwardDiagonal);
-		return new LinearGradientBrush(vector, m_colors.Colors, m_mode, m_transform);
-	}
+	public override object Clone() 
+		=> new LinearGradientBrush(Rectangle, LinearColors, WrapMode, Transform)
+		{
+			Blend = Blend,
+			InterpolationColors = InterpolationColors,
+			GammaCorrection = GammaCorrection
+		};
 
 	#endregion
 
@@ -143,7 +145,7 @@ public sealed class LinearGradientBrush : Brush
 		set => UpdateShader(() => m_colors = new()
 		{
 			Colors = value,
-			Positions = CreateUniformArray(value.Length)
+			Positions = GetUniformArray(value.Length)
 		});
 	}
 
@@ -320,62 +322,100 @@ public sealed class LinearGradientBrush : Brush
 
 	#region Utilities
 
-	private struct GradientVector
+	private static RectangleF GetRectangle(PointF point1, PointF point2)
+		=> new(point1.X, point1.Y, point1.X + point2.X, point1.Y + point2.Y);
+
+	private static float GetAngle(LinearGradientMode mode) => mode switch
 	{
-		public PointF BegPoint { get; internal set; }
-		public PointF EndPoint { get; internal set; }
-	}
+		LinearGradientMode.Horizontal => 0,
+		LinearGradientMode.Vertical => 90,
+		LinearGradientMode.ForwardDiagonal => 45,
+		LinearGradientMode.BackwardDiagonal => 135,
+		_ => throw new ArgumentException($"{mode} mode is not supported.", nameof(mode))
+	};
 
-	private static GradientVector GetGradientVector(PointF start, PointF end)
-		=> new() { BegPoint = start, EndPoint = end };
-
-	private static GradientVector GetGradientVector(RectangleF rect, LinearGradientMode mode)
-	{
-		(var begPoint, var endPoint) = mode switch
-		{
-			LinearGradientMode.Horizontal => ( new PointF(rect.Left, rect.Top), new PointF(rect.Right, rect.Top) ),
-			LinearGradientMode.Vertical => ( new PointF(rect.Left, rect.Top), new PointF(rect.Left, rect.Bottom) ),
-			LinearGradientMode.ForwardDiagonal => ( new PointF(rect.Left, rect.Top), new PointF(rect.Right, rect.Bottom) ),
-			LinearGradientMode.BackwardDiagonal => ( new PointF(rect.Right, rect.Top), new PointF(rect.Left, rect.Bottom) ),
-			_ => throw new ArgumentException($"{mode} mode is not supported.", nameof(mode))
-		};
-		return GetGradientVector(begPoint, endPoint);
-	}
-
-	private static GradientVector GetGradientVector(RectangleF rect, float angle, bool scale)
-	{
-		double radians = angle * (Math.PI / 180);
-		float midWidth = rect.Width / 2f;
-		float midHeight = rect.Height / 2f;
-
-		float centerX = rect.Left + midWidth;
-		float centerY = rect.Top + midHeight;
-
-		float lengthX = scale ? midWidth : 1f;
-		float lengthY = scale ? midHeight : 1f;
-
-		var begPoint = new PointF(
-			centerX - lengthX * (float)Math.Cos(radians),
-			centerY - lengthY * (float)Math.Sin(radians));
-
-		var endPoint = new PointF(
-			centerX + lengthX * (float)Math.Cos(radians),
-			centerY + lengthY * (float)Math.Sin(radians));
-
-		return GetGradientVector(begPoint, endPoint);
-	}
-
-	private static Color ApplyGamma(Color color, float gamma) 
-		=> Color.FromArgb(
-			color.A,
-			(int)(Math.Pow(color.R / 255.0, gamma) * 255),
-			(int)(Math.Pow(color.G / 255.0, gamma) * 255),
-			(int)(Math.Pow(color.B / 255.0, gamma) * 255));
-
-	private static float[] CreateUniformArray(int length)
+	private static float[] GetUniformArray(int length)
 		=> length < 2
 			? throw new ArgumentException("at least two items are required.", nameof(length))
 			: Enumerable.Range(0, length).Select(i => 1f * i / (length - 1)).ToArray();
+
+	static private Matrix GetTransform(RectangleF rect, float angle, bool scale)
+	{
+		float radians = angle % 360 * (float)(Math.PI / 180);
+
+		float cos = (float)Math.Cos(radians);
+		float sin = (float)Math.Sin(radians);
+
+		float absCos = Math.Abs(cos);
+		float absSin = Math.Abs(sin);
+
+		float wRatio = (absCos * rect.Width + absSin * rect.Height) / rect.Width;
+		float hRatio = (absSin * rect.Width + absCos * rect.Height) / rect.Height;
+
+		float transX = rect.X + rect.Width / 2;
+		float transY = rect.Y + rect.Height / 2;
+
+		var transform = new Matrix();
+		transform.Translate(transX, transY);
+		transform.Rotate(angle);
+		transform.Scale(wRatio, hRatio);
+		transform.Translate(-transX, -transY);
+
+		if (scale && absCos > 5e-4 && absSin > 5e-4)
+		{
+			var points = new PointF[3]
+			{
+				new(rect.Left, rect.Top),
+				new(rect.Right, rect.Top),
+				new(rect.Left, rect.Bottom),
+			};
+
+			transform.TransformPoints(points);
+
+			float ratio = rect.Width /rect.Height;
+			if (sin > 0 && cos > 0) 
+			{
+				float slope = GetSlope(radians, ratio);
+				points[0].Y = (slope * (points[0].X - rect.Left)) + rect.Top;
+				points[1].X = ((points[1].Y - rect.Bottom) / slope) + rect.Right;
+				points[2].X = ((points[2].Y - rect.Top) / slope) + rect.Left;
+			}
+			else if (sin > 0 && cos < 0)
+			{
+				float slope = GetSlope(radians - 1 / 2f * Math.PI, ratio);
+				points[0].X = ((points[0].Y - rect.Bottom) / slope) + rect.Right;
+				points[1].Y = (slope * (points[1].X - rect.Right)) + rect.Bottom;
+				points[2].Y = (slope * (points[2].X - rect.Left)) + rect.Top;
+			}
+			else if (sin < 0 && cos < 0)
+			{
+				float slope = GetSlope(radians, ratio);
+				points[0].Y = (slope * (points[0].X - rect.Right)) + rect.Bottom;
+				points[1].X = ((points[1].Y - rect.Top) / slope) + rect.Left;
+				points[2].X = ((points[2].Y - rect.Bottom) / slope) + rect.Right;
+			}
+			else
+			{
+				float slope = GetSlope(radians - 3 / 2f * Math.PI, ratio);
+				points[0].X = ((points[0].Y - rect.Y) / slope) + rect.X;
+				points[1].Y = (slope * (points[1].X - rect.Left)) + rect.Top;
+				points[2].Y = (slope * (points[2].X - rect.Right)) + rect.Bottom;
+			}
+
+			float m11 = (points[1].X - points[0].X) / rect.Width;
+			float m12 = (points[1].Y - points[0].Y) / rect.Width;
+			float m21 = (points[2].X - points[0].X) / rect.Height;
+			float m22 = (points[2].Y - points[0].Y) / rect.Height;
+
+			transform = new Matrix(m11, m12, m21, m22, 0, 0);
+			transform.Translate(-rect.X, -rect.Y);
+		}
+
+		return transform;
+
+		static float GetSlope(double angleRadians, float aspectRatio)
+			=> -1.0f / (aspectRatio * (float)Math.Tan(angleRadians));
+	}
 
 	void SigmaBellBlend(float focus, float scale, float sigma, float mean, float delta, int startIndex, int endIndex, bool invert)
 	{
@@ -416,30 +456,36 @@ public sealed class LinearGradientBrush : Brush
 		}
 	}
 
+	private static Color ApplyGamma(Color color, float gamma) 
+		=> Color.FromArgb(
+			color.A,
+			(int)(Math.Pow(color.R / 255.0, gamma) * 255),
+			(int)(Math.Pow(color.G / 255.0, gamma) * 255),
+			(int)(Math.Pow(color.B / 255.0, gamma) * 255));
+
 	private void UpdateShader(Action action)
 	{
 		action();
 
+		var transform = new Matrix(m_transform.MatrixElements);
 		switch (m_mode)
 		{
 			case WrapMode.TileFlipX:
-				m_transform.Scale(-1, 1);
+				transform.Scale(-1, 1);
 				break;
 			case WrapMode.TileFlipY:
-				m_transform.Scale(1, -1);
+				transform.Scale(1, -1);
 				break;
 			case WrapMode.TileFlipXY:
-				m_transform.Scale(-1, -1);
+				transform.Scale(-1, -1);
 				break;
 		}
 
-		var vector = GetGradientVector(m_rect, LinearGradientMode.ForwardDiagonal);
+		var start = new SKPoint(0, m_rect.Left);
+		var end = new SKPoint(0, m_rect.Right);
+		var matrix = transform.m_matrix;
 		var gamma = m_gamma ? 2.2f : 1.0f;
-
-		var start = vector.BegPoint.m_point;
-		var end = vector.EndPoint.m_point;
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
-		var matrix = m_transform.m_matrix;
 
 		int index;
 
@@ -457,27 +503,25 @@ public sealed class LinearGradientBrush : Brush
 			blend[pos] = col; // specific color
 		}
 
-		var lastColor = Color.Empty;
-		var blendKeys = blend.Keys.OrderBy(key => key);
-
-		var positions = blendKeys.ToArray();
+		var positions = blend.Keys.OrderBy(key => key).ToArray();
 		var colors = new SKColor[positions.Length];
-		
-		index = 0;
-		foreach (var key in blendKeys)
+	
+		var lastColor = Color.Empty;
+		for (index = 0; index < positions.Length; index++)
 		{
+			var key = positions[index];
 			var value = blend[key];
 			if (value is Color currColor)
 			{
 				var color = ApplyGamma(currColor, gamma);
-				colors[index++] = color.m_color;
+				colors[index] = color.m_color;
 				lastColor = currColor;
 				continue;
 			}
 			if (value is float factor)
 			{
 				var color = ApplyFactor(lastColor, factor);
-				colors[index++] = color.m_color;
+				colors[index] = color.m_color;
 				continue;
 			}
 		}
