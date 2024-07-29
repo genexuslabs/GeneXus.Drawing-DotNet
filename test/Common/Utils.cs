@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace GeneXus.Drawing.Test.Drawing2D;
+namespace GeneXus.Drawing.Test;
 
 internal abstract class Utils
 {
