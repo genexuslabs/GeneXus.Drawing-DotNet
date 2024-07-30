@@ -22,31 +22,31 @@ public sealed class TextureBrush : Brush
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
+	///  specified image and wrap mode.
+	/// </summary>
+	public TextureBrush(Image image, WrapMode mode = WrapMode.Tile)
+		: this(image, mode, new Rectangle(0, 0, image.Size)) { }
+
+	/// <summary>
+	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
 	///  specified image, wrap mode, and bounding rectangle.
 	/// </summary>
-	public TextureBrush(Image image, RectangleF rect, WrapMode mode = WrapMode.Tile)
+	public TextureBrush(Image image, WrapMode mode, RectangleF rect)
 		: this(rect, image, mode) { }
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
 	///  specified image, wrap mode, and bounding rectangle.
 	/// </summary>
-	public TextureBrush(Image image, Rectangle rect, WrapMode mode = WrapMode.Tile)
-		: this(new RectangleF(rect.m_rect), image, mode) { }
-
-	/// <summary>
-	///  Initializes a new <see cref='TextureBrush'/> object that uses the 
-	///  specified image and wrap mode.
-	/// </summary>
-	public TextureBrush(Image image, WrapMode mode = WrapMode.Tile)
-		: this(image, new Rectangle(0, 0, image.Size), mode) { }
+	public TextureBrush(Image image, WrapMode mode, Rectangle rect)
+		: this(image, mode, new RectangleF(rect.m_rect)) { }
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses 
 	///  the specified image, bounding rectangle, and image attributes.
 	/// </summary>
 	public TextureBrush(Image image, RectangleF rect, object imageAttributes)
-		: this(image, rect, WrapMode.Tile) { } // TODO: implement ImageAttributes class
+		: this(image, WrapMode.Tile, rect) { } // TODO: implement ImageAttributes class
 
 	/// <summary>
 	///  Initializes a new <see cref='TextureBrush'/> object that uses 
