@@ -155,25 +155,25 @@ public sealed class TextureBrush : Brush
 		};
 
 		var info = new SKImageInfo((int)m_bounds.Width, (int)m_bounds.Height);
+		var matrix = Transform.m_matrix;
 
-		using var surfece = SKSurface.Create(info);
-		switch (m_image)
+		using var pixmap = m_image switch 
 		{
-			case Bitmap bitmap:
-				surfece.Canvas.DrawBitmap(bitmap.m_bitmap, m_bounds.m_rect);
-				break;
-			
-			case Svg svg:
-				surfece.Canvas.DrawImage(svg.InnerImage, m_bounds.m_rect);
-				break;
+			Bitmap bm => bm.m_bitmap.PeekPixels(),
+			Svg svg => svg.InnerImage.PeekPixels(),
+			_ => throw new NotImplementedException($"image type {m_image.GetType().Name}.")
+		};
 
-			default:
-				throw new NotImplementedException($"image type {m_image.GetType().Name}.");
-		}
+		using var bitmap = new SKBitmap();
+		using var subset = pixmap.ExtractSubset(SKRectI.Round(m_bounds.m_rect));
+		bitmap.InstallPixels(subset);
 		
-		var src = surfece.Snapshot();
+		using var surfece = SKSurface.Create(info);
+		surfece.Canvas.DrawBitmap(bitmap, 0, 0);
+		
+		using var src = surfece.Snapshot();
 
-		m_paint.Shader = SKShader.CreateImage(src, tmx, tmy);
+		m_paint.Shader = SKShader.CreateImage(src, tmx, tmy, matrix);
 	}
 
 	#endregion
