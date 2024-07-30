@@ -123,12 +123,19 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
 	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
 	/// </summary>
-	public object Clone(Rectangle rect, PixelFormat format)
+	public object Clone(RectangleF rect, PixelFormat format)
 	{
 		var bitmap = new Bitmap(rect.Width, rect.Height);
 		var portion = SKRectI.Truncate(rect.m_rect);
 		return m_bitmap.ExtractSubset(bitmap.m_bitmap, portion) ? bitmap : Clone();
 	}
+
+	/// <summary>
+	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
+	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
+	/// </summary>
+	public object Clone(Rectangle rect, PixelFormat format)
+		=> Clone(new RectangleF(rect.m_rect), format);
 
 	#endregion
 
