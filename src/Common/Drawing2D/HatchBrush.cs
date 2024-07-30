@@ -11,7 +11,7 @@ public sealed class HatchBrush : Brush
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref="HatchBrush"/> class with the 
-	///  specified <see cref="HatchStyle"/> enumeration, foreground color, and background color.
+	///  specified <see cref="Drawing2D.HatchStyle"/> enumeration, foreground color, and background color.
 	/// </summary>
 	public HatchBrush(HatchStyle hatchStyle, Color foreColor, Color backColor)
 		: base(new SKPaint { })
@@ -25,7 +25,7 @@ public sealed class HatchBrush : Brush
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref="HatchBrush"/> class with the 
-	///  specified <see cref="HatchStyle"/> enumeration and foreground color.
+	///  specified <see cref="Drawing2D.HatchStyle"/> enumeration and foreground color.
 	/// </summary>
 	public HatchBrush(HatchStyle hatchStyle, Color foreColor)
 		: this(hatchStyle, foreColor, Color.Transparent) { }
