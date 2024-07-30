@@ -16,20 +16,28 @@ internal class TextureBrushUnitTest
 	}
 	
 	[Test]
-	public void Constructor_BitmapRectWrap()
+	[TestCase(WrapMode.Tile, "wrap-tile.png")]
+	[TestCase(WrapMode.Clamp, "wrap-clamp.png")]
+	public void Constructor_BitmapRectWrap(WrapMode mode, string expected)
 	{
 		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
 		using var bitmap = new Bitmap(filePath);
-		var rect = new Rectangle(0, 0, 100, 50);
-		var wrapMode = WrapMode.Tile;
-		var matrix = new Matrix(1, 2, 3, 4, 5, 6);
+		var rect = new RectangleF(15, 15, 20, 20);
 
-		using var brush = new TextureBrush(bitmap, rect, wrapMode) { Transform = matrix };
+		var matrix = new Matrix();
+		matrix.Rotate(45);
+		matrix.Translate(10, 10);
+
+		using var brush = new TextureBrush(bitmap, mode, rect) { Transform = matrix };
 		Assert.Multiple(() =>
 		{
 			Assert.That(brush.Image, Is.EqualTo(bitmap));
-			Assert.That(brush.WrapMode, Is.EqualTo(wrapMode));
+			Assert.That(brush.WrapMode, Is.EqualTo(mode));
 			Assert.That(brush.Transform, Is.EqualTo(matrix));
+
+			string path = Path.Combine("brush", "textured", expected);
+			float similarity = Utils.CompareImage(path, brush, true);
+			Assert.That(similarity, Is.GreaterThan(0.95));
 		});
 	}
 
@@ -39,7 +47,7 @@ internal class TextureBrushUnitTest
 		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
 		using var bitmap = new Bitmap(filePath);
 
-		using var brush1 = new TextureBrush(bitmap, new Rectangle(0, 0, 100, 50), WrapMode.Tile) { Transform = new Matrix(1, 2, 3, 4, 5, 6) };
+		using var brush1 = new TextureBrush(bitmap, WrapMode.Tile, new Rectangle(0, 0, 100, 50)) { Transform = new Matrix(1, 2, 3, 4, 5, 6) };
 		using var brush2 = brush1.Clone() as TextureBrush;
 		Assert.Multiple(() =>
 		{
