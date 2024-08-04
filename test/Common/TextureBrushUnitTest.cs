@@ -16,9 +16,9 @@ internal class TextureBrushUnitTest
 	}
 	
 	[Test]
-	[TestCase(WrapMode.Tile, "wrap-tile.png")]
-	[TestCase(WrapMode.Clamp, "wrap-clamp.png")]
-	public void Constructor_BitmapRectWrap(WrapMode mode, string expected)
+	[TestCase(WrapMode.Tile)]
+	[TestCase(WrapMode.Clamp)]
+	public void Constructor_BitmapRectWrap(WrapMode mode)
 	{
 		var filePath = Path.Combine(IMAGE_PATH, "Sample.png");
 		using var bitmap = new Bitmap(filePath);
@@ -35,7 +35,7 @@ internal class TextureBrushUnitTest
 			Assert.That(brush.WrapMode, Is.EqualTo(mode));
 			Assert.That(brush.Transform, Is.EqualTo(matrix));
 
-			string path = Path.Combine("brush", "textured", expected);
+			string path = Path.Combine("brush", "textured", $"Mode{mode}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
 			Assert.That(similarity, Is.GreaterThan(0.95));
 		});

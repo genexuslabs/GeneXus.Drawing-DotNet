@@ -32,11 +32,11 @@ internal class LinearGradientBrushUnitTest
 	}
 	
 	[Test]
-	[TestCase(LinearGradientMode.Horizontal, "mode-h.png", new[] { 0.9999999f, 0f, 0f, 0.9999999f, 0f, 0f })]
-	[TestCase(LinearGradientMode.Vertical, "mode-v.png", new[] { -1.907349E-07f, 0.9999999f, -1f, -4.768372E-08f, 50f, 7.152557E-07f })]
-	[TestCase(LinearGradientMode.BackwardDiagonal, "mode-bd.png", new[] { -1f, 0.9999998f, -1f, -1f, 74.99999f, 25f })]
-	[TestCase(LinearGradientMode.ForwardDiagonal, "mode-fd.png", new[] { 0.9999999f, 0.9999999f, -1f, 0.9999999f, 25f, -25f })]
-	public void Constructor_RectangleMode(LinearGradientMode mode, string expected, float[] elements)
+	[TestCase(LinearGradientMode.Horizontal, new[] { 0.9999999f, 0f, 0f, 0.9999999f, 0f, 0f })]
+	[TestCase(LinearGradientMode.Vertical, new[] { -1.907349E-07f, 0.9999999f, -1f, -4.768372E-08f, 50f, 7.152557E-07f })]
+	[TestCase(LinearGradientMode.BackwardDiagonal, new[] { -1f, 0.9999998f, -1f, -1f, 74.99999f, 25f })]
+	[TestCase(LinearGradientMode.ForwardDiagonal, new[] { 0.9999999f, 0.9999999f, -1f, 0.9999999f, 25f, -25f })]
+	public void Constructor_RectangleMode(LinearGradientMode mode, float[] elements)
 	{
 		var rect = new RectangleF(15, 15, 20, 20);
 
@@ -51,18 +51,18 @@ internal class LinearGradientBrushUnitTest
 			Assert.That(brush.Rectangle, Is.EqualTo(rect));
 			Assert.That(brush.WrapMode, Is.EqualTo(WrapMode.Tile));
 
-			string path = Path.Combine("brush", "linear", expected);
+			string path = Path.Combine("brush", "linear", $"Mode{mode}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
 			Assert.That(similarity, Is.GreaterThan(0.95));
 		});
 	}
 	
 	[Test]
-	[TestCase(0f, "angle-0.png", new[] { 0.9999999f, 0f, 0f, 0.9999999f, 0f, 0f })]
-	[TestCase(45f, "angle-45.png", new[] { 0.999999f, 0.9999999f, -1f, 0.9999999f, 25f, -25f })]
-	[TestCase(75f, "angle-75.png", new[] { 0.3169872f, 1.183012f, -1.183013f, 0.3169872f, 46.65063f, -12.5f })]
-	[TestCase(90f, "angle-90.png", new[] { -1.907349E-07f, 0.9999999f, -1f, -4.768372E-08f, 50f, 7.152557E-07f })]
-	public void Constructor_RectangleAngle(float angle, string expected, float[] elements)
+	[TestCase(0f, new[] { 0.9999999f, 0f, 0f, 0.9999999f, 0f, 0f })]
+	[TestCase(45f, new[] { 0.999999f, 0.9999999f, -1f, 0.9999999f, 25f, -25f })]
+	[TestCase(75f, new[] { 0.3169872f, 1.183012f, -1.183013f, 0.3169872f, 46.65063f, -12.5f })]
+	[TestCase(90f, new[] { -1.907349E-07f, 0.9999999f, -1f, -4.768372E-08f, 50f, 7.152557E-07f })]
+	public void Constructor_RectangleAngle(float angle, float[] elements)
 	{
 		var rect = new RectangleF(15, 15, 20, 20);
 
@@ -77,7 +77,7 @@ internal class LinearGradientBrushUnitTest
 			Assert.That(brush.Rectangle, Is.EqualTo(rect));
 			Assert.That(brush.WrapMode, Is.EqualTo(WrapMode.Tile));
 
-			string path = Path.Combine("brush", "linear", expected);
+			string path = Path.Combine("brush", "linear", $"Angle{angle}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
 			Assert.That(similarity, Is.GreaterThan(0.95));
 		});

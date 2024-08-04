@@ -10,19 +10,19 @@ internal class SolidBrushUnitTest
 	}
 	
 	[Test]
-	[TestCase("#FF0000", "color-red.png")]
-	[TestCase("#00FF00", "color-green.png")]
-	[TestCase("#0000FF", "color-blue.png")]
-	public void Constructor_Color(string hex, string expected)
+	[TestCase("Red")]
+	[TestCase("Green")]
+	[TestCase("Blue")]
+	public void Constructor_Color(string name)
 	{
-		var color = new Color(hex);
+		var color = Color.FromName(name);
 
 		using var brush = new SolidBrush(color);
 		Assert.Multiple(() =>
 		{
 			Assert.That(brush.Color, Is.EqualTo(color));
 
-			string path = Path.Combine("brush", "solid", expected);
+			string path = Path.Combine("brush", "solid", $"Color{name}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
 			Assert.That(similarity, Is.GreaterThan(0.95));
 		});
