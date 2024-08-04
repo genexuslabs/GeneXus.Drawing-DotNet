@@ -467,7 +467,9 @@ public sealed class LinearGradientBrush : Brush
 	{
 		action();
 
-		var transform = new Matrix(m_transform.MatrixElements);
+		var points = new PointF[] { new(m_rect.Left, 0), new(m_rect.Right, 0) };
+
+		using var transform = new Matrix(m_transform.MatrixElements);
 		switch (m_mode)
 		{
 			case WrapMode.TileFlipX:
@@ -480,9 +482,11 @@ public sealed class LinearGradientBrush : Brush
 				transform.Scale(-1, -1);
 				break;
 		}
+		transform.TransformPoints(points);
+		transform.Reset();
 
-		var start = new SKPoint(0, m_rect.Left);
-		var end = new SKPoint(0, m_rect.Right);
+		var start = points[0].m_point;
+		var end = points[1].m_point;
 		var matrix = transform.m_matrix;
 		var gamma = m_gamma ? 2.2f : 1.0f;
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
