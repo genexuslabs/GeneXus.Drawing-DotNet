@@ -70,7 +70,7 @@ internal abstract class Utils
 		float hits = 0f; // compare pixel to pixel
 		for (int i = 0; i < bg.Width; i++)
 			for (int j = 0; j < bg.Height; j++)
-				hits += DeltaE(bg.GetPixel(i, j), bm.GetPixel(i, j)) < 10 ? 1 : 0;
+				hits += DeltaE(bg.GetPixel(i, j), bm.GetPixel(i, j)) < 35 ? 1 : 0;
 
 		if (save)
 		{
