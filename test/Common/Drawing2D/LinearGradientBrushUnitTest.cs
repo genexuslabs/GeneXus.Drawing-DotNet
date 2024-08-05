@@ -93,6 +93,7 @@ internal class LinearGradientBrushUnitTest
 			Assert.That(brush2, Is.Not.Null);
 			Assert.That(brush2, Is.Not.SameAs(brush1));
 			Assert.That(brush2.LinearColors, Is.EqualTo(brush1.LinearColors));
+			Assert.That(brush2.Transform.Elements, Is.EqualTo(brush1.Transform.Elements));
 			Assert.That(brush2.Rectangle, Is.EqualTo(brush1.Rectangle));
 			Assert.That(brush2.WrapMode, Is.EqualTo(brush1.WrapMode));
 		});
