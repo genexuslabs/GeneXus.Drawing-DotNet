@@ -12,14 +12,14 @@ public sealed class PathGradientBrush : Brush
 	private WrapMode m_mode;
 	private Matrix m_transform;
 	private Blend m_blend;
-	private ColorBlend m_interpolation;
+	private ColorBlend m_colors;
 	private PointF m_center, m_focus;
 	private Color m_color;
 	private Color[] m_surround;
 
 	private PathGradientBrush(GraphicsPath path, WrapMode mode, Matrix transform)
-		: base(new SKPaint {  })
-	{	
+		: base(new SKPaint { })
+	{
 		m_path = path;
 		m_mode = mode;
 		m_transform = transform;
@@ -28,9 +28,9 @@ public sealed class PathGradientBrush : Brush
 		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
 		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
 
-		m_interpolation = new();
-		Array.Copy(new[] { Color.Empty }, m_interpolation.Colors, 1);
-		Array.Copy(new[] { 0f }, m_interpolation.Positions, 1);
+		m_colors = new();
+		Array.Copy(new[] { Color.Empty }, m_colors.Colors, 1);
+		Array.Copy(new[] { 0f }, m_colors.Positions, 1);
 
 		m_color = new Color(255, 255, 255, 255);
 		m_center = GetCentroid(m_path);
@@ -139,17 +139,17 @@ public sealed class PathGradientBrush : Brush
 	/// </summary>
 	public ColorBlend InterpolationColors
 	{
-		get => m_interpolation;
+		get => m_colors;
 		set => UpdateShader(() =>
 		{
 			var interpolation = value ?? throw new ArgumentNullException(nameof(value));
-			if (Enumerable.SequenceEqual(m_interpolation.Positions, interpolation.Positions) && Enumerable.SequenceEqual(m_interpolation.Colors, interpolation.Colors))
+			if (Enumerable.SequenceEqual(m_colors.Positions, interpolation.Positions) && Enumerable.SequenceEqual(m_colors.Colors, interpolation.Colors))
 				return;
 			if (interpolation.Positions[0] != 0 )
 				throw new ArgumentException("first element must be equal to 0.", nameof(value));
 			if (interpolation.Positions[value.Positions.Length - 1] != 1)
 				throw new ArgumentException("last element must be equal to 1.", nameof(value));
-			m_interpolation = interpolation;
+			m_colors = interpolation;
 		});
 	}
 
@@ -303,10 +303,10 @@ public sealed class PathGradientBrush : Brush
 			var fac = m_blend.Factors[index];
 			blend[pos] = fac; // blend factor
 		}
-		for (index = 0; index < m_interpolation.Positions.Length; index++)
+		for (index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
 		{
-			var pos = m_interpolation.Positions[index];
-			var col = m_interpolation.Colors[index];
+			var pos = m_colors.Positions[index];
+			var col = m_colors.Colors[index];
 			blend[pos] = col; // specific color
 		}
 
