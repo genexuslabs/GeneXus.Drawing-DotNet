@@ -20,6 +20,9 @@ public sealed class PathGradientBrush : Brush
 	private PathGradientBrush(GraphicsPath path, WrapMode mode, Matrix transform)
 		: base(new SKPaint { })
 	{
+		var color = Color.White;
+		var bounds = path.GetBounds().m_rect;
+
 		m_path = path;
 		m_mode = mode;
 		m_transform = transform;
@@ -32,10 +35,10 @@ public sealed class PathGradientBrush : Brush
 		Array.Copy(new[] { Color.Empty }, m_colors.Colors, 1);
 		Array.Copy(new[] { 0f }, m_colors.Positions, 1);
 
-		m_color = new Color(255, 255, 255, 255);
-		m_center = GetCentroid(m_path);
+		m_color = color;
+		m_center = new PointF(bounds.MidX, bounds.MidY);
 		m_focus = new PointF(0, 0);
-		m_surround = new[] { CenterColor };
+		m_surround = new[] { color };
 
 		UpdateShader(() => { });
 	}
@@ -258,12 +261,6 @@ public sealed class PathGradientBrush : Brush
 			types[i] = (byte)PathPointType.Line;
 		types[types.Length - 1] = (byte)PathPointType.CloseSubpath;
 		return new GraphicsPath(points, types);
-	}
-
-	private static PointF GetCentroid(GraphicsPath path)
-	{
-		var bounds = path.GetBounds();
-		return new PointF(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
 	}
 
 	private void UpdateShader(Action action)
