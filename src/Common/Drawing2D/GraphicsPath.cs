@@ -636,7 +636,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	/// </summary>
 	public RectangleF GetBounds(Matrix matrix, Pen pen)
 	{
-		using var transformed = new GraphicsPath(m_path);
+		using var path = new SKPath(m_path);
+		using var transformed = new GraphicsPath(path);
 		transformed.Transform(matrix);
 		using var fill = pen.m_paint.GetFillPath(transformed.m_path) ?? transformed.m_path;
 		return new RectangleF(fill.Bounds);
