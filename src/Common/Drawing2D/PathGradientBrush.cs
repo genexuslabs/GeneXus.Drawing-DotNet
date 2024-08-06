@@ -48,15 +48,27 @@ public sealed class PathGradientBrush : Brush
 		: this(path, WrapMode.Clamp, new Matrix()) { }
 
 	/// <summary>
-	///  Initializes a new instance of the <see cref='PathGradientBrush'/> class with the specified points and wrap mode.
+	///  Initializes a new instance of the <see cref='PathGradientBrush'/> class with the specified points.
 	/// </summary>
-	public PathGradientBrush(PointF[] points, WrapMode mode = WrapMode.Clamp)
-		: this(CreatePath(points), mode, new Matrix()) { }
+	public PathGradientBrush(params PointF[] points)
+		: this(points, WrapMode.Clamp) { }
 
 	/// <summary>
 	///  Initializes a new instance of the <see cref='PathGradientBrush'/> class with the specified points and wrap mode.
 	/// </summary>
-	public PathGradientBrush(Point[] points, WrapMode mode = WrapMode.Clamp)
+	public PathGradientBrush(PointF[] points, WrapMode mode)
+		: this(CreatePath(points), mode, new Matrix()) { }
+
+	/// <summary>
+	///  Initializes a new instance of the <see cref='PathGradientBrush'/> class with the specified points.
+	/// </summary>
+	public PathGradientBrush(params Point[] points)
+		: this(points, WrapMode.Clamp) { }
+
+	/// <summary>
+	///  Initializes a new instance of the <see cref='PathGradientBrush'/> class with the specified points and wrap mode.
+	/// </summary>
+	public PathGradientBrush(Point[] points, WrapMode mode)
 		: this(Array.ConvertAll(points, point => new PointF(point.m_point)), mode) { }
 
 
