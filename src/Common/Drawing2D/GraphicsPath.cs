@@ -1064,15 +1064,22 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					break;
 
 				case PathPointType.Bezier:
-					if (i + 2 >= points.Length 
-					|| (types[i + 1] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier 
-					|| (types[i + 2] & (byte)PathPointType.PathTypeMask) != (byte)PathPointType.Bezier)
-						throw new ArgumentException("invalid Bezier curve definition.");
-
-					path.CubicTo(points[i].m_point, points[i + 1].m_point, points[i + 2].m_point);
-					
-					i += 2;
-					break;
+					if (i + 2 < points.Length 
+					&& (types[i + 1] & (byte)PathPointType.PathTypeMask) == (byte)PathPointType.Bezier
+					&& (types[i + 2] & (byte)PathPointType.PathTypeMask) == (byte)PathPointType.Bezier)
+					{
+						path.CubicTo(points[i].m_point, points[i + 1].m_point, points[i + 2].m_point);
+						i += 2;
+						break;
+					}
+					if (i + 1 < points.Length
+					&& (types[i + 1] & (byte)PathPointType.PathTypeMask) == (byte)PathPointType.Bezier)
+					{
+						path.QuadTo(points[i].m_point, points[i + 1].m_point);
+						i += 1;
+						break;
+					}
+					throw new ArgumentException("invalid Bezier curve definition.");
 
 				default:
 					throw new ArgumentException($"unknown type 0x{type:X2} at index {i}", nameof(types));
