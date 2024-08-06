@@ -371,13 +371,13 @@ public sealed class LinearGradientBrush : Brush
 		int index;
 
 		var blend = new Dictionary<float, object>();
-		for (index = 0; index < m_blend.Positions.Length; index++)
+		for (index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
 		{
 			var pos = m_blend.Positions[index];
 			var fac = m_blend.Factors[index];
 			blend[pos] = fac; // blend factor
 		}
-		for (index = 0; index < m_colors.Positions.Length; index++)
+		for (index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
 		{
 			var pos = m_colors.Positions[index];
 			var col = m_colors.Colors[index];
