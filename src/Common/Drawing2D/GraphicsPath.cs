@@ -72,7 +72,10 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  Creates an exact copy of this <see cref='GraphicsPath'/>.
 	/// </summary>
 	public object Clone()
-		=> new GraphicsPath(m_path);
+	{
+		using var path = new SKPath(m_path);
+		return new GraphicsPath(path);
+	}
 
 	#endregion
 
