@@ -63,7 +63,19 @@ public sealed class PathGradientBrush : Brush
 	///  Creates an exact copy of this <see cref='PathGradientBrush'/>.
 	/// </summary>
 	public override object Clone()
-		=> m_path.Clone() is GraphicsPath path ? new PathGradientBrush(path, m_mode, m_transform) : throw new Exception("path could not be cloned.");
+	{
+		var path = new GraphicsPath(m_path.PathPoints, m_path.PathTypes, m_path.FillMode);
+		var transform = new Matrix(m_transform.MatrixElements);
+		return new PathGradientBrush(path, WrapMode, transform)
+		{
+			Blend = Blend,
+			CenterColor = CenterColor,
+			CenterPoint = CenterPoint,
+			FocusScales = FocusScales,
+			InterpolationColors = InterpolationColors,
+			SurroundColors = SurroundColors,
+		};
+	}
 
 	#endregion
 
