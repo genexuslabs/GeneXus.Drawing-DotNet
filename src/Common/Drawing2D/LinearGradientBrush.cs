@@ -128,6 +128,8 @@ public sealed class LinearGradientBrush : Brush
 		set => UpdateShader(() => 
 		{
 			var colors = value ?? throw new ArgumentNullException(nameof(value));
+			if (Enumerable.SequenceEqual(m_colors.Positions, colors.Positions) && Enumerable.SequenceEqual(m_colors.Colors, colors.Colors))
+				return;
 			if (colors.Positions[0] != 0 )
 				throw new ArgumentException("first element must be equal to 0.", nameof(value));
 			if (colors.Positions[value.Positions.Length - 1] != 1)
