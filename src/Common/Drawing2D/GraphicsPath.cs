@@ -772,6 +772,12 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	public string ToSvg()
 		=> m_path.ToSvgPathData();
 
+	/// <summary>
+	///  Returns the <see cref="GraphicsPath"/> associated with SVG input string.
+	/// </summary>
+	public static GraphicsPath FromSvg(string svg)
+		=> new(SKPath.ParseSvgPathData(svg));
+
 	#endregion
 
 
