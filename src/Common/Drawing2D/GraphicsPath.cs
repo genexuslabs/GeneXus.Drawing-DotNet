@@ -73,7 +73,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	/// </summary>
 	public object Clone()
 	{
-		using var path = new SKPath(m_path);
+		var path = new SKPath(m_path);
 		return new GraphicsPath(path);
 	}
 
