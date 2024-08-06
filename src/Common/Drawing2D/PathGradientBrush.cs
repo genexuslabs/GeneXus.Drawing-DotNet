@@ -125,7 +125,17 @@ public sealed class PathGradientBrush : Brush
 	public ColorBlend InterpolationColors
 	{
 		get => m_interpolation;
-		set => UpdateShader(() => m_interpolation = value);
+		set => UpdateShader(() =>
+		{
+			var interpolation = value ?? throw new ArgumentNullException(nameof(value));
+			if (Enumerable.SequenceEqual(m_interpolation.Positions, interpolation.Positions) && Enumerable.SequenceEqual(m_interpolation.Colors, interpolation.Colors))
+				return;
+			if (interpolation.Positions[0] != 0 )
+				throw new ArgumentException("first element must be equal to 0.", nameof(value));
+			if (interpolation.Positions[value.Positions.Length - 1] != 1)
+				throw new ArgumentException("last element must be equal to 1.", nameof(value));
+			m_interpolation = interpolation;
+		});
 	}
 
 	/// <summary>
