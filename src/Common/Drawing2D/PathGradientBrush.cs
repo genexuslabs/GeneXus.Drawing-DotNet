@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using SkiaSharp;
@@ -21,18 +22,20 @@ public sealed class PathGradientBrush : Brush
 	{	
 		m_path = path;
 		m_mode = mode;
+		m_transform = transform;
 
-		m_blend = null;
+		m_blend = new();
+		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
+		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
+
+		m_interpolation = new();
+		Array.Copy(new[] { Color.Empty }, m_interpolation.Colors, 1);
+		Array.Copy(new[] { 0f }, m_interpolation.Positions, 1);
+
 		m_color = new Color(255, 255, 255, 255);
 		m_center = GetCentroid(m_path);
 		m_focus = new PointF(0, 0);
-		m_interpolation = new()
-		{
-			Colors = new[] { Color.Empty },
-			Positions = new[] { 0f }
-		};
 		m_surround = new[] { CenterColor };
-		m_transform = transform;
 
 		UpdateShader(() => { });
 	}
@@ -255,33 +258,67 @@ public sealed class PathGradientBrush : Brush
 	{
 		action();
 
+		using var transform = new Matrix(m_transform.MatrixElements);
 		switch (m_mode)
 		{
 			case WrapMode.TileFlipX:
-				m_transform.Scale(-1, 1);
+				transform.Scale(-1, 1);
 				break;
 			case WrapMode.TileFlipY:
-				m_transform.Scale(1, -1);
+				transform.Scale(1, -1);
 				break;
 			case WrapMode.TileFlipXY:
-				m_transform.Scale(-1, -1);
+				transform.Scale(-1, -1);
 				break;
 		}
 
-		var center = m_center.m_point;
-		var focus = Math.Max(m_focus.X, m_focus.Y);
-		var factors = m_blend?.Factors ?? Enumerable.Repeat(1f, m_interpolation.Positions.Length).ToArray();
-		var positions = m_interpolation.Positions
-			.Prepend(0f)
-			.Take(factors.Length)
-			.ToArray();
-		var colors = m_interpolation.Colors
-			.Prepend(m_color)
-			.Zip(factors, ApplyFactor)
-			.Select(color => color.m_color)
-			.ToArray();
+		var points = new PointF[] { m_center, m_focus };
+		transform.TransformPoints(points);
+		transform.Reset();
+
+		var matrix = transform.m_matrix;
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
-		var matrix = m_transform.m_matrix;
+
+		var center = points[0].m_point;
+		var focus = Math.Max(points[1].X, points[1].Y);
+
+		int index;
+
+		var blend = new Dictionary<float, object>() { [0] = m_color, [1] = Color.Empty };
+		for (index = 0; index < m_blend.Positions.Length; index++)
+		{
+			var pos = m_blend.Positions[index];
+			var fac = m_blend.Factors[index];
+			blend[pos] = fac; // blend factor
+		}
+		for (index = 0; index < m_interpolation.Positions.Length; index++)
+		{
+			var pos = m_interpolation.Positions[index];
+			var col = m_interpolation.Colors[index];
+			blend[pos] = col; // specific color
+		}
+
+		var positions = blend.Keys.OrderBy(key => key).ToArray();
+		var colors = new SKColor[positions.Length];
+	
+		var lastColor = Color.Empty;
+		for (index = 0; index < positions.Length; index++)
+		{
+			var key = positions[index];
+			var value = blend[key];
+			if (value is Color currColor)
+			{
+				colors[index] = currColor.m_color;
+				lastColor = currColor;
+				continue;
+			}
+			if (value is float factor)
+			{
+				var color = ApplyFactor(lastColor, factor);
+				colors[index] = color.m_color;
+				continue;
+			}
+		}
 
 		m_paint.Shader = SKShader.CreateRadialGradient(center, focus, colors, positions, mode, matrix);
 	}
