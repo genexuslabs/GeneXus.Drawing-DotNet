@@ -192,14 +192,14 @@ public sealed class PathGradientBrush : Brush
 	///  Creates a gradient with a center color and a linear falloff to each surrounding color.
 	/// </summary>
 	public void SetBlendTriangularShape(float focus, float scale = 1.0f)
-		=> throw new NotImplementedException();
+		=> UpdateShader(() => m_blend = GetBlendTriangularShape(focus, scale));
 
 	/// <summary>
 	///  Creates a gradient brush that changes color starting from the center of the path outward 
 	///  to the path's boundary. The transition from one color to another is based on a bell-shaped curve.
 	/// </summary>
 	public void SetSigmaBellShape(float focus, float scale = 1.0f)
-		=> throw new NotImplementedException();
+		=> UpdateShader(() => m_blend = GetSigmaBellShape(focus, scale));
 
 	/// <summary>
 	///  Translates the local geometric transformation of this <see cref='PathGradientBrush'/> object
