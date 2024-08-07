@@ -1013,9 +1013,13 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		// apply clip if required
 		if (!format.FormatFlags.HasFlag(StringFormatFlags.NoClip))
 		{
-			var bounds = new SKPath();
-			bounds.AddRect(layout);
-			path = path.Op(bounds, SKPathOp.Intersect);
+			var clip = new SKPath();
+			clip.AddRect(new SKRect(
+				Math.Max(layout.Left, path.TightBounds.Left), 
+				Math.Max(layout.Top, path.TightBounds.Top), 
+				Math.Min(layout.Right, path.TightBounds.Right),
+				Math.Min(layout.Bottom, path.TightBounds.Bottom)));
+			path = path.Op(clip, SKPathOp.Intersect);
 		}
 
 		m_path.AddPath(path);
