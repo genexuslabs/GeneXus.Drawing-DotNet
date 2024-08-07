@@ -295,9 +295,7 @@ public sealed class PathGradientBrush : Brush
 		transform.TransformPoints(points);
 		transform.Reset();
 
-		var matrix = transform.m_matrix;
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
-
 		var center = points[0].m_point;
 		var focus = Math.Max(points[1].X, points[1].Y);
 
@@ -340,10 +338,16 @@ public sealed class PathGradientBrush : Brush
 		}
 
 		var bounds = m_path.GetBounds();
+		
+		float transX = bounds.Width < bounds.Height ? bounds.Left : 0;
+		float transY = bounds.Height < bounds.Width ? bounds.Top : 0;
+		transform.Translate(transX, transY);
+		
 		float scaleX = bounds.Width < bounds.Height ? bounds.Width / bounds.Height : 1;
 		float scaleY = bounds.Height < bounds.Width ? bounds.Height / bounds.Width : 1;
-		transform.Scale(scaleX, scaleY); // make an ellipse
-
+		transform.Scale(scaleX, scaleY); // as an ellipse
+		
+		var matrix = transform.m_matrix;
 		float radius = Math.Max(bounds.Width, bounds.Height) / 2;
 
 		m_paint.Shader = SKShader.CreateRadialGradient(center, radius, colors, positions, mode, matrix);
