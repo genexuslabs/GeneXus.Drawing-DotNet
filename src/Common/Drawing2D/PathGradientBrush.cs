@@ -267,9 +267,9 @@ public sealed class PathGradientBrush : Brush
 	{
 		var types = new byte[points.Length];
 		types[0] = (byte)PathPointType.Start;
-		for (int i = 1; i < types.Length - 1; i++)
+		for (int i = 1; i < types.Length; i++)
 			types[i] = (byte)PathPointType.Line;
-		types[types.Length - 1] = (byte)PathPointType.CloseSubpath;
+		types[types.Length - 1] |= (byte)PathPointType.CloseSubpath;
 		return new GraphicsPath(points, types);
 	}
 
