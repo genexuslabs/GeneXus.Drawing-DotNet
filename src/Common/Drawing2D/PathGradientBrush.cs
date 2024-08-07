@@ -339,7 +339,14 @@ public sealed class PathGradientBrush : Brush
 			}
 		}
 
-		m_paint.Shader = SKShader.CreateRadialGradient(center, focus, colors, positions, mode, matrix);
+		var bounds = m_path.GetBounds();
+		float scaleX = bounds.Width < bounds.Height ? bounds.Width / bounds.Height : 1;
+		float scaleY = bounds.Height < bounds.Width ? bounds.Height / bounds.Width : 1;
+		transform.Scale(scaleX, scaleY); // make an ellipse
+
+		float radius = Math.Max(bounds.Width, bounds.Height) / 2;
+
+		m_paint.Shader = SKShader.CreateRadialGradient(center, radius, colors, positions, mode, matrix);
 	}
 
 	#endregion
