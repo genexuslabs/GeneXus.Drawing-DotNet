@@ -21,7 +21,9 @@ public sealed class PathGradientBrush : Brush
 		: base(new SKPaint { })
 	{
 		var color = Color.White;
-		var bounds = path.GetBounds().m_rect;
+		var points = path.PathPoints;
+		if (points.First() == points.Last())
+			points = points.Take(points.Length - 1).ToArray();
 
 		m_path = path;
 		m_mode = mode;
@@ -35,8 +37,16 @@ public sealed class PathGradientBrush : Brush
 		Array.Copy(new[] { Color.Empty }, m_colors.Colors, 1);
 		Array.Copy(new[] { 0f }, m_colors.Positions, 1);
 
+		m_center = new PointF(0, 0);
+		foreach (var point in points)
+		{
+			m_center.X += point.X;
+			m_center.Y += point.Y;
+		}
+		m_center.X /= points.Length;
+		m_center.Y /= points.Length;
+
 		m_color = color;
-		m_center = new PointF(bounds.MidX, bounds.MidY);
 		m_focus = new PointF(0, 0);
 		m_surround = new[] { color };
 
