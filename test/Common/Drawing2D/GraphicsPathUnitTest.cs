@@ -372,8 +372,10 @@ internal class GraphicsPathUnitTest
 	{
 		var text = "x!";
 		var font = new Font("Arial", 16);
-		var origin = new PointF(0, 0);
 		var format = new StringFormat();
+		var origin = new PointF(0, 0);
+		var size = new SizeF(12, 12);
+		var layout = new RectangleF(origin, size);
 
 		using var path = new GraphicsPath();
 		path.AddString(text, font.FontFamily, (int)font.Style, font.Size, origin, format);
