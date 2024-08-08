@@ -873,7 +873,10 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 
 	private void AddEllipse(SKRect rect)
-		=> m_path.AddOval(rect);
+	{
+		m_path.AddOval(rect);
+		m_path.Close();
+	}
 
 
 	private void AddLine(SKPoint pt1, SKPoint pt2)
@@ -897,11 +900,15 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		if (points.Length < 3)
 			throw new ArgumentException("At least three points are required.");
 		m_path.AddPoly(points, true);
+		m_path.Close();
 	}
 
 
 	private void AddRectangle(SKRect rect)
-		=> m_path.AddRect(rect);
+	{
+		m_path.AddRect(rect);
+		m_path.Close();
+	}
 
 
 	private void AddString(string text, FontFamily family, int style, float emSize, SKRect layout, StringFormat format)
