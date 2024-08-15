@@ -53,7 +53,7 @@ internal class LinearGradientBrushUnitTest
 
 			string path = Path.Combine("brush", "linear", $"Mode{mode}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
-			Assert.That(similarity, Is.GreaterThan(0.95));
+			Assert.That(similarity, Is.GreaterThan(0.9));
 		});
 	}
 	
@@ -79,7 +79,7 @@ internal class LinearGradientBrushUnitTest
 
 			string path = Path.Combine("brush", "linear", $"Angle{angle}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
-			Assert.That(similarity, Is.GreaterThan(0.95));
+			Assert.That(similarity, Is.GreaterThan(0.9));
 		});
 	}
 

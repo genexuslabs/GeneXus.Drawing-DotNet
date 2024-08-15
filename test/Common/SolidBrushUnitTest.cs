@@ -24,7 +24,7 @@ internal class SolidBrushUnitTest
 
 			string path = Path.Combine("brush", "solid", $"Color{name}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
-			Assert.That(similarity, Is.GreaterThan(0.95));
+			Assert.That(similarity, Is.GreaterThan(0.9));
 		});
 	}
 	

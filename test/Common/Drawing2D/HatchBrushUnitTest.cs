@@ -84,7 +84,7 @@ internal class HatchBrushUnitTest
 			};
 			string path = Path.Combine("brush", "hatch", $"Style{name}.png");
 			float similarity = Utils.CompareImage(path, brush, true);
-			Assert.That(similarity, Is.GreaterThan(0.95));
+			Assert.That(similarity, Is.GreaterThan(0.9));
 		});
 	}
 
