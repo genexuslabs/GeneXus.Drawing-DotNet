@@ -78,7 +78,7 @@ internal class HatchBrushUnitTest
 
 			string name = style switch
 			{
-				HatchStyle.Cross => "Cross", // defines LargeGrid nad Max aliases
+				HatchStyle.Cross => "Cross", // defines LargeGrid and Max aliases
 				HatchStyle.Horizontal => "Horizontal", // defines Min alias
 				_ => style.ToString()
 			};
