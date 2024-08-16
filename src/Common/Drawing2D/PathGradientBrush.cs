@@ -337,10 +337,10 @@ public sealed class PathGradientBrush : Brush
 			}
 		}
 
-		var bounds = m_path.GetBounds();
+		var bounds = m_path.GetBounds().m_rect;
 		
-		float transX = bounds.Width < bounds.Height ? bounds.Left : 0;
-		float transY = bounds.Height < bounds.Width ? bounds.Top : 0;
+		float transX = (bounds.MidX - center.X) / 2;
+		float transY = (bounds.MidY - center.Y) / 2;
 		transform.Translate(transX, transY);
 		
 		float scaleX = bounds.Width < bounds.Height ? bounds.Width / bounds.Height : 1;
