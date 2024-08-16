@@ -9,52 +9,97 @@ internal abstract class Utils
 		Directory.GetParent(Environment.CurrentDirectory).Parent.FullName,
 		"res", "images");
 
-	public static double DeltaE(Color color1, Color color2)
-    {
-        var lab1 = RgbToLab(color1);
-        var lab2 = RgbToLab(color2);
+	private static readonly double MAX_COLOR_DISTANCE = GetColorDistance(
+		Color.FromArgb(0, 0, 0, 0), 
+		Color.FromArgb(255, 255, 255, 255));
 
-		// human eye cannot distinguish colors below 1 DeltaE
-		return DistanceCie76(lab1, lab2, color1.A / 255.0, color2.A / 255.0);
+	public static RectangleF GetBoundingRectangle(PointF[] points)
+    {
+        if (points == null || points.Length == 0)
+            throw new ArgumentException("The points array cannot be null or empty.", nameof(points));
+		
+        float minX = points[0].X, maxX = points[0].X, minY = points[0].Y, maxY = points[0].Y;
+		foreach (PointF point in points)
+		{
+			minX = point.X < minX ? point.X : minX;
+			maxX = point.X > maxX ? point.X : maxX;
+			minY = point.Y < minY ? point.Y : minY;
+			maxY = point.Y > maxY ? point.Y : maxY;
+		}
+
+        float width = maxX - minX;
+        float height = maxY - minY;
+
+        return new RectangleF(minX, minY, width, height);
     }
 
-    private static double[] RgbToLab(Color color)
-    {
-        // convert RGB to XYZ
-        double r = PivotRgb(color.R / 255.0);
-        double g = PivotRgb(color.G / 255.0);
-        double b = PivotRgb(color.B / 255.0);
+	public static PointF GetCenterPoint(PointF[] points)
+	{
+		PointF center = new(0, 0);
+		foreach (PointF point in points)
+		{
+			center.X += point.X;
+			center.Y += point.Y;
+		}
+		center.X /= points.Length;
+		center.Y /= points.Length;
+		return center;
+	}
 
-        double x = r * 0.4124564 + g * 0.3575761 + b * 0.1804375;
-        double y = r * 0.2126729 + g * 0.7151522 + b * 0.0721750;
-        double z = r * 0.0193339 + g * 0.1191920 + b * 0.9503041;
+	public static double GetColorDistance(Color color1, Color color2)
+	{
+		double aDiff = Math.Pow(color1.A - color2.A, 2);
+		double rDiff = Math.Pow(color1.R - color2.R, 2);
+		double gDiff = Math.Pow(color1.G - color2.G, 2);
+		double bDiff = Math.Pow(color1.B - color2.B, 2);
+		return Math.Sqrt(aDiff + rDiff + gDiff + bDiff);
+	}
 
-        // convert XYZ to LAB
-        double[] xyz = { x / 0.95047, y / 1.00000, z / 1.08883 };
-        for (int i = 0; i < 3; i++)
-            xyz[i] = PivotXyz(xyz[i]);
+	public static Color GetAverageColor(Bitmap bm, int x, int y, int radius)
+	{
+		int aSum = 0, rSum = 0, gSum = 0, bSum = 0, count = 0;
+		for (int dy = -radius; dy <= radius; dy++)
+        {
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                int nx = x + dx;
+                int ny = y + dy;
 
-        return new[] 
-		{ 
-			116.0 * xyz[1] - 16, 
-			500.0 * (xyz[0] - xyz[1]), 
-			200.0 * (xyz[1] - xyz[2])
-		};
-    }
+				if (nx < 0 || ny < 0 || nx >= bm.Width || ny >= bm.Height)
+					continue;
 
-    private static double PivotRgb(double n)
-		=> (n > 0.04045) ? Math.Pow((n + 0.055) / 1.055, 2.4) : n / 12.92;
+				Color color = bm.GetPixel(nx, ny);
+				rSum += color.R;
+				gSum += color.G;
+				bSum += color.B;
+				aSum += color.A;
+				count++;
+            }
+        }
+		return Color.FromArgb(aSum / count, rSum / count, gSum / count, bSum / count);
+	}
 
-    private static double PivotXyz(double n)
-		=> (n > 0.008856) ? Math.Pow(n, 1.0 / 3.0) : (7.787 * n) + (16.0 / 116.0);
+	public static float GetSimilarity(Bitmap bm1, Bitmap bm2, double tolerance = 0.1, int window = 3)
+	{
+		float hits = 0f; // compare pixel by pixel considering the average in a box of window size
+		if (bm1.Size == bm2.Size)
+		{
+			int radius = window / 2;
+			double threshold = tolerance * MAX_COLOR_DISTANCE;
+			
+			for (int i = 0; i < bm1.Width; i++)
+			{
+				for (int j = 0; j < bm1.Height; j++)
+				{
+					Color avg1 = GetAverageColor(bm1, i, j, radius);
+					Color avg2 = GetAverageColor(bm2, i, j, radius);
 
-    private static double DistanceCie76(double[] lab1, double[] lab2, double alpha1, double alpha2)
-		=> Math.Sqrt(
-			Math.Pow(lab2[0] - lab1[0], 2) +
-			Math.Pow(lab2[1] - lab1[1], 2) +
-			Math.Pow(lab2[2] - lab1[2], 2) +
-			Math.Pow(alpha1 - alpha2, 2)
-		);
+					hits += GetColorDistance(avg1, avg2) < threshold ? 1 : 0;
+				}
+			}
+		}
+		return hits / (bm1.Width * bm1.Height);
+	}
 
 	public static float CompareImage(string filename, Brush brush, bool save = false)
 	{
@@ -67,21 +112,16 @@ internal abstract class Utils
 		using var g = Graphics.FromImage(bg);
 		g.FillRectangle(brush, bg.GetBounds(ref gu));
 
-		float hits = 0f; // compare pixel to pixel
-		for (int i = 0; i < bg.Width; i++)
-			for (int j = 0; j < bg.Height; j++)
-				hits += DeltaE(bg.GetPixel(i, j), bm.GetPixel(i, j)) < 35 ? 1 : 0;
-
 		if (save)
 		{
 			string savepath = Path.Combine(IMAGE_PATH, ".out", filename);
 
-			var dirpath = Path.GetDirectoryName(savepath);
+			string dirpath = Path.GetDirectoryName(savepath);
 			if (!Directory.Exists(dirpath)) Directory.CreateDirectory(dirpath);
 
 			bg.Save(savepath);
 		}
 
-		return hits / (bg.Width * bg.Height);
+		return GetSimilarity(bg, bm);
 	}
 }
