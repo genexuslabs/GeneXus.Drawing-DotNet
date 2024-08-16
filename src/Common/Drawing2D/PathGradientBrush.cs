@@ -291,7 +291,7 @@ public sealed class PathGradientBrush : Brush
 				break;
 		}
 
-		var points = new PointF[] { m_center, m_focus };
+		var points = new PointF[] { new(m_center.X, m_center.Y), new(m_focus.X, m_focus.Y) };
 		transform.TransformPoints(points);
 		transform.Reset();
 
