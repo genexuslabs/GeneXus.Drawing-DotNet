@@ -338,7 +338,7 @@ public sealed class Region : IDisposable
 	///  this <see cref='Region'/> when drawn using the specified <see cref='Graphics'/> (if it is defined).
 	/// </summary>
 	public bool IsVisible(PointF point, Graphics g = null)
-		=> IsVisible(PointF.Truncate(point), g);
+		=> IsVisible(new Point(unchecked((int)point.X), unchecked((int)point.Y)), g);
 
 	/// <summary>
 	///  Tests whether the specified <see cref='Point'/> structure is contained within 
