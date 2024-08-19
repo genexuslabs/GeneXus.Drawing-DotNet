@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -32,6 +33,13 @@ public struct PointF : IEquatable<PointF>
 		: this(unchecked((short)((dw >> 0) & 0xFFFF)), unchecked((short)((dw >> 16) & 0xFFFF))) { }
 
 	/// <summary>
+	/// Initializes a new instance of the <see cref='PointF'/> struct from the specified
+	/// <see cref="Vector2"/>.
+	/// </summary>
+	public PointF(Vector2 vector)
+		: this(vector.X, vector.Y) { }
+
+	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='PointF'/>.
 	/// </summary>
 	public override readonly string ToString() => $"{{X={X},Y={Y}}}";
@@ -48,6 +56,16 @@ public struct PointF : IEquatable<PointF>
 	/// Creates a <see cref='SizeF'/> with the coordinates of the specified <see cref='PointF'/> .
 	/// </summary>
 	public static explicit operator SizeF(PointF p) => new(p.X, p.Y);
+
+	/// <summary>
+	/// Converts the specified <see cref="PointF"/> to a <see cref="Vector2"/>.
+	/// </summary>
+	public static explicit operator Vector2(PointF point) => point.ToVector2();
+
+	/// <summary>
+	/// Converts the specified <see cref="Vector2"/> to a <see cref="PointF"/>.
+	/// </summary>
+	public static explicit operator PointF(Vector2 vector) => new(vector);
 
 	/// <summary>
 	/// Compares two <see cref='PointF'/> objects. The result specifies whether the values of the
@@ -137,6 +155,11 @@ public struct PointF : IEquatable<PointF>
 
 
 	#region Methods
+
+	/// <summary>
+	/// Creates a new <see cref="Vector2"/> from this <see cref="PointF"/>.
+	/// </summary>
+	public readonly Vector2 ToVector2() => new(m_point.X, m_point.Y);
 
 	/// <summary>
 	/// Translates a <see cref='PointF'/> by a given <see cref='SizeF'/> .
