@@ -149,6 +149,21 @@ public struct Point : IEquatable<Point>
 	public static Point Subtract(Point pt, Size sz) => new(pt.m_point - sz.m_size);
 
 	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a ceiling operation on all the coordinates.
+	/// </summary>
+	public static Point Ceiling(PointF value) => new(unchecked((int)Math.Ceiling(value.X)), unchecked((int)Math.Ceiling(value.Y)));
+
+	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a truncate operation on all the coordinates.
+	/// </summary>
+	public static Point Truncate(PointF value) => new(unchecked((int)value.X), unchecked((int)value.Y));
+
+	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a round operation on all the coordinates.
+	/// </summary>
+	public static PointF Round(PointF value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
+
+	/// <summary>
 	/// Translates this <see cref='Point'/> by the specified amount.
 	/// </summary>
 	public void Offset(int dx, int dy) => m_point.Offset(dx, dy);
