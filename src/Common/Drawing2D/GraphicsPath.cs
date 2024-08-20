@@ -547,7 +547,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			return;
 		
 		var data = PathData;
-		matrix.TransformPoints(data.Points);
+		matrix?.TransformPoints(data.Points);
 
 		using var path = new GraphicsPath(data.Points, data.Types, FillMode);
 		
