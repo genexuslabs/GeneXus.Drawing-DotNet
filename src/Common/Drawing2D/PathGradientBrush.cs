@@ -297,16 +297,14 @@ public sealed class PathGradientBrush : Brush
 		var center = points[0].m_point;
 		var focus = Math.Max(points[1].X, points[1].Y);
 
-		int index;
-
 		var blend = new Dictionary<float, object>() { [0] = m_color, [1] = Color.Empty };
-		for (index = 0; index < m_blend.Positions.Length; index++)
+		for (int index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
 		{
 			var pos = m_blend.Positions[index];
 			var fac = m_blend.Factors[index];
 			blend[pos] = fac; // blend factor
 		}
-		for (index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
+		for (int index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
 		{
 			var pos = m_colors.Positions[index];
 			var col = m_colors.Colors[index];
@@ -317,7 +315,7 @@ public sealed class PathGradientBrush : Brush
 		var colors = new SKColor[positions.Length];
 	
 		var lastColor = Color.Empty;
-		for (index = 0; index < positions.Length; index++)
+		for (int index = 0; index < positions.Length; index++)
 		{
 			var key = positions[index];
 			var value = blend[key];

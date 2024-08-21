@@ -366,16 +366,14 @@ public sealed class LinearGradientBrush : Brush
 		var gamma = m_gamma ? 2.2f : 1.0f;
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
 
-		int index;
-
 		var blend = new Dictionary<float, object>();
-		for (index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
+		for (int index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
 		{
 			var pos = m_blend.Positions[index];
 			var fac = m_blend.Factors[index];
 			blend[pos] = fac; // blend factor
 		}
-		for (index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
+		for (int index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
 		{
 			var pos = m_colors.Positions[index];
 			var col = m_colors.Colors[index];
@@ -386,7 +384,7 @@ public sealed class LinearGradientBrush : Brush
 		var colors = new SKColor[positions.Length];
 	
 		var lastColor = Color.Empty;
-		for (index = 0; index < positions.Length; index++)
+		for (int index = 0; index < positions.Length; index++)
 		{
 			var key = positions[index];
 			var value = blend[key];
