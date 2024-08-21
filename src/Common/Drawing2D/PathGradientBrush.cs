@@ -156,11 +156,9 @@ public sealed class PathGradientBrush : Brush
 		set => UpdateShader(() =>
 		{
 			var interpolation = value ?? throw new ArgumentNullException(nameof(value));
-			if (Enumerable.SequenceEqual(m_colors.Positions, interpolation.Positions) && Enumerable.SequenceEqual(m_colors.Colors, interpolation.Colors))
-				return;
-			if (interpolation.Positions[0] != 0 )
+			if (interpolation.Positions[0] != 0)
 				throw new ArgumentException("first element must be equal to 0.", nameof(value));
-			if (interpolation.Positions[value.Positions.Length - 1] != 1)
+			if (interpolation.Positions[interpolation.Positions.Length - 1] != 1 && interpolation.Positions.Length > 1)
 				throw new ArgumentException("last element must be equal to 1.", nameof(value));
 			m_colors = interpolation;
 		});
