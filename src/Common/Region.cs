@@ -490,7 +490,7 @@ public sealed class Region : IDisposable
 			var rect = new SKRectI
 			{
 				Left   = BitConverter.ToInt32(rgnData, offset + 0),
-				Top	= BitConverter.ToInt32(rgnData, offset + 4),
+				Top	   = BitConverter.ToInt32(rgnData, offset + 4),
 				Right  = BitConverter.ToInt32(rgnData, offset + 8),
 				Bottom = BitConverter.ToInt32(rgnData, offset + 12)
 			};
