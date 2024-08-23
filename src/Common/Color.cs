@@ -297,6 +297,20 @@ public readonly struct Color : IEquatable<Color>
 	/// </summary>
 	public readonly KnownColor ToKnownColor() => Enum.TryParse(Name, out KnownColor color) ? color : 0;
 
+	/// <summary>
+	/// Linearly interpolates two <see cref='Color'/> by a given amount clamped between 0 and 1.
+	/// </summary>
+	public static Color Blend(Color color1, Color color2, float amount)
+	{
+		if (amount <= 0) return color1;
+		if (amount >= 1) return color2;
+		int r = (int)(color1.R + (color2.R - color1.R) * amount);
+        int g = (int)(color1.G + (color2.G - color1.G) * amount);
+        int b = (int)(color1.B + (color2.B - color1.B) * amount);
+        int a = (int)(color1.A + (color2.A - color1.A) * amount);
+        return FromArgb(a, r, g, b);
+	}
+
 	#endregion
 
 
