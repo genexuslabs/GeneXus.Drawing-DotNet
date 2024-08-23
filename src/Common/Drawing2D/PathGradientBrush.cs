@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Numerics;
 using SkiaSharp;
 
 namespace GeneXus.Drawing.Drawing2D;
@@ -269,6 +270,101 @@ public sealed class PathGradientBrush : Brush
 		return new GraphicsPath(points, types);
 	}
 
+	private Color ComputeColor(int x, int y, Vector2[] points, PathPointType[] types, Color[] colors, float[] positions)
+	{
+		var center = m_center.ToVector2();
+		var color = Color.Transparent;
+		if (m_path.IsVisible(x, y))
+		{
+			var coord = new Vector2(x, y);
+			if (m_surround.Length > 1)
+			{
+				// determine the weights of this point to the corners of the path
+				var weight = new float[points.Length];
+				for (int i = 0; i < points.Length; i++)
+				{
+					var p0 = points[(i + 0) % points.Length];
+					var p1 = points[(i + 1) % points.Length];
+
+					var e0 = p1 - p0;
+					var e1 = coord - p0;
+					var ep = p0 + e0 * Vector2.Dot(e0, e1) / Vector2.Dot(e0, e0);
+
+					int j = (i + points.Length - 1) % points.Length;
+					weight[j] = Vector2.Distance(coord, ep);
+				}
+
+				float total = weight.Sum(); // for normalizing in 0..1
+
+				// determine the blended color for the given point by weights
+				color = colors[colors.Length - 1];
+				for (int i = 0; i < weight.Length; i++)
+				{
+					float amount = weight[i] / total;
+					int j = Math.Min(i, colors.Length - 1); // NOTE: there could be less colors than vertices
+					color = Color.Blend(color, colors[j], amount);
+				}
+
+				// change the colors and positions according to surrounded colors
+				colors = new[] { color, colors[colors.Length - 1] };
+				positions = new[] { 0f, 1f };
+			}
+
+			// determine the distance of this point to the edge of the path
+			float dist = float.MaxValue, dmax = 0f;
+			for (int i = 0; i < points.Length; i++)
+			{
+				var p0 = points[(i + 0) % points.Length];
+				var p1 = points[(i + 1) % points.Length];
+				var p2 = points[(i + 2) % points.Length];
+
+				var type = types[i % types.Length];
+				switch(type)
+				{
+					case PathPointType.Line:
+						var e0 = p1 - p0;
+						var e1 = coord - p0;
+						var ep = p0 + e0 * Vector2.Dot(e0, e1) / Vector2.Dot(e0, e0);
+						
+						dist = Math.Min(dist, Vector2.Distance(coord, ep));
+						dmax = Math.Max(dmax, Vector2.Distance(center, ep));
+						break;
+
+					case PathPointType.Bezier:
+						for (float t = 0; t < 1; t += 0.01f)
+						{
+							var c0 = Vector2.Lerp(p0, p1, t);
+							var c1 = Vector2.Lerp(p1, p2, t);
+							var bp = Vector2.Lerp(c0, c1, t);
+							
+							dist = Math.Min(dist, Vector2.Distance(coord, bp));
+							dmax = Math.Max(dmax, Vector2.Distance(center, bp));
+						}
+						i++;
+						break;
+
+					default:
+						throw new ArgumentException($"unknown type 0x{type:X2} at index {i}", nameof(types));
+				}
+			}
+
+			dist /= dmax; // normalized in 0..1
+
+			// determine the blended color for the given point by positions
+			color = colors[colors.Length - 1];
+			for (int i = 0; i < positions.Length - 1; i++)
+			{
+				if (dist >= positions[i] && dist <= positions[i + 1])
+				{
+					float amount = (dist - positions[i]) / (positions[i + 1] - positions[i]);
+					color = Color.Blend(colors[i], colors[i + 1], amount);
+					break;
+				}
+			}
+		}
+		return color;
+	}
+
 	private void UpdateShader(Action action)
 	{
 		action();
@@ -287,30 +383,51 @@ public sealed class PathGradientBrush : Brush
 				break;
 		}
 
-		var points = new PointF[] { new(m_center.X, m_center.Y), new(m_focus.X, m_focus.Y) };
-		transform.TransformPoints(points);
-		transform.Reset();
+		var bounds = m_path.GetBounds();
+		var points = m_path.PathPoints
+			.Select(point => point.ToVector2())
+			.ToArray();
+		var types = m_path.PathTypes
+			.Select(type => (PathPointType)(type & (byte)PathPointType.PathTypeMask))
+			.Skip(1) // skip PathPointType.Start
+			.ToArray();
 
-		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
-		var center = points[0].m_point;
-		var focus = Math.Max(points[1].X, points[1].Y);
-
-		var blend = new Dictionary<float, object>() { [0] = m_color, [1] = Color.Empty };
-		for (int index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
+		var blend = new Dictionary<float, object>() { [0] = m_surround[0], [1] = m_color };
+		if (m_surround.Length > 1)
 		{
-			var pos = m_blend.Positions[index];
-			var fac = m_blend.Factors[index];
-			blend[pos] = fac; // blend factor
+			blend[1] ??= Color.Black;
+			for (int index = 0; index < m_surround.Length; index++)
+			{
+				var pos = 1f * index / m_surround.Length;
+				var col = m_surround[index];
+				blend[pos] = col; // corner color
+			}
 		}
-		for (int index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
+		else
 		{
-			var pos = m_colors.Positions[index];
-			var col = m_colors.Colors[index];
-			blend[pos] = col; // specific color
+			blend[1] ??= Color.White;
+			if (m_blend.Positions.Length > 1)
+			{
+				for (int index = 0; index < m_blend.Positions.Length; index++)
+				{
+					var pos = m_blend.Positions[index];
+					var fac = m_blend.Factors[index];
+					blend[pos] = fac; // edge factor
+				}
+			}
+			if (m_colors.Positions.Length > 1)
+			{
+				for (int index = 0; index < m_colors.Positions.Length; index++)
+				{
+					var pos = m_colors.Positions[index];
+					var col = m_colors.Colors[index];
+					blend[pos] = col; // edge color
+				}
+			}
 		}
 
 		var positions = blend.Keys.OrderBy(key => key).ToArray();
-		var colors = new SKColor[positions.Length];
+		var colors = new Color[positions.Length];
 	
 		var lastColor = Color.Empty;
 		for (int index = 0; index < positions.Length; index++)
@@ -319,32 +436,33 @@ public sealed class PathGradientBrush : Brush
 			var value = blend[key];
 			if (value is Color currColor)
 			{
-				colors[index] = currColor.m_color;
+				colors[index] = currColor;
 				lastColor = currColor;
 				continue;
 			}
 			if (value is float factor)
 			{
 				var color = ApplyFactor(lastColor, factor);
-				colors[index] = color.m_color;
+				colors[index] = color;
 				continue;
 			}
 		}
 
-		var bounds = m_path.GetBounds().m_rect;
-		
-		float transX = (bounds.MidX - center.X) / 2;
-		float transY = (bounds.MidY - center.Y) / 2;
-		transform.Translate(transX, transY);
-		
-		float scaleX = bounds.Width < bounds.Height ? bounds.Width / bounds.Height : 1;
-		float scaleY = bounds.Height < bounds.Width ? bounds.Height / bounds.Width : 1;
-		transform.Scale(scaleX, scaleY); // as an ellipse
-		
-		var matrix = transform.m_matrix;
-		float radius = Math.Max(bounds.Width, bounds.Height) / 2;
+		using var bitmap = new Bitmap(bounds.Width + bounds.Left, bounds.Height + bounds.Top);
+		for (int x = 0; x < bitmap.Width; x++)
+		{
+			for (int y = 0; y < bitmap.Height; y++)
+			{
+				var color = ComputeColor(x, y, points, types, colors, positions);
+				bitmap.SetPixel(x, y, color);
+			}
+		}
 
-		m_paint.Shader = SKShader.CreateRadialGradient(center, radius, colors, positions, mode, matrix);
+		var source = bitmap.m_bitmap;
+		var matrix = transform.m_matrix;
+		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
+
+		m_paint.Shader = SKShader.CreateBitmap(source, mode, mode, matrix);
 	}
 
 	#endregion
