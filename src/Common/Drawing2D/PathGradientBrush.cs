@@ -14,13 +14,12 @@ public sealed class PathGradientBrush : Brush
 	private Blend m_blend;
 	private ColorBlend m_colors;
 	private PointF m_center, m_focus;
-	private Color m_color;
+	private Color? m_color;
 	private Color[] m_surround;
 
 	private PathGradientBrush(GraphicsPath path, WrapMode mode, Matrix transform)
 		: base(new SKPaint { })
 	{
-		var color = Color.White;
 		var points = path.PathPoints;
 		if (points.First() == points.Last())
 			points = points.Take(points.Length - 1).ToArray();
@@ -37,18 +36,12 @@ public sealed class PathGradientBrush : Brush
 		Array.Copy(new[] { Color.Empty }, m_colors.Colors, 1);
 		Array.Copy(new[] { 0f }, m_colors.Positions, 1);
 
-		m_center = new PointF(0, 0);
-		foreach (var point in points)
-		{
-			m_center.X += point.X;
-			m_center.Y += point.Y;
-		}
-		m_center.X /= points.Length;
-		m_center.Y /= points.Length;
+		m_center = new(
+			points.Average(pt => pt.X), 
+			points.Average(pt => pt.Y));
 
-		m_color = color;
-		m_focus = new PointF(0, 0);
-		m_surround = new[] { color };
+		m_focus = new(0, 0);
+		m_surround = new[] { Color.White };
 
 		UpdateShader(() => { });
 	}
@@ -114,7 +107,7 @@ public sealed class PathGradientBrush : Brush
 	///  Gets or sets a <see cref='Drawing.Blend'/> that specifies positions and factors that define a 
 	///  custom falloff for the gradient.
 	/// </summary>
-	public Blend Blend 
+	public Blend Blend
 	{
 		get => m_blend; 
 		set => UpdateShader(() => m_blend = value ?? throw new ArgumentNullException(nameof(value)));
@@ -123,9 +116,9 @@ public sealed class PathGradientBrush : Brush
 	/// <summary>
 	///  Gets or sets the <see cref='Color'/> at the center of the path gradient.
 	/// </summary>
-	public Color CenterColor 
+	public Color CenterColor
 	{ 
-		get => m_color;
+		get => m_color ?? (m_surround.Length > 1 ? Color.Black : Color.White);
 		set => UpdateShader(() => m_color = value);
 	}
 
