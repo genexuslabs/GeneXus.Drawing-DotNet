@@ -325,20 +325,32 @@ public sealed class PathGradientBrush : Brush
 						var e0 = p1 - p0;
 						var e1 = coord - p0;
 						var ep = p0 + e0 * Vector2.Dot(e0, e1) / Vector2.Dot(e0, e0);
-						
-						dist = Math.Min(dist, Vector2.Distance(coord, ep));
-						dmax = Math.Max(dmax, Vector2.Distance(center, ep));
+
+						float distEp = Vector2.Distance(coord, ep);
+						float dmaxEp = Vector2.Distance(center, ep);
+
+						if (distEp < dist)
+						{
+							dist = distEp;
+							dmax = dmaxEp;
+						}
 						break;
 
 					case PathPointType.Bezier:
-						for (float t = 0; t < 1; t += 0.01f)
+						for (float t = 0; t <= 1; t += 0.1f)
 						{
 							var c0 = Vector2.Lerp(p0, p1, t);
 							var c1 = Vector2.Lerp(p1, p2, t);
-							var bp = Vector2.Lerp(c0, c1, t);
-							
-							dist = Math.Min(dist, Vector2.Distance(coord, bp));
-							dmax = Math.Max(dmax, Vector2.Distance(center, bp));
+							var cp = Vector2.Lerp(c0, c1, t);
+
+							var distCp = Vector2.Distance(coord, cp);
+							var dmaxCp = Vector2.Distance(center, cp);
+
+							if (distCp < dist)
+							{
+								dist = distCp;
+								dmax = dmaxCp;
+							}
 						}
 						i++;
 						break;
@@ -448,6 +460,7 @@ public sealed class PathGradientBrush : Brush
 			}
 		}
 
+		// NOTE: Skia does not offers path gradient shader, that's why we use a bitmap
 		using var bitmap = new Bitmap(bounds.Width + bounds.Left, bounds.Height + bounds.Top);
 		for (int x = 0; x < bitmap.Width; x++)
 		{
