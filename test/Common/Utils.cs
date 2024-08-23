@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace GeneXus.Drawing.Test;
 
@@ -18,32 +19,18 @@ internal abstract class Utils
         if (points == null || points.Length == 0)
             throw new ArgumentException("The points array cannot be null or empty.", nameof(points));
 		
-        float minX = points[0].X, maxX = points[0].X, minY = points[0].Y, maxY = points[0].Y;
-		foreach (PointF point in points)
-		{
-			minX = point.X < minX ? point.X : minX;
-			maxX = point.X > maxX ? point.X : maxX;
-			minY = point.Y < minY ? point.Y : minY;
-			maxY = point.Y > maxY ? point.Y : maxY;
-		}
-
-        float width = maxX - minX;
-        float height = maxY - minY;
-
-        return new RectangleF(minX, minY, width, height);
+        float xMin = points.Min(pt => pt.X);
+		float xMax = points.Max(pt => pt.X);
+		float yMin = points.Min(pt => pt.Y);
+		float yMax = points.Max(pt => pt.Y);
+		return new(xMin, yMin, xMax - xMin, yMax - yMin);
     }
 
 	public static PointF GetCenterPoint(PointF[] points)
 	{
-		PointF center = new(0, 0);
-		foreach (PointF point in points)
-		{
-			center.X += point.X;
-			center.Y += point.Y;
-		}
-		center.X /= points.Length;
-		center.Y /= points.Length;
-		return center;
+		float xCenter = points.Average(pt => pt.X);
+		float yCenter = points.Average(pt => pt.Y);
+		return new(xCenter, yCenter);
 	}
 
 	public static double GetColorDistance(Color color1, Color color2)
