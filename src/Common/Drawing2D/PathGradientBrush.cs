@@ -169,7 +169,12 @@ public sealed class PathGradientBrush : Brush
 	public Color[] SurroundColors 
 	{
 		get => m_surround;
-		set => UpdateShader(() => m_surround = value);
+		set => UpdateShader(() => 
+		{
+			if (value.Length > m_path.PointCount)
+				throw new ArgumentException("parameter is not valid.", nameof(value));
+			m_surround = value;
+		});
 	}
 
 	/// <summary>
