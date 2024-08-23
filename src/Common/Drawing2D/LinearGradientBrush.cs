@@ -11,7 +11,7 @@ public sealed class LinearGradientBrush : Brush
 	private RectangleF m_rect;
 	private WrapMode m_mode;
 	private Matrix m_transform;
-	private Blend m_blend;
+	private Blend m_factors;
 	private ColorBlend m_colors;
 	private bool m_gamma;
 
@@ -24,9 +24,9 @@ public sealed class LinearGradientBrush : Brush
 
 		m_gamma = false;
 		
-		m_blend = new();
-		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
-		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
+		m_factors = new();
+		Array.Copy(new[] { 1f }, m_factors.Factors, 1);
+		Array.Copy(new[] { 0f }, m_factors.Positions, 1);
 
 		var uniform = GetUniformArray(colors.Length);
 
@@ -104,8 +104,8 @@ public sealed class LinearGradientBrush : Brush
 	/// </summary>
 	public Blend Blend 
 	{ 
-		get => m_blend;
-		set => UpdateShader(() => m_blend = value ?? throw new ArgumentNullException(nameof(value)));
+		get => m_factors;
+		set => UpdateShader(() => m_factors = value ?? throw new ArgumentNullException(nameof(value)));
 	}
 
 	/// <summary>
@@ -223,13 +223,13 @@ public sealed class LinearGradientBrush : Brush
 	///  Creates a gradient falloff based on a bell-shaped curve.
 	/// </summary>
 	public void SetSigmaBellShape(float focus, float scale = 1.0f)
-		=> UpdateShader(() => m_blend = GetSigmaBellShape(focus, scale));
+		=> UpdateShader(() => m_factors = GetSigmaBellShape(focus, scale));
 
 	/// <summary>
 	///  Creates a linear gradient with a center color and a linear falloff to a single color on both ends.
 	/// </summary>
 	public void SetBlendTriangularShape(float focus, float scale = 1.0f)
-		=> UpdateShader(() => m_blend = GetBlendTriangularShape(focus, scale));
+		=> UpdateShader(() => m_factors = GetBlendTriangularShape(focus, scale));
 
 	#endregion
 
@@ -367,10 +367,10 @@ public sealed class LinearGradientBrush : Brush
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
 
 		var blend = new Dictionary<float, object>();
-		for (int index = 0; index < m_blend.Positions.Length && m_blend.Positions.Length > 1; index++)
+		for (int index = 0; index < m_factors.Positions.Length && m_factors.Positions.Length > 1; index++)
 		{
-			var pos = m_blend.Positions[index];
-			var fac = m_blend.Factors[index];
+			var pos = m_factors.Positions[index];
+			var fac = m_factors.Factors[index];
 			blend[pos] = fac; // blend factor
 		}
 		for (int index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)

@@ -12,7 +12,7 @@ public sealed class PathGradientBrush : Brush
 	private GraphicsPath m_path;
 	private WrapMode m_mode;
 	private Matrix m_transform;
-	private Blend m_blend;
+	private Blend m_factors;
 	private ColorBlend m_colors;
 	private PointF m_center, m_focus;
 	private Color? m_color;
@@ -29,9 +29,9 @@ public sealed class PathGradientBrush : Brush
 		m_mode = mode;
 		m_transform = transform;
 
-		m_blend = new();
-		Array.Copy(new[] { 1f }, m_blend.Factors, 1);
-		Array.Copy(new[] { 0f }, m_blend.Positions, 1);
+		m_factors = new();
+		Array.Copy(new[] { 1f }, m_factors.Factors, 1);
+		Array.Copy(new[] { 0f }, m_factors.Positions, 1);
 
 		m_colors = new();
 		Array.Copy(new[] { Color.Empty }, m_colors.Colors, 1);
@@ -110,8 +110,8 @@ public sealed class PathGradientBrush : Brush
 	/// </summary>
 	public Blend Blend
 	{
-		get => m_blend; 
-		set => UpdateShader(() => m_blend = value ?? throw new ArgumentNullException(nameof(value)));
+		get => m_factors; 
+		set => UpdateShader(() => m_factors = value ?? throw new ArgumentNullException(nameof(value)));
 	}
 
 	/// <summary>
@@ -239,14 +239,14 @@ public sealed class PathGradientBrush : Brush
 	///  Creates a gradient with a center color and a linear falloff to each surrounding color.
 	/// </summary>
 	public void SetBlendTriangularShape(float focus, float scale = 1.0f)
-		=> UpdateShader(() => m_blend = GetBlendTriangularShape(focus, scale));
+		=> UpdateShader(() => m_factors = GetBlendTriangularShape(focus, scale));
 
 	/// <summary>
 	///  Creates a gradient brush that changes color starting from the center of the path outward 
 	///  to the path's boundary. The transition from one color to another is based on a bell-shaped curve.
 	/// </summary>
 	public void SetSigmaBellShape(float focus, float scale = 1.0f)
-		=> UpdateShader(() => m_blend = GetSigmaBellShape(focus, scale));
+		=> UpdateShader(() => m_factors = GetSigmaBellShape(focus, scale));
 
 	/// <summary>
 	///  Translates the local geometric transformation of this <see cref='PathGradientBrush'/> object
@@ -406,12 +406,12 @@ public sealed class PathGradientBrush : Brush
 		else
 		{
 			blend[1] ??= Color.White;
-			if (m_blend.Positions.Length > 1)
+			if (m_factors.Positions.Length > 1)
 			{
-				for (int index = 0; index < m_blend.Positions.Length; index++)
+				for (int index = 0; index < m_factors.Positions.Length; index++)
 				{
-					var pos = m_blend.Positions[index];
-					var fac = m_blend.Factors[index];
+					var pos = m_factors.Positions[index];
+					var fac = m_factors.Factors[index];
 					blend[pos] = fac; // edge factor
 				}
 			}
