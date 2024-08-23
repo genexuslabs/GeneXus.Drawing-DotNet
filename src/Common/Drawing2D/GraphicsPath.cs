@@ -1043,8 +1043,8 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 	private bool IsVisible(SKPoint point, SKRect? bounds)
 	{
-		bool isBoundContained = bounds?.Contains(point) ?? true;
-		return isBoundContained && m_path.Bounds.Contains(point.X, point.Y);
+		bool isBoundContained = bounds?.Contains(point) ?? m_path.Bounds.Contains(point.X, point.Y);
+		return isBoundContained && m_path.Contains(point.X + 0.5f, point.Y + 0.5f); // NOTE: use the next value because skia issue
 	}
 
 	#endregion
