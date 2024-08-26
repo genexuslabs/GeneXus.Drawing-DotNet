@@ -62,33 +62,33 @@ This section describes each module (namespace) specifiying which elements are pa
 ### GeneXus.Drawing.Common
 Basic graphics funcionalities based on `System.Drawing`.
 
-| <div style="width: 200px;">Name<div> | Type     | Description
-|--------------------------------------|----------|--------------
-| `Bitmap`           | Class    | Represents an image defined by pixels.
-| `Color`            | Class    | Defines colors used for drawing.
-| `Font`             | Class    | Defines a format for text, including font family, size, and style.
-| `Icon`             | Class    | Represents an icon image.
-| `Image`            | Class    | Represents an image in a specific format.
+| Name                 | Type     | Description
+|----------------------|----------|--------------
+| `Bitmap`             | Class    | Represents an image defined by pixels.
+| `Color`              | Class    | Defines colors used for drawing.
+| `Font`               | Class    | Defines a format for text, including font family, size, and style.
+| `Icon`               | Class    | Represents an icon image.
+| `Image`              | Class    | Represents an image in a specific format.
 | `Svg` <sup>(1)</sup> | Class    | Represents Scalable Vector Graphics.
-| `Point`            | Struct   | Defines an x and y coordinate in a 2D plane.
-| `PointF`           | Struct   | Defines a floating-point x and y coordinate in a 2D plane.
-| `Rectangle`        | Struct   | Defines an x, y, width, and height of a rectangle.
-| `RectangleF`       | Struct   | Defines a floating-point x, y, width, and height of a rectangle.
-| `Size`             | Struct   | Defines the width and height of a rectangular area.
-| `SizeF`            | Struct   | Defines the width and height of a rectangular area with floating-point values.
-| `FontSlant`        | Enum     | Specifies the slant of a font.
-| `FontStyle`        | Enum     | Specifies the style of a font.
-| `GraphicsUnit`     | Enum     | Specifies the unit of measure for drawing operations.
-| `KnownColor`       | Enum     | Defines predefined colors.
-| `RotateFlipType`   | Enum     | Specifies how an image is rotated or flipped.
+| `Point`              | Struct   | Defines an x and y coordinate in a 2D plane.
+| `PointF`             | Struct   | Defines a floating-point x and y coordinate in a 2D plane.
+| `Rectangle`          | Struct   | Defines an x, y, width, and height of a rectangle.
+| `RectangleF`         | Struct   | Defines a floating-point x, y, width, and height of a rectangle.
+| `Size`               | Struct   | Defines the width and height of a rectangular area.
+| `SizeF`              | Struct   | Defines the width and height of a rectangular area with floating-point values.
+| `FontSlant`          | Enum     | Specifies the slant of a font.
+| `FontStyle`          | Enum     | Specifies the style of a font.
+| `GraphicsUnit`       | Enum     | Specifies the unit of measure for drawing operations.
+| `KnownColor`         | Enum     | Defines predefined colors.
+| `RotateFlipType`     | Enum     | Specifies how an image is rotated or flipped.
 
 <small><sup>(1)</sup> New element (does not belogs to `System.Drawing` library).</small>
 
 ### GeneXus.Drawing.Imaging
 Advanced image processing based on `System.Drawing.Imaging` to support sophisticated image manipulation and format handling.
 
-| <div style="width: 200px;">Name<div> | Type     | Description
-|--------------------------------------|----------|--------------
+| Name               | Type     | Description
+|--------------------|----------|--------------
 | `ColorPalette`     | Class    | Defines a color palette for an image.
 | `ImageFormat`      | Class    | Specifies the format of an image file.
 | `PixelFormat`      | Class    | Specifies the format of the pixels in an image.
@@ -98,20 +98,20 @@ Advanced image processing based on `System.Drawing.Imaging` to support sophistic
 ### GeneXus.Drawing.Text
 Advanced typographic features based on `System.Drawing.Text` for managing and rendering fonts and text.
 
-| <div style="width: 200px;">Name<div> | Type     | Description
-|--------------------------------------|----------|--------------
-| `FontCollection`   | Class    | Represents a collection of fonts.
+| Name                      | Type     | Description
+|---------------------------|----------|--------------
+| `FontCollection`          | Class    | Represents a collection of fonts.
 | `InstalledFontCollection` | Class | Represents a collection of installed fonts.
-| `PrivateFontCollection` | Class | Represents a collection of private fonts.
-| `GenericFontFamilies` | Enum | Specifies generic font families.
+| `PrivateFontCollection`   | Class | Represents a collection of private fonts.
+| `GenericFontFamilies`     | Enum | Specifies generic font families.
 
 ### GeneXus.Drawing.Interop
 Advanced interoperability utilities based on `System.Drawing.Interop` that includes definitions used in font management and graphics rendering.
 
-| <div style="width: 200px;">Name<div> | Type     | Description
-|--------------------------------------|----------|--------------
-| `GDIDEFS`          | Enum     | Defines constants for GDI+.
-| `LOGFONT`          | Struct   | Defines the logical font information for text rendering.
+| Name      | Type     | Description
+|-----------|----------|--------------
+| `GDIDEFS` | Enum     | Defines constants for GDI+.
+| `LOGFONT` | Struct   | Defines the logical font information for text rendering.
 
 # How to build
 
