@@ -1,5 +1,5 @@
 # GeneXus.Drawing-DotNet
-A cross-platform implementation of select `System.Drawing` elements tailored for GeneXus development.
+A cross-platform implementation of selected `System.Drawing` elements tailored for GeneXus development.
 
 ## Status
 | Branch | Build
