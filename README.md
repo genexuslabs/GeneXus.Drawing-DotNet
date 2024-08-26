@@ -5,7 +5,6 @@ A cross-platform implementation of selected `System.Drawing` elements tailored f
 | Branch | Build
 |--------|---
 | main   | |[![](https://github.com/genexuslabs/GeneXus.Drawing-DotNet/workflows/Build/badge.svg?branch=main)](https://github.com/genexuslabs/genexus.drawing-dotnet/actions?query=workflow%3ABuild+branch%3Amain)
-| beta   | |[![](https://github.com/genexuslabs/genexus.drawing-dotnet/workflows/Build/badge.svg?branch=beta)](https://github.com/genexuslabs/genexus.drawing-dotnet/actions?query=workflow%3ABuild+branch%3Abeta)
 
 ## History
 The creation of this library was driven by Microsoft's decision to make the `System.Drawing.Common` NuGet package as Windows-specific as of .NET 6. For further details about this annoucement, please refer to [Microsoft Learn Article: System.Drawing.Common only supported on Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only).

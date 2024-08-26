@@ -1,7 +1,7 @@
 # Contribution
 Contribution is encouraged so long as they adhere to our guidelines and complies with Apache 2.0 licence.
 
-This repository uses _topic branches_ for organizing contributions always starting from the `main` branch. While there are several other branches in this repository (e.g. `beta`), contributions will only be accepted on the `main` branch. Please refer to [Branches](#branches) section for detailed information.
+This repository uses _topic branches_ for organizing contributions always starting from the `main` branch. While there are several other branches in this repository (e.g. `release/*`), contributions will only be accepted on the `main` branch. Please refer to [Branches](#branches) section for detailed information.
 
 To be considered for inclusion, a contribution must fall into one of the following categories:
 
@@ -82,8 +82,7 @@ A collection of resources that may be helpful for implementing `GeneXus.Drawing`
 The following well-defined branches can be found within a repository.
 | Name          | Description
 |---------------|-------------
-|`main`			| Stable development version of this library.
-|`beta`			| Development version that integrates every pull request for this library.
+| `main`			| Stable development version of this library.
 | `release/*`	| A set of stable versions of this library already released.
-|`issue/*`		| A set of topic branches aimed to fix bugs in this library.
-|`feature/*`	| A set of topic branches aimed to include features in this library.
+| `issue/*`		| A set of topic branches aimed to fix bugs in this library.
+| `feature/*`	| A set of topic branches aimed to include features in this library.
