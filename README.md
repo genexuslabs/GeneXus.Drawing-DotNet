@@ -24,6 +24,8 @@ This repository is organized as follows:
 Root
 ├─ src                           : source code
 │  ├─ Common
+│  │  ├─ Drawing2D               : elements for GeneXus.Drawing.Drawing2D
+│  │  │  └─ ...
 │  │  ├─ Imaging                 : elements for GeneXus.Drawing.Imaging
 │  │  │  └─ ...
 │  │  ├─ Interop                 : elements for GeneXus.Drawing.Interop
@@ -32,10 +34,12 @@ Root
 │  │  │  └─ ...
 │  │  └─ ...                     : elements for GeneXus.Drawing
 │  │ 
-│  └─ PackageREADME.md
+│  └─ PackageREADME.md           : package readme file
 │
 ├─ test                          : unit tests
 │  ├─ Common
+│  │  ├─ Drawing2D               : unit-tests for GeneXus.Drawing.Drawing2D
+│  │  │  └─ ...
 │  │  ├─ Text                    : unit-tests for GeneXus.Drawing.Text
 │  │  │  └─ ...
 │  │  └─ ...                     : unit-tests for GeneXus.Drawing
@@ -61,27 +65,66 @@ This section describes each module (namespace) specifiying which elements are pa
 ### GeneXus.Drawing.Common
 Basic graphics funcionalities based on `System.Drawing`.
 
-| Name                 | Type     | Description
-|----------------------|----------|--------------
-| `Bitmap`             | Class    | Represents an image defined by pixels.
-| `Color`              | Class    | Defines colors used for drawing.
-| `Font`               | Class    | Defines a format for text, including font family, size, and style.
-| `Icon`               | Class    | Represents an icon image.
-| `Image`              | Class    | Represents an image in a specific format.
-| `Svg` <sup>(1)</sup> | Class    | Represents Scalable Vector Graphics.
-| `Point`              | Struct   | Defines an x and y coordinate in a 2D plane.
-| `PointF`             | Struct   | Defines a floating-point x and y coordinate in a 2D plane.
-| `Rectangle`          | Struct   | Defines an x, y, width, and height of a rectangle.
-| `RectangleF`         | Struct   | Defines a floating-point x, y, width, and height of a rectangle.
-| `Size`               | Struct   | Defines the width and height of a rectangular area.
-| `SizeF`              | Struct   | Defines the width and height of a rectangular area with floating-point values.
-| `FontSlant`          | Enum     | Specifies the slant of a font.
-| `FontStyle`          | Enum     | Specifies the style of a font.
-| `GraphicsUnit`       | Enum     | Specifies the unit of measure for drawing operations.
-| `KnownColor`         | Enum     | Defines predefined colors.
-| `RotateFlipType`     | Enum     | Specifies how an image is rotated or flipped.
+| Name                    | Type     | Description
+|-------------------------|----------|--------------
+| `Bitmap`                | Class    | Represents an image defined by pixels.
+| `Brush`                 | Class    | Abstract class for brushes used to fill graphics shapes.
+| `Color`                 | Class    | Defines colors used for drawing.
+| `Font`                  | Class    | Defines a format for text, including font family, size, and style.
+| `Graphics`              | Class    | Provides methods for drawing on a drawing surface.
+| `Icon`                  | Class    | Represents an icon image.
+| `Image`                 | Class    | Represents an image in a specific format.
+| `Pen`                   | Class    | Defines an object used to draw lines and curves.
+| `Region`                | Class    | Defines the area of a drawing surface.
+| `Svg` <sup>(1)</sup>    | Class    | Represents Scalable Vector Graphics.
+| `TextureBrush`          | Class    | Defines a brush that uses an image to fill shapes.
+| `Point`                 | Struct   | Defines an x and y coordinate in a 2D plane.
+| `PointF`                | Struct   | Defines a floating-point x and y coordinate in a 2D plane.
+| `Rectangle`             | Struct   | Defines an x, y, width, and height of a rectangle.
+| `RectangleF`            | Struct   | Defines a floating-point x, y, width, and height of a rectangle.
+| `Size`                  | Struct   | Defines the width and height of a rectangular area.
+| `SizeF`                 | Struct   | Defines the width and height of a rectangular area with floating-point values.
+| `CopyPixelOperation`    | Enum     | Specifies the type of pixel copying operation.
+| `FontSlant`             | Enum     | Specifies the slant of a font.
+| `FontStyle`             | Enum     | Specifies the style of a font.
+| `GraphicsUnit`          | Enum     | Specifies the unit of measure for drawing operations.
+| `KnownColor`            | Enum     | Defines predefined colors.
+| `RotateFlipType`        | Enum     | Specifies how an image is rotated or flipped.
+| `StringAlignment`       | Enum     | Specifies the alignment of text within a string.
+| `StringDigitSubstitute` | Enum     | Specifies how digits are substituted in a string.
+| `StringFormatFlags`     | Enum     | Specifies formatting options for strings.
+| `StringTrimming`        | Enum     | Specifies how text is trimmed when it does not fit.
 
 <small><sup>(1)</sup> New element (does not belogs to `System.Drawing` library).</small>
+
+### GeneXus.Drawing.Drawing2D
+Advanced 2D graphics functionalities based on `System.Drawing.Drawing2D` for complex vector graphics and rendering tasks.
+
+| Name                  | Type     | Description
+|-----------------------|----------|--------------
+| `Blend`               | Class    | Defines a blend of colors along a gradient.
+| `ColorBlend`          | Class    | Defines a blend of colors for a gradient.
+| `GraphicsPath`        | Class    | Represents a series of connected lines and curves.
+| `HatchBrush`          | Class    | Defines a brush with a hatching pattern.
+| `PathGradientBrush`   | Class    | Defines a brush that fills an area with a gradient of colors.
+| `LinearGradientBrush` | Class    | Defines a brush that fills an area with a linear gradient of colors.
+| `Matrix`              | Struct   | Defines a transformation matrix for graphics operations.
+| `PathData`            | Struct   | Contains data associated with a GraphicsPath object.
+| `CombineMode`         | Enum     | Specifies how two graphics objects are combined.
+| `CompositingQuality`  | Enum     | Specifies the quality of compositing operations.
+| `CoordinateSpace`     | Enum     | Specifies the coordinate space for transformations.
+| `DashCap`             | Enum     | Specifies the cap style for dashed lines.
+| `FillMode`            | Enum     | Specifies the fill mode for filling shapes.
+| `InterpolationMode`   | Enum     | Specifies the interpolation mode for scaling and resizing.
+| `LineCap`             | Enum     | Specifies the shape of the end of a line.
+| `LineJoin`            | Enum     | Specifies the shape used to join two connected lines.
+| `MatrixOrder`         | Enum     | Specifies the order of matrix transformations.
+| `PenAlignment`        | Enum     | Specifies the alignment of a pen's stroke.
+| `PenType`             | Enum     | Specifies the type of pen used for drawing.
+| `PixelOffsetMode`     | Enum     | Specifies how to offset pixels when drawing.
+| `SmoothingMode`       | Enum     | Specifies the level of smoothing applied to graphics.
+| `WarpMode`            | Enum     | Specifies how text is warped.
+| `WrapMode`            | Enum     | Specifies how text wraps within its container.
 
 ### GeneXus.Drawing.Imaging
 Advanced image processing based on `System.Drawing.Imaging` to support sophisticated image manipulation and format handling.
@@ -100,9 +143,11 @@ Advanced typographic features based on `System.Drawing.Text` for managing and re
 | Name                      | Type     | Description
 |---------------------------|----------|--------------
 | `FontCollection`          | Class    | Represents a collection of fonts.
-| `InstalledFontCollection` | Class | Represents a collection of installed fonts.
-| `PrivateFontCollection`   | Class | Represents a collection of private fonts.
-| `GenericFontFamilies`     | Enum | Specifies generic font families.
+| `InstalledFontCollection` | Class    | Represents a collection of installed fonts.
+| `PrivateFontCollection`   | Class    | Represents a collection of private fonts.
+| `GenericFontFamilies`     | Enum     | Specifies generic font families.
+| `HotkeyPrefix`            | Enum     | Specifies how hotkey prefixes are rendered.
+| `TextRenderingHint`       | Enum     | Specifies the level of text rendering quality.
 
 ### GeneXus.Drawing.Interop
 Advanced interoperability utilities based on `System.Drawing.Interop` that includes definitions used in font management and graphics rendering.
