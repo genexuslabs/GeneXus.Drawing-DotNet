@@ -10,7 +10,7 @@ A cross-platform implementation of selected `System.Drawing` elements tailored f
 ## History
 The creation of this library was driven by Microsoft's decision to make the `System.Drawing.Common` NuGet package as Windows-specific as of .NET 6. For further details about this annoucement, please refer to [Microsoft Learn Article: System.Drawing.Common only supported on Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only).
 
-In response, this project aims to replicate the behaviour of `System.Drawing` library but focusing on GeneXus needs, rather than attempting to cover every use case of the original library. The primeray goal is to enable developers to seamlessy replace the `using` statements referencing the `System.Drawing` library in the GeneXus platform code with `GeneXus.Drawing` namespace. To achieve this goal, this project relies on the `SkiaSharp` library, a robus cross-platform graphics framework.
+In response, this project aims to replicate the behaviour of `System.Drawing` library but focusing on GeneXus needs, rather than attempting to cover every use case of the original library. The primeray goal is to enable developers to seamlessy replace the `using` statements referencing the `System.Drawing` library in the GeneXus platform code with `GeneXus.Drawing` namespace. To achieve this goal, this project relies on the `SkiaSharp` library, a robust cross-platform graphics framework.
 
 ## Considerations
 There are a few important considerations regarding `GeneXus.Drawing` that users should be aware of:
