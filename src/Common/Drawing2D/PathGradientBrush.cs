@@ -38,7 +38,7 @@ public sealed class PathGradientBrush : Brush
 		Array.Copy(new[] { 0f }, m_colors.Positions, 1);
 
 		m_center = new(
-			points.Average(pt => pt.X), 
+			points.Average(pt => pt.X),
 			points.Average(pt => pt.Y));
 
 		m_focus = new(0, 0);
@@ -105,12 +105,12 @@ public sealed class PathGradientBrush : Brush
 	#region Properties
 
 	/// <summary>
-	///  Gets or sets a <see cref='Drawing.Blend'/> that specifies positions and factors that define a 
+	///  Gets or sets a <see cref='Drawing.Blend'/> that specifies positions and factors that define a
 	///  custom falloff for the gradient.
 	/// </summary>
 	public Blend Blend
 	{
-		get => m_factors; 
+		get => m_factors;
 		set => UpdateShader(() => m_factors = value ?? throw new ArgumentNullException(nameof(value)));
 	}
 
@@ -118,7 +118,7 @@ public sealed class PathGradientBrush : Brush
 	///  Gets or sets the <see cref='Color'/> at the center of the path gradient.
 	/// </summary>
 	public Color CenterColor
-	{ 
+	{
 		get => m_color ?? (m_surround.Length > 1 ? Color.Black : Color.White);
 		set => UpdateShader(() => m_color = value);
 	}
@@ -127,7 +127,7 @@ public sealed class PathGradientBrush : Brush
 	///  Gets or sets the center <see cref='Point'/> of the path gradient.
 	/// </summary>
 	public PointF CenterPoint
-	{ 
+	{
 		get => m_center;
 		set => UpdateShader(() => m_center = value);
 	}
@@ -135,8 +135,8 @@ public sealed class PathGradientBrush : Brush
 	/// <summary>
 	///  Gets or sets the focus <see cref='Point'/> for the gradient falloff.
 	/// </summary>
-	public PointF FocusScales 
-	{ 
+	public PointF FocusScales
+	{
 		get => m_focus;
 		set => UpdateShader(() => m_focus = value);
 	}
@@ -164,13 +164,13 @@ public sealed class PathGradientBrush : Brush
 	public RectangleF Rectangle => m_path.GetBounds();
 
 	/// <summary>
-	///  Gets or sets an array of <see cref='Color'/> structures that correspond to the 
+	///  Gets or sets an array of <see cref='Color'/> structures that correspond to the
 	///  points in the path this gradient fills.
 	/// </summary>
-	public Color[] SurroundColors 
+	public Color[] SurroundColors
 	{
 		get => m_surround;
-		set => UpdateShader(() => 
+		set => UpdateShader(() =>
 		{
 			if (value.Length > m_path.PointCount)
 				throw new ArgumentException("parameter is not valid.", nameof(value));
@@ -179,7 +179,7 @@ public sealed class PathGradientBrush : Brush
 	}
 
 	/// <summary>
-	///  Gets or sets a copy of the <see cref='Matrix'/> that defines a local geometric 
+	///  Gets or sets a copy of the <see cref='Matrix'/> that defines a local geometric
 	///  transform for this gradient.
 	/// </summary>
 	public Matrix Transform
@@ -208,8 +208,8 @@ public sealed class PathGradientBrush : Brush
 	#region Methods
 
 	/// <summary>
-	///  Multiplies the <see cref='Matrix'/> object that represents the local 
-	///  geometric transformation of this <see cref='PathGradientBrush'/> object 
+	///  Multiplies the <see cref='Matrix'/> object that represents the local
+	///  geometric transformation of this <see cref='PathGradientBrush'/> object
 	///  by the specified <see cref='Matrix'/> object in the specified order.
 	/// </summary>
 	public void MultiplyTransform(Matrix matrix, MatrixOrder order = MatrixOrder.Prepend)
@@ -222,14 +222,14 @@ public sealed class PathGradientBrush : Brush
 		=> UpdateShader(() => Transform.Reset());
 
 	/// <summary>
-	///  Rotates the local geometric transformation of this <see cref='PathGradientBrush'/> object 
+	///  Rotates the local geometric transformation of this <see cref='PathGradientBrush'/> object
 	///  by the specified amount in the specified order.
 	/// </summary>
 	public void RotateTransform(float angle, MatrixOrder order = MatrixOrder.Prepend)
 		=> UpdateShader(() => Transform.Rotate(angle, order));
 
 	/// <summary>
-	///  Scales the local geometric transformation of this <see cref='PathGradientBrush'/> object 
+	///  Scales the local geometric transformation of this <see cref='PathGradientBrush'/> object
 	///  by the specified amounts in the specified order.
 	/// </summary>
 	public void ScaleTransform(float sx, float sy, MatrixOrder order = MatrixOrder.Prepend)
@@ -242,7 +242,7 @@ public sealed class PathGradientBrush : Brush
 		=> UpdateShader(() => m_factors = GetBlendTriangularShape(focus, scale));
 
 	/// <summary>
-	///  Creates a gradient brush that changes color starting from the center of the path outward 
+	///  Creates a gradient brush that changes color starting from the center of the path outward
 	///  to the path's boundary. The transition from one color to another is based on a bell-shaped curve.
 	/// </summary>
 	public void SetSigmaBellShape(float focus, float scale = 1.0f)
