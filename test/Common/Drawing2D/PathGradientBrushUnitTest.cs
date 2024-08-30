@@ -235,7 +235,40 @@ internal class PathGradientBrushUnitTest
 	[Test]
 	public void Property_Transform()
 	{
-		Assert.Fail("Not implemented");
+		var rect = new RectangleF(5, 5, 40, 40);
+		var color = Color.Red;
+		
+		using var path = new GraphicsPath();
+		path.AddEllipse(rect);
+
+		var transform = new Matrix();
+		transform.Scale(0.75f, 1f);
+
+		using var brush = new PathGradientBrush(path) { CenterColor = color, Transform = transform };
+		Assert.Multiple(() =>
+		{
+			var bounds = path.GetBounds();
+			var center = new PointF(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+
+			Assert.That(brush.Rectangle, Is.EqualTo(bounds));
+			Assert.That(brush.WrapMode, Is.EqualTo(WrapMode.Clamp));
+			Assert.That(brush.Transform, Is.EqualTo(transform));
+			Assert.That(brush.FocusScales, Is.EqualTo(new PointF(0, 0)));
+			Assert.That(brush.SurroundColors, Is.EqualTo(new[] { Color.White }));
+
+			Assert.That(brush.CenterColor, Is.EqualTo(color));
+			Assert.That(brush.CenterPoint, Is.EqualTo(center));
+
+			Assert.That(brush.Blend.Factors, Is.EqualTo(new[] { 1f }));
+			Assert.That(brush.Blend.Positions, Is.EqualTo(new[] { 0f }));
+
+			Assert.That(brush.InterpolationColors.Colors, Is.EqualTo(new[] { Color.Empty }));
+			Assert.That(brush.InterpolationColors.Positions, Is.EqualTo(new[] { 0f }));
+
+			string filepath = Path.Combine("brush", "path", $"CircleTransform.png");
+			float similarity = Utils.CompareImage(filepath, brush, true);
+			Assert.That(similarity, Is.GreaterThan(0.9));
+		});
 	}
 
 	[Test]
