@@ -440,8 +440,8 @@ public sealed class PathGradientBrush : Brush
 
 		var positions = blend.Keys.OrderBy(key => key).ToArray();
 		var colors = new Color[positions.Length];
-	
-		var lastColor = Color.Empty;
+
+		var lastColor = m_surround[0];
 		for (int index = 0; index < positions.Length; index++)
 		{
 			var key = positions[index];
@@ -454,7 +454,18 @@ public sealed class PathGradientBrush : Brush
 			}
 			if (value is float factor)
 			{
-				var color = ApplyFactor(lastColor, factor);
+				var nextColor = m_color ?? Color.White;
+				for (int i = index + 1; i < positions.Length; i++)
+				{
+					key = positions[i];
+					value = blend[key];
+					if (value is Color foundColor)
+					{
+						nextColor = foundColor;
+						break;
+					}
+				}
+				var color = Color.Blend(lastColor, nextColor, factor);
 				colors[index] = color;
 				continue;
 			}

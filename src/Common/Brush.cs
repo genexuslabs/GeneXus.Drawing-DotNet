@@ -57,13 +57,6 @@ public abstract class Brush : IDisposable, ICloneable
 
 	#region Utilities
 
-	protected static Color ApplyFactor(Color color, float factor)
-		=> Color.FromArgb(
-			(int)(color.A * factor),
-			(int)(color.R * factor),
-			(int)(color.G * factor),
-			(int)(color.B * factor));
-
 	protected static Drawing2D.Blend GetBlendTriangularShape(float focus, float scale)
 	{
 		if (focus < 0 || focus > 1)

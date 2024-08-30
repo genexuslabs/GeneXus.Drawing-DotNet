@@ -367,23 +367,29 @@ public sealed class LinearGradientBrush : Brush
 		var mode = m_mode == WrapMode.Clamp ? SKShaderTileMode.Decal : SKShaderTileMode.Repeat;
 
 		var blend = new Dictionary<float, object>();
-		for (int index = 0; index < m_factors.Positions.Length && m_factors.Positions.Length > 1; index++)
+		if (m_factors.Positions.Length > 1)
 		{
-			var pos = m_factors.Positions[index];
-			var fac = m_factors.Factors[index];
-			blend[pos] = fac; // blend factor
+			for (int index = 0; index < m_factors.Positions.Length; index++)
+			{
+				var pos = m_factors.Positions[index];
+				var fac = m_factors.Factors[index];
+				blend[pos] = fac; // blend factor
+			}
 		}
-		for (int index = 0; index < m_colors.Positions.Length && m_colors.Positions.Length > 1; index++)
+		if (m_colors.Positions.Length > 1)
 		{
-			var pos = m_colors.Positions[index];
-			var col = m_colors.Colors[index];
-			blend[pos] = col; // specific color
+			for (int index = 0; index < m_colors.Positions.Length; index++)
+			{
+				var pos = m_colors.Positions[index];
+				var col = m_colors.Colors[index];
+				blend[pos] = col; // specific color
+			}
 		}
 
 		var positions = blend.Keys.OrderBy(key => key).ToArray();
 		var colors = new SKColor[positions.Length];
 	
-		var lastColor = Color.Empty;
+		var lastColor = m_colors.Colors[0];
 		for (int index = 0; index < positions.Length; index++)
 		{
 			var key = positions[index];
@@ -397,7 +403,18 @@ public sealed class LinearGradientBrush : Brush
 			}
 			if (value is float factor)
 			{
-				var color = ApplyFactor(lastColor, factor);
+				var nextColor = m_colors.Colors[m_colors.Colors.Length - 1];
+				for (int i = index + 1; i < positions.Length; i++)
+				{
+					key = positions[i];
+					value = blend[key];
+					if (value is Color foundColor)
+					{
+						nextColor = foundColor;
+						break;
+					}
+				}
+				var color = Color.Blend(lastColor, nextColor, factor);
 				colors[index] = color.m_color;
 				continue;
 			}
