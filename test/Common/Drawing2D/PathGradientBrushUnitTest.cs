@@ -93,7 +93,7 @@ internal class PathGradientBrushUnitTest
 			Positions = new float[] { 0.0f, 0.4f, 1.0f }
 		};
 
-		using var brush = new PathGradientBrush(points) { Blend = blend, CenterColor = color };
+		using var brush = new PathGradientBrush(points) { CenterColor = color, Blend = blend };
 		Assert.Multiple(() => 
 		{
 			var bounds = Utils.GetBoundingRectangle(points);
