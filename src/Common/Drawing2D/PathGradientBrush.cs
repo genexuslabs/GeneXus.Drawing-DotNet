@@ -270,7 +270,7 @@ public sealed class PathGradientBrush : Brush
 		return new GraphicsPath(points, types);
 	}
 
-	public static Vector2 Intersect(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+	private static Vector2 Intersect(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
 	{
 		Vector2 d1 = p1 - p0; // line p0-p1
 		Vector2 d2 = p3 - p2; // line p2-p3
@@ -283,7 +283,7 @@ public sealed class PathGradientBrush : Brush
 		return p0 + t1 * d1;
 	}
 
-	public static bool Triangulated(Vector2 pt, Vector2 p0, Vector2 p1, Vector2 p2)
+	private static bool Triangulated(Vector2 pt, Vector2 p0, Vector2 p1, Vector2 p2)
 	{
 		bool EdgeCheck(Vector2 a, Vector2 b)
 			=> (a.Y <= pt.Y && pt.Y < b.Y || b.Y <= pt.Y && pt.Y < a.Y)
