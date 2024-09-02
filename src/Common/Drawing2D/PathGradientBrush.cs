@@ -311,7 +311,7 @@ public sealed class PathGradientBrush : Brush
 		return Vector2.Lerp(c0, c1, percent);
 	}
 
-	private Color ComputeColor(int x, int y, Vector2 center, Vector2[] points, PathPointType[] types, Color[] colors, float[] positions)
+	private Color ComputeColor(int x, int y, Vector2 center, Vector2[] outer, Vector2[] inner, PathPointType[] types, Color[] colors, float[] positions)
 	{
 		var color = Color.Transparent;
 		if (m_path.IsVisible(x, y))
@@ -320,15 +320,15 @@ public sealed class PathGradientBrush : Brush
 			if (m_surround.Length > 1)
 			{
 				// determine the weights of this point to the corners of the path
-				var weight = new float[points.Length];
-				for (int i = 0; i < points.Length; i++)
+				var weight = new float[outer.Length];
+				for (int i = 0; i < outer.Length; i++)
 				{
-					var p0 = points[(i + 0) % points.Length];
-					var p1 = points[(i + 1) % points.Length];
+					var p0 = outer[(i + 0) % outer.Length];
+					var p1 = outer[(i + 1) % outer.Length];
 
 					var ep = Project(target, p0, p1);
 
-					int j = (i + points.Length - 1) % points.Length;
+					int j = (i + outer.Length - 1) % outer.Length;
 					weight[j] = Vector2.Distance(target, ep);
 				}
 
@@ -350,11 +350,15 @@ public sealed class PathGradientBrush : Brush
 
 			// determine the distance of this point to the edge of the path
 			float dist = float.MaxValue, dmax = 0f;
-			for (int i = 0; i < points.Length; i++)
+			for (int i = 0; i < outer.Length; i++)
 			{
-				var p0 = points[(i + 0) % points.Length];
-				var p1 = points[(i + 1) % points.Length];
-				var p2 = points[(i + 2) % points.Length];
+				var p0 = outer[(i + 0) % outer.Length];
+				var p1 = outer[(i + 1) % outer.Length];
+				var p2 = outer[(i + 2) % outer.Length];
+
+				var c0 = inner[(i + 0) % inner.Length];
+				var c1 = inner[(i + 1) % inner.Length];
+				var c2 = inner[(i + 2) % inner.Length];
 
 				var type = types[i % types.Length];
 				switch(type)
@@ -363,20 +367,24 @@ public sealed class PathGradientBrush : Brush
 						var ep = Intersect(target, center, p0, p1);
 						if (Triangulated(target, p0, p1, center))
 						{
-							dist = Vector2.Distance(target, ep);
-							dmax = Vector2.Distance(center, ep);
+							var ip = Intersect(target, center, c0, c1);
+							var pp = Project(ip, c0, c1);
 
-							i = points.Length; // break the loop
+							dist = Vector2.Distance(target, ep);
+							dmax = Vector2.Distance(pp, ep);
+
+							i = outer.Length; // break the loop
 						}
 						break;
 
 					case PathPointType.Bezier:
 						for (float t = 0; t <= 1; t += 0.1f)
 						{
-							var cp = Bezier(p0, p1, p2, t);
+							var bp = Bezier(p0, p1, p2, t);
+							var cp = Bezier(c0, c1, c2, t);
 
-							var distCp = Vector2.Distance(target, cp);
-							var dmaxCp = Vector2.Distance(center, cp);
+							var distCp = Vector2.Distance(target, bp);
+							var dmaxCp = Vector2.Distance(cp, bp);
 
 							if (distCp < dist)
 							{
@@ -430,12 +438,18 @@ public sealed class PathGradientBrush : Brush
 
 		var bounds = m_path.GetBounds();
 		var center = m_center.ToVector2();
-		var points = m_path.PathPoints
+		
+		var outer = m_path.PathPoints
 			.Select(point => point.ToVector2())
 			.ToArray();
 		var types = m_path.PathTypes
 			.Select(type => (PathPointType)(type & (byte)PathPointType.PathTypeMask))
 			.Skip(1) // skip PathPointType.Start
+			.ToArray();
+
+		var focus = Matrix3x2.CreateScale(m_focus.X, m_focus.Y);
+		var inner = outer
+			.Select(point => Vector2.Transform(point - center, focus) + center)
 			.ToArray();
 
 		var blend = new Dictionary<float, object>() { [0] = m_surround[0], [1] = m_color };
@@ -511,7 +525,7 @@ public sealed class PathGradientBrush : Brush
 		{
 			for (int y = 0; y < bitmap.Height; y++)
 			{
-				var color = ComputeColor(x, y, center, points, types, colors, positions);
+				var color = ComputeColor(x, y, center, outer, inner, types, colors, positions);
 				bitmap.SetPixel(x, y, color);
 			}
 		}
