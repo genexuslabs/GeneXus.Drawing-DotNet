@@ -299,7 +299,7 @@ public sealed class PathGradientBrush : Brush
 
 		// point projection in the line p0-p1
 		float t = Vector2.Dot(e0, e1) / Vector2.Dot(e0, e0);
-		return p0 + e0 * t;
+		return p0 + e0 * Math.Min(1, Math.Max(0, t));
 	}
 
 	private static Vector2 Bezier(Vector2 p0, Vector2 p1, Vector2 p2, float percent)
