@@ -270,14 +270,14 @@ public sealed class PathGradientBrush : Brush
 		return new GraphicsPath(points, types);
 	}
 
-	private static Vector2 Intersect(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+	private static Vector2? Intersect(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
 	{
 		Vector2 d1 = p1 - p0; // line p0-p1
 		Vector2 d2 = p3 - p2; // line p2-p3
 
 		float det = d1.X * d2.Y - d1.Y * d2.X;
 		if (Math.Abs(det) < 1e-6) // check if lines are parallel
-			return new Vector2(float.MaxValue, float.MaxValue);
+			return null;
 
 		// point the in the intersection
 		float t = ((p2.X - p0.X) * d2.Y - (p2.Y - p0.Y) * d2.X) / det;
@@ -299,9 +299,13 @@ public sealed class PathGradientBrush : Brush
 		var e0 = p1 - p0;
 		var e1 = pt - p0;
 
+		// determine the numerator and denominator for scalar factor
+		float num = Vector2.Dot(e0, e1);
+		float den = Vector2.Dot(e0, e0) + float.Epsilon;
+		float t = Math.Min(1, Math.Max(0, num / den));
+
 		// point projection in the line p0-p1
-		float t = Vector2.Dot(e0, e1) / Vector2.Dot(e0, e0);
-		return p0 + e0 * Math.Min(1, Math.Max(0, t));
+		return p0 + e0 * t;
 	}
 
 	private static Vector2 Bezier(Vector2 p0, Vector2 p1, Vector2 p2, float percent)
@@ -366,14 +370,16 @@ public sealed class PathGradientBrush : Brush
 				switch(type)
 				{
 					case PathPointType.Line:
-						var ep = Intersect(target, center, p0, p1);
 						if (Triangulated(target, p0, p1, center))
 						{
-							var ip = Intersect(target, center, c0, c1);
-							var pp = Project(ip, c0, c1);
+							var ep = Intersect(target, center, p0, p1) ?? throw new Exception("line defined by target and center is parallel to shape edge");
+							var ip = Intersect(target, center, c0, c1) ?? center;
+							
+							ep = Project(ep, p0, p1);
+							ip = Project(ip, c0, c1);
 
 							dist = Vector2.Distance(target, ep);
-							dmax = Vector2.Distance(pp, ep);
+							dmax = Vector2.Distance(ip, ep);
 
 							i = outer.Length; // break the loop
 						}
