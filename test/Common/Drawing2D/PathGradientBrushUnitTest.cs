@@ -157,9 +157,74 @@ internal class PathGradientBrushUnitTest
 	}
 
 	[Test]
-	public void Property_FocusScales()
+	public void Property_FocusScales_Circular()
 	{
-		Assert.Fail("Not implemented");
+		var rect = new RectangleF(5, 5, 40, 40);
+		var color = Color.Red;
+		var focus = new PointF(0.50f, 0.25f);
+		
+		using var path = new GraphicsPath();
+		path.AddEllipse(rect);
+
+		using var brush = new PathGradientBrush(path) { CenterColor = color, FocusScales = focus };
+		Assert.Multiple(() =>
+		{
+			var bounds = path.GetBounds();
+			var center = new PointF(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+
+			Assert.That(brush.Rectangle, Is.EqualTo(bounds));
+			Assert.That(brush.WrapMode, Is.EqualTo(WrapMode.Clamp));
+			Assert.That(brush.Transform.IsIdentity, Is.True);
+			Assert.That(brush.FocusScales, Is.EqualTo(focus));
+			Assert.That(brush.SurroundColors, Is.EqualTo(new[] { Color.White }));
+
+			Assert.That(brush.CenterColor, Is.EqualTo(color));
+			Assert.That(brush.CenterPoint, Is.EqualTo(center));
+
+			Assert.That(brush.Blend.Factors, Is.EqualTo(new[] { 1f }));
+			Assert.That(brush.Blend.Positions, Is.EqualTo(new[] { 0f }));
+
+			Assert.That(brush.InterpolationColors.Colors, Is.EqualTo(new[] { Color.Empty }));
+			Assert.That(brush.InterpolationColors.Positions, Is.EqualTo(new[] { 0f }));
+
+			string filepath = Path.Combine("brush", "path", $"CircleRefocused.png");
+			float similarity = Utils.CompareImage(filepath, brush, true);
+			Assert.That(similarity, Is.GreaterThan(0.9));
+		});
+	}
+
+	[Test]
+	public void Property_FocusScales_Triangular()
+	{
+		var points = new PointF[] {  new(0, 0), new(50, 0), new(25, 25) };
+		var color = Color.Red;
+		var focus = new PointF(0.50f, 0.25f);
+
+		using var brush = new PathGradientBrush(points) { CenterColor = color, FocusScales = focus };
+		Assert.Multiple(() =>
+		{
+			var bounds = Utils.GetBoundingRectangle(points);
+			var center = Utils.GetCenterPoint(points);
+
+			Assert.That(brush.Rectangle, Is.EqualTo(bounds));
+			Assert.That(brush.WrapMode, Is.EqualTo(WrapMode.Clamp));
+			Assert.That(brush.Transform.IsIdentity, Is.True);
+			Assert.That(brush.FocusScales, Is.EqualTo(focus));
+			Assert.That(brush.SurroundColors, Is.EqualTo(new[] { Color.White }));
+
+			Assert.That(brush.CenterColor, Is.EqualTo(color));
+			Assert.That(brush.CenterPoint, Is.EqualTo(center));
+
+			Assert.That(brush.Blend.Factors, Is.EqualTo(new[] { 1f }));
+			Assert.That(brush.Blend.Positions, Is.EqualTo(new[] { 0f }));
+
+			Assert.That(brush.InterpolationColors.Colors, Is.EqualTo(new[] { Color.Empty }));
+			Assert.That(brush.InterpolationColors.Positions, Is.EqualTo(new[] { 0f }));
+
+			string filepath = Path.Combine("brush", "path", $"TriangleRefocused.png");
+			float similarity = Utils.CompareImage(filepath, brush, true);
+			Assert.That(similarity, Is.GreaterThan(0.9));
+		});
 	}
 
 	[Test]
