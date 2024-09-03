@@ -279,8 +279,9 @@ public sealed class PathGradientBrush : Brush
 		if (Math.Abs(det) < 1e-6) // check if lines are parallel
 			return new Vector2(float.MaxValue, float.MaxValue);
 
-		float t1 = ((p2.X - p0.X) * d2.Y - (p2.Y - p0.Y) * d2.X) / det;
-		return p0 + t1 * d1;
+		// point the in the intersection
+		float t = ((p2.X - p0.X) * d2.Y - (p2.Y - p0.Y) * d2.X) / det;
+		return p0 + t * d1;
 	}
 
 	private static bool Triangulated(Vector2 pt, Vector2 p0, Vector2 p1, Vector2 p2)
@@ -289,6 +290,7 @@ public sealed class PathGradientBrush : Brush
 			=> (a.Y <= pt.Y && pt.Y < b.Y || b.Y <= pt.Y && pt.Y < a.Y)
 			&& (pt.X + 1e-5 < (b.X - a.X) * (pt.Y - a.Y) / (b.Y - a.Y) + a.X);
 
+		// check if point is in the triangle by checking the edges
 		return EdgeCheck(p0, p2) ^ EdgeCheck(p1, p0) ^ EdgeCheck(p2, p1);
 	}
 
