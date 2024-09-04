@@ -1594,8 +1594,8 @@ public sealed class Graphics : IDisposable
 	///  Restores the state of this <see cref="Graphics"/> to the state 
 	///  represented by a <see cref="GraphicsState"/>.
 	/// </summary>
-	public void Restore(object state)
-		=> throw new NotImplementedException(); // TODO: implement GraphicsState class
+	public void Restore(GraphicsState state)
+		=> m_canvas.RestoreToCount(state.m_index);
 
 	/// <summary>
 	///  Applies the specified rotation to the transformation matrix of this <see cref="Graphics"/>.
@@ -1612,8 +1612,8 @@ public sealed class Graphics : IDisposable
 	///  Saves the current state of this  <see cref="Graphics"/> and 
 	///  identifies the saved state with a <see cref="GraphicsState"/>.
 	/// </summary>
-	public object Save()
-		=> throw new NotImplementedException(); // TODO: implement GraphicsState
+	public GraphicsState Save()
+		=> new(m_canvas.SaveLayer());
 
 	/// <summary>
 	///  Applies the specified scaling operation to the transformation matrix of 
