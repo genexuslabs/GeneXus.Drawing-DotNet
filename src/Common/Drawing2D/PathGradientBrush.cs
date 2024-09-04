@@ -279,7 +279,7 @@ public sealed class PathGradientBrush : Brush
 		if (Math.Abs(det) < 1e-6) // check if lines are parallel
 			return null;
 
-		// point the in the intersection
+		// point intersection of p0-p1 and p2-p3
 		float t = ((p2.X - p0.X) * d2.Y - (p2.Y - p0.Y) * d2.X) / det;
 		return p0 + t * d1;
 	}
@@ -296,8 +296,8 @@ public sealed class PathGradientBrush : Brush
 
 	private static Vector2 Project(Vector2 pt, Vector2 p0, Vector2 p1)
 	{
-		var e0 = p1 - p0;
-		var e1 = pt - p0;
+		Vector2 e0 = p1 - p0;
+		Vector2 e1 = pt - p0;
 
 		// determine the numerator and denominator for scalar factor
 		float num = Vector2.Dot(e0, e1);
@@ -305,13 +305,13 @@ public sealed class PathGradientBrush : Brush
 		float t = Math.Min(1, Math.Max(0, num / den));
 
 		// point projection in the line p0-p1
-		return p0 + e0 * t;
+		return p0 + t * e0;
 	}
 
 	private static Vector2 Bezier(Vector2 p0, Vector2 p1, Vector2 p2, float percent)
 	{
-		var c0 = Vector2.Lerp(p0, p1, percent);
-		var c1 = Vector2.Lerp(p1, p2, percent);
+		Vector2 c0 = Vector2.Lerp(p0, p1, percent);
+		Vector2 c1 = Vector2.Lerp(p1, p2, percent);
 
 		// point in the bezier curve p0-p1-p2 at percent
 		return Vector2.Lerp(c0, c1, percent);
