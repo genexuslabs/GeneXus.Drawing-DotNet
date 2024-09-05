@@ -111,7 +111,7 @@ public abstract class Brush : IDisposable, ICloneable
 			m_blend.Positions[0] = focus;
 			m_blend.Factors[0] = scale;
 
-			SigmaBellBlend(ref m_blend, focus,  scale, 1 / fallOffLenght, 1f / 2, 1f / 255, 1, count - 1, true);
+			SigmaBellBlend(ref m_blend, focus, scale, 1 / fallOffLenght, 1f / 2, 1f / 255, 1, count - 1, true);
 
 			m_blend.Positions[count - 1] = 1f;
 			m_blend.Factors[count - 1] = 0f;

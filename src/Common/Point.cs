@@ -59,7 +59,7 @@ public struct Point : IEquatable<Point>
 	/// <summary>
 	/// Compares two <see cref='Point'/> objects. The result specifies whether the values of the
 	/// <see cref='Point.X'/> or <see cref='Point.Y'/> properties of the two
-	/// <see cref='Point'/>  objects are unequal.
+	/// <see cref='Point'/> objects are unequal.
 	/// </summary>
 	public static bool operator !=(Point left, Point right) => left.m_point != right.m_point;
 

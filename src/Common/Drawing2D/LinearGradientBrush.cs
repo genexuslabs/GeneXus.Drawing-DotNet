@@ -155,7 +155,7 @@ public sealed class LinearGradientBrush : Brush
 	public RectangleF Rectangle => m_rect;
 
 	/// <summary>
-	///  Gets or sets a copy of the <see cref='Matrix'/>  object 
+	///  Gets or sets a copy of the <see cref='Matrix'/> object 
 	///  that defines a local geometric transformation for the image associated 
 	///  with this <see cref='LinearGradientBrush'/> object.
 	/// </summary>

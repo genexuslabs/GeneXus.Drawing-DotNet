@@ -273,7 +273,7 @@ public readonly struct Color : IEquatable<Color>
 	#region Methods
 
 	/// <summary>
-	/// Gets the 32-bit ARGB value of this <see cref='Color'/>  structure.
+	/// Gets the 32-bit ARGB value of this <see cref='Color'/> structure.
 	/// </summary>
 	public readonly int ToArgb() => (A << 24) | (R << 16) | (G << 8) | B;
 
@@ -305,10 +305,10 @@ public readonly struct Color : IEquatable<Color>
 		if (amount <= 0) return color1;
 		if (amount >= 1) return color2;
 		int r = (int)(color1.R + (color2.R - color1.R) * amount);
-        int g = (int)(color1.G + (color2.G - color1.G) * amount);
-        int b = (int)(color1.B + (color2.B - color1.B) * amount);
-        int a = (int)(color1.A + (color2.A - color1.A) * amount);
-        return FromArgb(a, r, g, b);
+		int g = (int)(color1.G + (color2.G - color1.G) * amount);
+		int b = (int)(color1.B + (color2.B - color1.B) * amount);
+		int a = (int)(color1.A + (color2.A - color1.A) * amount);
+		return FromArgb(a, r, g, b);
 	}
 
 	#endregion

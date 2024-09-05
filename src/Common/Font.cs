@@ -329,13 +329,13 @@ public sealed class Font : IDisposable, ICloneable
 		=> GetHeight(graphics.PageUnit, graphics.DpiY);
 
 	/// <summary>
-	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution.
+	/// Returns the height, in pixels, of this <see cref='Font'/> when drawn to a device with the specified vertical resolution.
 	/// </summary>
 	public float GetHeight(float dpi)
 		=> GetHeight(Unit, dpi);
 
 	/// <summary>
-	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution
+	/// Returns the height, in pixels, of this <see cref='Font'/> when drawn to a device with the specified vertical resolution
 	/// and with the specified <see cref='GraphicsUnit'>.
 	/// </summary>
 	private float GetHeight(GraphicsUnit unit, float dpi)

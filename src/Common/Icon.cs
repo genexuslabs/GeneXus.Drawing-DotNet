@@ -36,7 +36,7 @@ public sealed class Icon : IDisposable, ICloneable
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref='Icon'/> class from a  <see cref='Bitmap'/> instance.
+	/// Initializes a new instance of the <see cref='Icon'/> class from a <see cref='Bitmap'/> instance.
 	/// </summary>
 	public Icon(Bitmap bitmap)
 		: this(bitmap, new() { new IconEntry { Width = (byte)bitmap.Width, Height = (byte)bitmap.Height } }, -1, -1) { }
@@ -256,7 +256,7 @@ public sealed class Icon : IDisposable, ICloneable
 		{
 			Reserved = reader.ReadUInt16(),
 			Type = reader.ReadUInt16(), // Type (1 for icon, 2 for cursor)
-			Count = reader.ReadUInt16()  // Number of images
+			Count = reader.ReadUInt16() // Number of images
 		};
 
 		// Read ICONDIRENTRY structures

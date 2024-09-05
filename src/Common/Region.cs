@@ -195,9 +195,9 @@ public sealed class Region : IDisposable
 
 		var rdh = new RGNDATAHEADER
 		{
-			dwSize   = (uint)Marshal.SizeOf<RGNDATAHEADER>(),
-			iType	= 1, // RDH_RECTANGLES
-			nCount   = (uint)rects.Count,
+			dwSize	 = (uint)Marshal.SizeOf<RGNDATAHEADER>(),
+			iType	 = 1, // RDH_RECTANGLES
+			nCount	 = (uint)rects.Count,
 			nRgnSize = (uint)(rects.Count * Marshal.SizeOf<RECT>())
 		};
 		var headerSize = Marshal.SizeOf<RGNDATAHEADER>();
@@ -474,7 +474,7 @@ public sealed class Region : IDisposable
 
 		var rdh = new RGNDATAHEADER
 		{
-			dwSize   = BitConverter.ToUInt32(rgnData, 0),
+			dwSize	 = BitConverter.ToUInt32(rgnData, 0),
 			iType	 = BitConverter.ToUInt32(rgnData, 4),
 			nCount	 = BitConverter.ToUInt32(rgnData, 8),
 			nRgnSize = BitConverter.ToUInt32(rgnData, 12)

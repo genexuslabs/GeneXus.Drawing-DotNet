@@ -491,7 +491,7 @@ public sealed class Graphics : IDisposable
 
 	/// <summary>
 	///  Draws the specified <see cref='Image'/>, using its original physical size, at the specified
-	///  location given by a  <see cref='PointF'/> structure.
+	///  location given by a <see cref='PointF'/> structure.
 	/// </summary>
 	public void DrawImage(Image image, PointF point)
 		=> DrawImage(image, point.X, point.Y);
@@ -504,7 +504,7 @@ public sealed class Graphics : IDisposable
 
 	/// <summary>
 	///  Draws the specified <see cref='Image'/>, using its original physical size, at the specified
-	///  location given by a  <see cref='Point'/> structure.
+	///  location given by a <see cref='Point'/> structure.
 	/// </summary>
 	public void DrawImage(Image image, Point point)
 		=> DrawImage(image, new PointF(point.m_point));
@@ -1440,7 +1440,7 @@ public sealed class Graphics : IDisposable
 
 	/// <summary>
 	///  Measures the specified string when drawn with the specified <see cref="Font"/> in a <see cref="RectangleF"/> area, 
-	///  formatted  with the specified <see cref="StringFormat"/>, and the maximum bounding box 
+	///  formatted with the specified <see cref="StringFormat"/>, and the maximum bounding box 
 	///  specified by a <see cref="RectangleF"/> structure.
 	/// </summary>
 	public SizeF MeasureString(string text, Font font, RectangleF layoutArea = default, StringFormat format = null)
@@ -1609,7 +1609,7 @@ public sealed class Graphics : IDisposable
 	}
 
 	/// <summary>
-	///  Saves the current state of this  <see cref="Graphics"/> and 
+	///  Saves the current state of this <see cref="Graphics"/> and 
 	///  identifies the saved state with a <see cref="GraphicsState"/>.
 	/// </summary>
 	public GraphicsState Save()
@@ -1727,12 +1727,12 @@ public sealed class Graphics : IDisposable
 
 	private static float GetUnitFactor(float dpi, GraphicsUnit unit) => unit switch
 	{
-		GraphicsUnit.Pixel	  => 1f,
+		GraphicsUnit.Pixel		=> 1f,
 		GraphicsUnit.Display	=> dpi / 72f,
-		GraphicsUnit.Point	  => dpi / 72f,
-		GraphicsUnit.Inch	   => dpi,
-		GraphicsUnit.Document   => dpi / 300f,
-		GraphicsUnit.Millimeter => dpi / 25.4f,
+		GraphicsUnit.Point		=> dpi / 72f,
+		GraphicsUnit.Inch		=> dpi,
+		GraphicsUnit.Document	=> dpi / 300f,
+		GraphicsUnit.Millimeter	=> dpi / 25.4f,
 		_ => throw new ArgumentException($"{unit} unit not supported.", nameof(unit)),
 	};
 

@@ -10,7 +10,7 @@ public sealed class TextureBrush : Brush
 	internal RectangleF m_bounds;
 	internal WrapMode m_mode;
 
-	private TextureBrush(RectangleF rect, Image image, WrapMode mode)  
+	private TextureBrush(RectangleF rect, Image image, WrapMode mode)
 		: base(new SKPaint { }) 
 	{
 		m_bounds = rect;
@@ -79,9 +79,9 @@ public sealed class TextureBrush : Brush
 	public Image Image => m_image;
 
 	/// <summary>
-	///  Gets or sets a copy of the <see cref='Matrix'/>  object 
+	///  Gets or sets a copy of the <see cref='Matrix'/> object 
 	///  that defines a local geometric transformation for the image associated 
-	///  with this <see cref='TextureBrush'/>  object.
+	///  with this <see cref='TextureBrush'/> object.
 	/// </summary>
 	public Matrix Transform { get; set; } = new Matrix();
 
