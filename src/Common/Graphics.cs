@@ -152,7 +152,11 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets or sets a copy of the geometric world transformation for this <see cref='Graphics'/>.
 	/// </summary>
-	public Matrix Transform { get; set; } = new Matrix();
+	public Matrix Transform
+	{
+		get => new(m_canvas.TotalMatrix);
+		set => m_canvas.SetMatrix(value.m_matrix);
+	}
 
 	/// <summary>
 	///  Gets or sets the world transform elements for this <see cref='Graphics'/>.
