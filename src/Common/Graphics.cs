@@ -545,13 +545,13 @@ public sealed class Graphics : IDisposable
 	///  Draws a portion of an <see cref='Image'/> at a specified location.
 	/// </summary>
 	public void DrawImage(Image image, float x, float y, RectangleF rect, GraphicsUnit unit)
-		=> DrawImage(image, rect, new RectangleF(x, y, image.Width, image.Height), unit);
+		=> DrawImage(image, new RectangleF(x, y, rect.Width, rect.Height), rect, unit);
 
 	/// <summary>
 	///  Draws a portion of an <see cref='Image'/> at a specified location.
 	/// </summary>
 	public void DrawImage(Image image, int x, int y, Rectangle rect, GraphicsUnit unit)
-		=> DrawImage(image, rect, new RectangleF(x, y, image.Width, image.Height), unit);
+		=> DrawImage(image, new RectangleF(x, y, rect.Width, rect.Height), rect, unit);
 
 	/// <summary>
 	///  Draws the specified portion of the specified <see cref='Image'/> at the specified location 
@@ -562,8 +562,8 @@ public sealed class Graphics : IDisposable
 		float factorX = GetUnitFactor(DpiX, unit);
 		float factorY = GetUnitFactor(DpiY, unit);
 
-		var src = RectangleF.Inflate(source, factorX, factorY);
-		var dst = RectangleF.Inflate(destination, factorX, factorY);
+		var src = new RectangleF(source.X, source.Y, source.Width * factorX, source.Height * factorY);
+		var dst = new RectangleF(destination.X, destination.Y, destination.Width * factorX, destination.Height * factorY);
 
 		m_canvas.DrawImage(image.InnerImage, src.m_rect, dst.m_rect);
 	}
