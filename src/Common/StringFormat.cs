@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -96,7 +97,7 @@ public sealed class StringFormat : ICloneable, IDisposable
 	/// <summary>
 	///  Gets the language of <see cref='StringDigitSubstitute'/> for this <see cref='StringFormat'/>.
 	/// </summary>
-	public int DigitSubstitutionLanguage { get; private set; }
+	public int DigitSubstitutionLanguage { get; private set; } = CultureInfo.InvariantCulture.LCID;
 
 	/// <summary>
 	///  Gets or sets a <see cref='StringFormatFlags'/> that contains formatting information.
@@ -195,7 +196,7 @@ public sealed class StringFormat : ICloneable, IDisposable
 		.Where(char.IsControl)
 		.ToArray();
 
-	internal static readonly Dictionary<char, char> CONTROL_CHARACTERS = new Dictionary<char, char>
+	internal static readonly Dictionary<char, char> CONTROL_CHARACTERS = new()
 	{
 		{ '\u0000', '␀' },  // Null
 		{ '\u0001', '␁' },  // Start of Heading
@@ -324,6 +325,25 @@ public sealed class StringFormat : ICloneable, IDisposable
 			text = string.Join("", lines);
 		}
 		return text;
+	}
+
+
+	internal string ApplyDigitSubstitution(string text)
+	{
+		var sb = new StringBuilder(text);
+		if (DigitSubstitutionMethod != StringDigitSubstitute.None)
+		{
+			var lcid = DigitSubstitutionMethod == StringDigitSubstitute.User 
+				? CultureInfo.CurrentCulture.LCID 
+				: DigitSubstitutionLanguage; 
+				
+			var culture = new CultureInfo(lcid);
+
+			var format = culture.NumberFormat;
+			for (int i = 0; i < format.NativeDigits.Length; i++)
+				sb.Replace(i.ToString(), format.NativeDigits[i]);
+		}
+		return sb.ToString();
 	}
 
 

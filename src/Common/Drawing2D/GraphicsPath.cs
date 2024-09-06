@@ -943,6 +943,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		text = format.ApplyDirection(text);
 		text = format.ApplyTabStops(text);
 		text = format.ApplyControlEscape(text);
+		text = format.ApplyDigitSubstitution(text);
 		text = format.ApplyWrapping(text, layout, paint.MeasureText);
 		text = format.ApplyTrimming(text, layout, paint.FontSpacing, paint.MeasureText);
 		text = format.ApplyHotkey(text, out var underlines);
