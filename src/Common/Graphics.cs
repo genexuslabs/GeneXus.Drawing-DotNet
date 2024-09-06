@@ -581,22 +581,17 @@ public sealed class Graphics : IDisposable
 	public void DrawImage(Image image, PointF[] destPoints, RectangleF srcRect, GraphicsUnit srcUnit, object imageAtt = null, object callback = null, int callbackData = 0)
 	{
 		// TODO: Implement ImageAttributes (attributes), DrawImageAbort (callback) and IntPtr (callbackData)
-		var path = new SKPath();
+		using var path = new SKPath();
+		
 		path.MoveTo(destPoints[0].m_point);
 		for (int i = 1; i < destPoints.Length; i++)
 			path.LineTo(destPoints[i].m_point);
 		path.Close();
+		
+		m_canvas.ClipPath(path);
 
-		float factorX = GetUnitFactor(DpiX, srcUnit);
-		float factorY = GetUnitFactor(DpiY, srcUnit);
-
-		using var surface = SKSurface.Create(image.InnerImage.Info);
-		surface.Canvas.DrawImage(image.InnerImage, 0, 0);
-		surface.Canvas.ClipPath(path);
-		surface.Canvas.ClipRect(srcRect.m_rect);
-		surface.Canvas.Scale(factorX, factorY);
-
-		m_canvas.DrawSurface(surface, 0, 0);
+		var dstRect = new RectangleF(path.Bounds);
+		DrawImage(image, dstRect, srcRect, srcUnit);
 	}
 
 	/// <summary>
