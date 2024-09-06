@@ -1617,7 +1617,7 @@ public sealed class Graphics : IDisposable
 	///  identifies the saved state with a <see cref="GraphicsState"/>.
 	/// </summary>
 	public GraphicsState Save()
-		=> new(m_canvas.SaveLayer());
+		=> new(m_canvas.Save());
 
 	/// <summary>
 	///  Applies the specified scaling operation to the transformation matrix of 
