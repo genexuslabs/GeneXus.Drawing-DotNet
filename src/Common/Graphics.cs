@@ -378,7 +378,7 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void DrawClosedCurve(Pen pen, PointF[] points, float tension = 0.5f, FillMode fillMode = FillMode.Winding)
 	{
-		using var path = GetClosedCurvePath(points, fillMode, tension);
+		using var path = GetCurvePath(points, fillMode, tension, true);
 		m_canvas.DrawPath(path.m_path, pen.m_paint);
 	}
 
@@ -394,39 +394,17 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void DrawCurve(Pen pen, PointF[] points, int offset, int numberOfSegments, float tension = 0.5f)
 	{
-		// TODO: include tension
 		if (offset < 0 || offset >= points.Length)
 			throw new ArgumentOutOfRangeException(nameof(offset));
 
-		if (numberOfSegments < 1 || offset + numberOfSegments >= points.Length)
+		if (numberOfSegments < 1 || offset + numberOfSegments > points.Length)
 			throw new ArgumentOutOfRangeException(nameof(numberOfSegments));
 
-		using var path = new SKPath();
-		path.MoveTo(points[offset].m_point);
-		for (int i = offset + 1; i < offset + numberOfSegments - 1; i++)
-		{
-			PointF p0 = points[Math.Max(i - 1, 0)];
-			PointF p1 = points[i + 0];
-			PointF p2 = points[i + 1];
-			PointF p3 = points[Math.Min(i + 2, points.Length - 1)];
+		var fillMode = FillMode.Alternate;
+		points = points.Skip(offset).Take(numberOfSegments).ToArray();
 
-			// calculate the tangents
-			float t1x = (p2.X - p0.X) * tension;
-			float t1y = (p2.Y - p0.Y) * tension;
-			float t2x = (p3.X - p1.X) * tension;
-			float t2y = (p3.Y - p1.Y) * tension;
-
-			// calculate the control points
-			var p1x = points[i + 0].X + t1x / 3;
-			var p1y = points[i + 0].Y + t1y / 3;
-			var p2x = points[i + 1].X - t2x / 3;
-			var p2y = points[i + 1].Y - t2y / 3;
-
-			// add the cubic Bezier segment to the path
-			path.CubicTo(p1x, p1y, p2x, p2y, points[i + 1].X, points[i + 1].Y);
-		}
-
-		m_canvas.DrawPath(path, pen.m_paint);
+		using var path = GetCurvePath(points, fillMode, tension, false);
+		m_canvas.DrawPath(path.m_path, pen.m_paint);
 	}
 
 	/// <summary>
@@ -1140,7 +1118,7 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void FillClosedCurve(Brush brush, PointF[] points, FillMode fillMode = FillMode.Alternate, float tension = 0.5f)
 	{
-		using var path = GetClosedCurvePath(points, fillMode, tension);
+		using var path = GetCurvePath(points, fillMode, tension, true);
 		m_canvas.DrawPath(path.m_path, brush.m_paint);
 	}
 
@@ -1745,14 +1723,17 @@ public sealed class Graphics : IDisposable
 
 	#region Helpers
 
-	private static GraphicsPath GetClosedCurvePath(PointF[] points, FillMode fillMode, float tension)
+	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
 	{
-		// TODO: include tension
 		if (points.Length < 3)
 			throw new ArgumentException("invalid number of points for drawing a closed curve (at least 3)");
 
 		var path = new GraphicsPath(fillMode);
-		path.AddClosedCurve(points);
+		if (closed) 
+			path.AddClosedCurve(points, tension);
+		else 
+			path.AddCurve(points, tension);
+
 		return path;
 	}
 
