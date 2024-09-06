@@ -1337,7 +1337,7 @@ public sealed class Graphics : IDisposable
 	///  within the visible clip region of this <see cref="Graphics"/>.
 	/// </summary>
 	public bool IsVisible(Point point)
-		=> IsVisible(point.X, point.Y);
+		=> IsVisible(new PointF(point.X, point.Y));
 
 	/// <summary>
 	///  Indicates whether the specified <see cref="RectangleF"/> structure is contained 
@@ -1351,7 +1351,7 @@ public sealed class Graphics : IDisposable
 	///  within the visible clip region of this <see cref="Graphics"/>.
 	/// </summary>
 	public bool IsVisible(Rectangle rect)
-		=> IsVisible(rect.X, rect.Y, rect.Width, rect.Height);
+		=> IsVisible(new RectangleF(rect.X, rect.Y, rect.Width, rect.Height));
 
 	/// <summary>
 	///  Indicates whether the point specified by a pair of coordinates structure is contained 
