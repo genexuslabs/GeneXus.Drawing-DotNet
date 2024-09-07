@@ -3,6 +3,22 @@
 # GeneXus.Drawing-DotNet
 A cross-platform implementation of selected `System.Drawing` elements tailored for GeneXus development.
 
+# Table of Contents
+
+- [History](#history)
+- [Considerations](#considerations)
+- [Repository](#repository)
+- [Modules](#modules)
+   - [GeneXus.Drawing.Common](#genexusdrawingcommon)
+   - [GeneXus.Drawing.Imaging](#genexusdrawingimaging)
+   - [GeneXus.Drawing.Text](#genexusdrawingtext)
+   - [GeneXus.Drawing.Interop](#genexusdrawinginterop)
+- [How to build](#how-to-build)
+   - [Requirements](#requirements)
+   - [Instructions](#instructions)
+- [License](#license)
+- [Third-Party License Attributions](#third-party-license-attributions)
+
 ## History
 The creation of this library was driven by Microsoft's decision to make the `System.Drawing.Common` NuGet package as Windows-specific as of .NET 6. For further details about this annoucement, please refer to [Microsoft Learn Article: System.Drawing.Common only supported on Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only).
 
