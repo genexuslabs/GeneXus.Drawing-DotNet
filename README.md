@@ -18,6 +18,7 @@ A cross-platform implementation of selected `System.Drawing` elements tailored f
    - [Instructions](#instructions)
 - [License](#license)
 - [Third-Party License Attributions](#third-party-license-attributions)
+- [Contributing](#contributing)
 
 ## History
 The creation of this library was driven by Microsoft's decision to make the `System.Drawing.Common` NuGet package as Windows-specific as of .NET 6. For further details about this annoucement, please refer to [Microsoft Learn Article: System.Drawing.Common only supported on Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only).
@@ -195,3 +196,11 @@ The `GeneXus.Drawing` library is based on the [SkiaSharp project](https://github
 > SkiaSharp is a cross-platform 2D graphics API for .NET platforms based on Google's Skia Graphics Library (skia.org). It provides a comprehensive 2D API that can be used across mobile, server and desktop models to render images.
 
 License (MIT): https://github.com/mono/SkiaSharp/blob/main/LICENSE.md
+
+Certainly! Here's an updated paragraph for the README file:
+
+# Contributing
+
+We welcome contributions from the community to improve this project. Please follow the guidelines outlined in the [CONTRIBUTION](CONTRIBUTION.md) file for that.
+
+Thank you for considering to work with us! We look forward to your contributions.
