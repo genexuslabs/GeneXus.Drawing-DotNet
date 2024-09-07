@@ -38,15 +38,8 @@ jobs:
 
         switch -regex ($Env:GITHUB_REF_NAME) {
           '^main' {
-             #$PUBLISH_TO_NUGETORG = 'true'
-
-             #---
-             # Temporary publish to an internal feed with prerelease tag 'trunk'
-             # while we are working in the first release
-             $PUBLISH_TO_NUGETORG = 'false'
-             $VersionTag = 'trunk'
-             #---
-           }
+             $PUBLISH_TO_NUGETORG = 'true'
+          }
           default {
             $PUBLISH_TO_NUGETORG = 'false'
             $VersionTag = "dev"
