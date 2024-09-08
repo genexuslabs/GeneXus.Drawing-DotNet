@@ -1592,7 +1592,7 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void RotateTransform(float angle, MatrixOrder order = MatrixOrder.Prepend)
 	{
-		var scaleMatrix = SKMatrix.CreateRotationDegrees(angle);
+		var scaleMatrix = SKMatrix.CreateRotationDegrees(-angle);
 		if (order == MatrixOrder.Append)
 			scaleMatrix = scaleMatrix.PreConcat(m_canvas.TotalMatrix);
 		m_canvas.Concat(ref scaleMatrix);
