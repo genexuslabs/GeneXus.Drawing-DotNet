@@ -1276,7 +1276,7 @@ public sealed class Graphics : IDisposable
 		=> throw new NotSupportedException("skia unsupported feature");
 
 	/// <summary>
-	///  Gets the nearest color to the specified <see cref="Color"/> structure.
+	///  Gets the nearest color to the specified <see cref="Drawing.Color"/> structure.
 	/// </summary>
 	public Color GetNearestColor(Color color)
 	{
