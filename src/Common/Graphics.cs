@@ -12,11 +12,13 @@ public sealed class Graphics : IDisposable
 {
 	internal readonly SKCanvas m_canvas;
 	internal readonly SKBitmap m_bitmap;
+	private int m_context;
 
 	private Graphics(SKBitmap bitmap)
 	{
 		m_bitmap = bitmap;
 		m_canvas = new SKCanvas(m_bitmap);
+		m_context = -1;
 
 		VisibleClipBounds = new RectangleF(m_canvas.LocalClipBounds); 
 		Clip = new Region(VisibleClipBounds);
@@ -281,7 +283,10 @@ public sealed class Graphics : IDisposable
 	///  Clears the entire drawing surface and fills it with the specified background color.
 	/// </summary>
 	public void Clear(Color color)
-		=> m_canvas.Clear(color.m_color);
+	{
+		ClipColor = color;
+		m_canvas.Clear(ClipColor.m_color);
+	}
 
 	/// <summary>
 	///  Performs a bit-block transfer of the color data, corresponding to a rectangle of pixels,
@@ -1558,7 +1563,16 @@ public sealed class Graphics : IDisposable
 	///  Resets the clip region of this <see cref="Graphics"/> to an infinite region.
 	/// </summary>
 	public void ResetClip()
-		=> SetClip(Rectangle.Empty);
+	{
+		m_context = -1;
+
+		// NOTE: reset without losing the transformation matrix
+		var matrix = m_canvas.TotalMatrix;
+		m_canvas.RestoreToCount(m_context);
+		m_canvas.SetMatrix(matrix);
+
+		m_canvas.Clear(ClipColor.m_color);
+	}
 
 	/// <summary>
 	///  Resets the world transformation matrix of this <see cref="Graphics"/> to 
@@ -1636,8 +1650,12 @@ public sealed class Graphics : IDisposable
 			case CombineMode.Xor: 
 				Clip.Xor(region);
 				break;
-		};
-		throw new ArgumentException($"{combineMode} value is not supported", nameof(combineMode));
+
+			default:
+				throw new ArgumentException($"{combineMode} value is not supported", nameof(combineMode));
+		}
+		m_context = m_canvas.Save();
+		m_canvas.ClipRegion(Clip.m_region);
 	}
 
 	/// <summary>
@@ -1683,7 +1701,16 @@ public sealed class Graphics : IDisposable
 	///  amounts in the horizontal and vertical directions.
 	/// </summary>
 	public void TranslateClip(float dx, float dy)
-		=> Clip.Translate(dx, dy);
+	{
+		// NOTE: restore without losing the transformation matrix
+		var matrix = m_canvas.TotalMatrix;
+		m_canvas.RestoreToCount(m_context);
+		m_canvas.SetMatrix(matrix);
+
+		Clip.Translate(dx, dy);
+		m_canvas.ClipRegion(Clip.m_region);
+		m_canvas.Clear(ClipColor.m_color);
+	}
 
 	/// <summary>
 	///  Changes the origin of the coordinate system by applying the specified translation to the
@@ -1717,6 +1744,8 @@ public sealed class Graphics : IDisposable
 
 
 	#region Helpers
+
+	private Color ClipColor { get; set;}
 
 	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
 	{
