@@ -20,8 +20,7 @@ public sealed class Graphics : IDisposable
 		m_canvas = new SKCanvas(m_bitmap);
 		m_context = -1;
 
-		VisibleClipBounds = new RectangleF(m_canvas.LocalClipBounds); 
-		Clip = new Region(VisibleClipBounds);
+		Clip = new Region(ClipBounds);
 	}
 
 	/// <summary>
@@ -172,7 +171,7 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets the bounding rectangle of the visible clipping region of this <see cref='Graphics'/>.
 	/// </summary>
-	public RectangleF VisibleClipBounds { get; set; }
+	public RectangleF VisibleClipBounds => Clip.GetBounds(this);
 
 	#endregion
 
