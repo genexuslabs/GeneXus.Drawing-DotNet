@@ -1536,7 +1536,11 @@ public sealed class Graphics : IDisposable
 	///  speciried the <see cref="Matrix"/> in the specified order.
 	/// </summary>
 	public void MultiplyTransform(Matrix matrix, MatrixOrder order = MatrixOrder.Prepend)
-		=> m_canvas.SetMatrix(matrix.m_matrix);
+	{
+		var result = new Matrix(Transform.m_matrix);
+		result.Multiply(matrix, order);
+		Transform = result;
+	}
 
 	/// <summary>
 	///  Releases a device context handle obtained by a previous call to 
