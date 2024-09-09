@@ -14,7 +14,16 @@ public sealed class Graphics : IDisposable
 	internal readonly SKBitmap m_bitmap;
 	private int m_context;
 
-	private Graphics(SKBitmap bitmap)
+	internal static readonly (int X, int Y) DPI;
+
+	static Graphics()
+	{
+		using var surface = SKSurface.Create(new SKImageInfo(50, 50));
+		DPI.X = (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
+		DPI.Y = (int)(100f * surface.Canvas.DeviceClipBounds.Height / surface.Canvas.LocalClipBounds.Height);
+	}
+
+	internal Graphics(SKBitmap bitmap)
 	{
 		m_bitmap = bitmap;
 		m_canvas = new SKCanvas(m_bitmap);
@@ -93,12 +102,12 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets the horizontal resolution of this <see cref='Graphics'/>.
 	/// </summary>
-	public float DpiX => (int)(100 * m_canvas.DeviceClipBounds.Width / m_canvas.LocalClipBounds.Width);
+	public float DpiX => DPI.X;
 
 	/// <summary>
 	///  Gets the vertical resolution of this <see cref='Graphics'/>.
 	/// </summary>
-	public float DpiY => (int)(100 * m_canvas.DeviceClipBounds.Height / m_canvas.LocalClipBounds.Height);
+	public float DpiY => DPI.Y;
 
 	/// <summary>
 	///  Gets or sets the interpolation mode associated with this <see cref='Graphics'/>.
@@ -247,8 +256,8 @@ public sealed class Graphics : IDisposable
 	{
 		int state = m_canvas.Save();
 
-		float factorX = GetUnitFactor(DpiX, unit);
-		float factorY = GetUnitFactor(DpiY, unit);
+		float factorX = GetFactor(DpiX, unit, GraphicsUnit.Pixel);
+		float factorY = GetFactor(DpiY, unit, GraphicsUnit.Pixel);
 
 		var src = RectangleF.Inflate(srcRect, factorX, factorY);
 		var dst = RectangleF.Inflate(dstRect, factorX, factorY);
@@ -563,8 +572,8 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void DrawImage(Image image, RectangleF destination, RectangleF source, GraphicsUnit unit)
 	{
-		float factorX = GetUnitFactor(DpiX, unit);
-		float factorY = GetUnitFactor(DpiY, unit);
+		float factorX = GetFactor(DpiX, unit, GraphicsUnit.Pixel);
+		float factorY = GetFactor(DpiY, unit, GraphicsUnit.Pixel);
 
 		var src = new RectangleF(source.X, source.Y, source.Width * factorX, source.Height * factorY);
 		var dst = new RectangleF(destination.X, destination.Y, destination.Width * factorX, destination.Height * factorY);
@@ -1732,16 +1741,25 @@ public sealed class Graphics : IDisposable
 
 	#region Utitlies
 
-	private static float GetUnitFactor(float dpi, GraphicsUnit unit) => unit switch
+	internal static float GetFactor(float dpi, GraphicsUnit sourceUnit, GraphicsUnit targetUnit)
 	{
-		GraphicsUnit.Pixel		=> 1f,
-		GraphicsUnit.Display	=> dpi / 72f,
-		GraphicsUnit.Point		=> dpi / 72f,
-		GraphicsUnit.Inch		=> dpi,
-		GraphicsUnit.Document	=> dpi / 300f,
-		GraphicsUnit.Millimeter	=> dpi / 25.4f,
-		_ => throw new ArgumentException($"{unit} unit not supported.", nameof(unit)),
-	};
+		float sourceFactor = GetPointFactor(sourceUnit, dpi);
+		float targetFactor = GetPointFactor(targetUnit, dpi);
+		return sourceFactor / targetFactor;
+
+		static float GetPointFactor(GraphicsUnit unit, float dpi) => unit switch
+		{
+			GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
+			GraphicsUnit.Display => 72 / dpi, 		// Assuming display unit is pixels
+			GraphicsUnit.Pixel => 72 / dpi, 		// 1 pixel = 72 points per inch / Dots Per Inch
+			GraphicsUnit.Point => 1, 				// Already in points
+			GraphicsUnit.Inch => 72,				// 1 inch = 72 points
+			GraphicsUnit.Document => 72 / 300f, 	// 1 document unit = 1/300 inch
+			GraphicsUnit.Millimeter => 72 / 25.4f, 	// 1 millimeter = 1/25.4 inch
+			_ => throw new ArgumentException("Invalid GraphicsUnit")
+		};
+	}
+
 
 	#endregion
 
