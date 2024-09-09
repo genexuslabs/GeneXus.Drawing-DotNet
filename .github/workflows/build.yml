@@ -38,18 +38,11 @@ jobs:
 
         switch -regex ($Env:GITHUB_REF_NAME) {
           '^main' {
-             #$PUBLISH_TO_NUGETORG = 'true'
-
-             #---
-             # Temporary publish to an internal feed with prerelease tag 'trunk'
-             # while we are working in the first release
-             $PUBLISH_TO_NUGETORG = 'false'
-             $VersionTag = 'trunk'
-             #---
-           }
+             $PUBLISH_TO_NUGETORG = 'true'
+          }
           default {
             $PUBLISH_TO_NUGETORG = 'false'
-            $VersionTag = "dev"
+            $VersionTag = "alpha"
             if ([string]::IsNullOrEmpty("${{ github.event.inputs.force-dev-push }}") ) {
               $doPush = $false
             } else {
@@ -90,7 +83,7 @@ jobs:
         $bytes = [Convert]::FromBase64String($Env:PFX_BASE64)
         [IO.File]::WriteAllBytes($codesign_pfx, $bytes)
 
-        Get-ChildItem .\_packages\$Env:Configuration\*.nupkg -Recurse |
+        Get-ChildItem .\_packages\$Env:Configuration\*.nupkg -Recurse | ForEach-Object {
           dotnet nuget sign $_.FullName --certificate-path $codesign_pfx --certificate-password $Env:PFX_PASS --timestamper $Env:TIMESTAMPER_URL
         }
 

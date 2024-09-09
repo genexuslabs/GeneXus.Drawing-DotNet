@@ -5,6 +5,7 @@
     <DefineConstants>$(DefineConstants);PACKAGE_COPYRIGHT_START_YEAR</DefineConstants>
     <RootNamespace>GeneXus.Drawing</RootNamespace>
     <SignAssembly>True</SignAssembly>
+    <RepositoryUrl>https://github.com/genexuslabs/GeneXus.Drawing-DotNet</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
