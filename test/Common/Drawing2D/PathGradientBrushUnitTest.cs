@@ -15,7 +15,6 @@ internal class PathGradientBrushUnitTest
 	{
 		var rect = new RectangleF(5, 5, 40, 40);
 		var color = Color.Red;
-		// var center = new PointF(15, 15); // NOT WORKING
 		
 		using var path = new GraphicsPath();
 		path.AddEllipse(rect);

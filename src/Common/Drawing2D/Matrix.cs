@@ -269,7 +269,7 @@ public sealed class Matrix : ICloneable, IDisposable
 	///  array of <see cref='Point'/>.
 	/// </summary>
 	public void TransformPoints(Point[] points)
-		=> TransformPoints(points, m_matrix, p => new(p), p => p.m_point);
+		=> TransformPoints(points, Transpose(m_matrix), p => new(p), p => p.m_point);
 
 	/// <summary>
 	///  Applies only the scale and rotate components of this <see cref='Matrix'/> to the specified 
@@ -350,8 +350,9 @@ public sealed class Matrix : ICloneable, IDisposable
 	{
 		for (int i = 0; i < points.Length; i++)
 		{
-			var point = matrix.MapPoint(getPoint(points[i]));
-			points[i] = newPoint(point);
+			var srcPoint = getPoint(points[i]);
+			var dstPoint = matrix.MapPoint(srcPoint);
+			points[i] = newPoint(dstPoint);
 		}
 	}
 

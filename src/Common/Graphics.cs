@@ -1766,7 +1766,7 @@ public sealed class Graphics : IDisposable
 
 	#region Helpers
 
-	private Color ClipColor { get; set;}
+	private Color ClipColor { get; set; }
 
 	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
 	{

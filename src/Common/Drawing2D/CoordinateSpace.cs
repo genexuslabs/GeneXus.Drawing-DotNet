@@ -13,7 +13,7 @@ public enum CoordinateSpace
 
 	/// <summary>
 	///  Specifies that coordinates are in the page coordinate context. Their units are defined 
-	///  by the <see cref='PageUnit'/> property, and must be one of the elements of 
+	///  by the <see cref='Graphics.PageUnit'/> property, and must be one of the elements of 
 	///  the <see cref='GraphicsUnit'/> enumeration.
 	/// </summary>
 	Page = 1,
