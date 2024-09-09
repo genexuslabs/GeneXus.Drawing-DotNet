@@ -197,8 +197,6 @@ The `GeneXus.Drawing` library is based on the [SkiaSharp project](https://github
 
 License (MIT): https://github.com/mono/SkiaSharp/blob/main/LICENSE.md
 
-Certainly! Here's an updated paragraph for the README file:
-
 # Contributing
 
 We welcome contributions from the community to improve this project. Please follow the guidelines outlined in the [CONTRIBUTION](CONTRIBUTION.md) file for that.
