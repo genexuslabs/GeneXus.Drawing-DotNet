@@ -9,7 +9,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 {
 	internal readonly SKPath m_path;
 
-	private GraphicsPath(SKPath path)
+	internal GraphicsPath(SKPath path)
 	{
 		m_path = path;
 	}
