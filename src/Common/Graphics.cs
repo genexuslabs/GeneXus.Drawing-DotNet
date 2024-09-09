@@ -1806,12 +1806,66 @@ public sealed class Graphics : IDisposable
 
 	private void TransformPoints<T>(CoordinateSpace destination, CoordinateSpace source, T[] points, Func<T, SKPoint> getPoint, Func<SKPoint, T> newPoint)
 	{
-		// TODO: implement CoordinateSpace
-		var matrix = m_canvas.TotalMatrix;
-		for (int i = 0; i < points.Length; i++)
+		if (source == destination)
+			return;
+
+		void ApplyTransform(SKMatrix matrix)
 		{
-			var point = matrix.MapPoint(getPoint(points[i]));
-			points[i] = newPoint(point);
+			for (int i = 0; i < points.Length; i++)
+			{
+				var srcPoint = getPoint(points[i]);
+				var dstPoint = matrix.MapPoint(srcPoint);
+				points[i] = newPoint(dstPoint);
+			}
+		}
+
+		// get factors according to page unot and scale
+		var factorX = GetFactor(DpiX, PageUnit, GraphicsUnit.Pixel) * PageScale;
+		var factorY = GetFactor(DpiY, PageUnit, GraphicsUnit.Pixel) * PageScale;
+
+		var factorMatrix = SKMatrix.CreateScale(factorX, factorY);
+
+		// get the destination and source matrices
+		var dstTransMatrix = new SKMatrix(m_canvas.TotalMatrix.Values);
+		var dstScaleMatrix = SKMatrix.Concat(dstTransMatrix, factorMatrix);
+
+		var srcTransMatrix = dstTransMatrix.Invert();
+		var srcScaleMatrix = dstScaleMatrix.Invert();
+
+		// apply transform based on source
+		switch (source)
+		{
+			case CoordinateSpace.World:
+				break;
+
+			case CoordinateSpace.Page:
+				ApplyTransform(srcTransMatrix);
+				break;
+
+			case CoordinateSpace.Device:
+				ApplyTransform(srcScaleMatrix);
+				break;
+
+			default:
+				throw new ArgumentException($"{source} coordinate space is not supported.", nameof(source));
+		}
+
+		// apply transform based on destination
+		switch (destination)
+		{
+			case CoordinateSpace.World:
+				break;
+
+			case CoordinateSpace.Page:
+				ApplyTransform(dstTransMatrix);
+				break;
+
+			case CoordinateSpace.Device:
+				ApplyTransform(dstScaleMatrix);
+				break;
+
+			default:
+				throw new ArgumentException($"{destination} coordinate space is not supported.", nameof(destination));
 		}
 	}
 
