@@ -800,7 +800,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		if (points.Length % 4 != 0)
 			throw new ArgumentException($"beziers requires points lenght with multiple of 4", nameof(points));
 		for (int i = 0; i < points.Length; i += 4)
-			AddBezier(points[i], points[i + 1], points[i + 2], points[i + 4]);
+			AddBezier(points[i], points[i + 1], points[i + 2], points[i + 3]);
 	}
 
 
