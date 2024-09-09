@@ -73,7 +73,7 @@ jobs:
       run: dotnet test --configuration $env:Configuration --no-build
 
     - name: Sign packages
-      #if: env.IS_PUBLISH_TO_NUGETORG == 'true'
+      if: env.IS_PUBLISH_TO_NUGETORG == 'true'
       env:
         TIMESTAMPER_URL: ${{ secrets.CODE_SIGN_CERTIFICATE_TIMESTAMPER_URL }}
         PFX_BASE64: ${{ secrets.CODE_SIGN_CERTIFICATE_BASE64 }}
