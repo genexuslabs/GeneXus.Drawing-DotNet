@@ -42,7 +42,7 @@ jobs:
           }
           default {
             $PUBLISH_TO_NUGETORG = 'false'
-            $VersionTag = "dev"
+            $VersionTag = "alpha"
             if ([string]::IsNullOrEmpty("${{ github.event.inputs.force-dev-push }}") ) {
               $doPush = $false
             } else {
