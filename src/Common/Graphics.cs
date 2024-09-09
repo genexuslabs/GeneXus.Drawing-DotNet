@@ -572,13 +572,14 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void DrawImage(Image image, RectangleF destination, RectangleF source, GraphicsUnit unit)
 	{
-		float factorX = GetFactor(DpiX, unit, GraphicsUnit.Pixel);
-		float factorY = GetFactor(DpiY, unit, GraphicsUnit.Pixel);
-
-		var src = new RectangleF(source.X, source.Y, source.Width * factorX, source.Height * factorY);
-		var dst = new RectangleF(destination.X, destination.Y, destination.Width * factorX, destination.Height * factorY);
-
-		m_canvas.DrawImage(image.InnerImage, src.m_rect, dst.m_rect);
+		var dst = new PointF[] 
+		{  
+			new(destination.Left, destination.Top),
+			new(destination.Right, destination.Top),
+			new(destination.Right, destination.Bottom),
+			new(destination.Left, destination.Bottom)
+		};
+		DrawImage(image, dst, source, unit);
 	}
 
 	/// <summary>
@@ -600,11 +601,18 @@ public sealed class Graphics : IDisposable
 		for (int i = 1; i < destPoints.Length; i++)
 			path.LineTo(destPoints[i].m_point);
 		path.Close();
-		
+
 		m_canvas.ClipPath(path);
 
 		var dstRect = new RectangleF(path.Bounds);
-		DrawImage(image, dstRect, srcRect, srcUnit);
+
+		float factorX = GetFactor(DpiX, srcUnit, GraphicsUnit.Pixel);
+		float factorY = GetFactor(DpiY, srcUnit, GraphicsUnit.Pixel);
+
+		var src = new RectangleF(srcRect.X, srcRect.Y, srcRect.Width * factorX, srcRect.Height * factorY);
+		var dst = new RectangleF(dstRect.X, dstRect.Y, dstRect.Width * factorX, dstRect.Height * factorY);
+
+		m_canvas.DrawImage(image.InnerImage, src.m_rect, dst.m_rect);
 	}
 
 	/// <summary>
