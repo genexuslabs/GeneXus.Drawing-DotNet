@@ -1529,7 +1529,7 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public SizeF MeasureStringInternal(string text, Font font, RectangleF layoutArea, StringFormat format, out int charsFitted, out int linesFilled)
 	{
-		var path = new GraphicsPath();
+		using var path = new GraphicsPath();
 		path.AddString(text, font.FontFamily, (int)font.Style, font.Size, layoutArea, format);
 
 		var bounds = path.GetBounds();
