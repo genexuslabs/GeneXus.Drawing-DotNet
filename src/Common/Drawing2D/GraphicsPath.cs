@@ -403,7 +403,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  of the current figure defined by a sequence of <see cref='PointF'/> structures.
 	/// </summary>
 	public void AddLines(params PointF[] points)
-		=> Array.ForEach(Enumerable.Range(0, points.Length - 2).ToArray(), i => AddLine(points[i], points[i + 1]));
+		=> Array.ForEach(Enumerable.Range(0, points.Length - 1).ToArray(), i => AddLine(points[i], points[i + 1]));
 
 	/// <summary>
 	///  Appends a series of connected line segments to the end 
