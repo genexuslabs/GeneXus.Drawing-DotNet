@@ -1,10 +1,24 @@
+[![Build & Publish](https://github.com/genexuslabs/GeneXus.Drawing-DotNet/actions/workflows/build.yml/badge.svg)](https://github.com/genexuslabs/GeneXus.Drawing-DotNet/actions/workflows/build.yml)
+
 # GeneXus.Drawing-DotNet
 A cross-platform implementation of selected `System.Drawing` elements tailored for GeneXus development.
 
-## Status
-| Branch | Build
-|--------|---
-| main   | |[![](https://github.com/genexuslabs/GeneXus.Drawing-DotNet/workflows/Build/badge.svg?branch=main)](https://github.com/genexuslabs/genexus.drawing-dotnet/actions?query=workflow%3ABuild+branch%3Amain)
+# Table of Contents
+
+- [History](#history)
+- [Considerations](#considerations)
+- [Repository](#repository)
+- [Modules](#modules)
+   - [GeneXus.Drawing.Common](#genexusdrawingcommon)
+   - [GeneXus.Drawing.Imaging](#genexusdrawingimaging)
+   - [GeneXus.Drawing.Text](#genexusdrawingtext)
+   - [GeneXus.Drawing.Interop](#genexusdrawinginterop)
+- [How to build](#how-to-build)
+   - [Requirements](#requirements)
+   - [Instructions](#instructions)
+- [License](#license)
+- [Third-Party License Attributions](#third-party-license-attributions)
+- [Contributing](#contributing)
 
 ## History
 The creation of this library was driven by Microsoft's decision to make the `System.Drawing.Common` NuGet package as Windows-specific as of .NET 6. For further details about this annoucement, please refer to [Microsoft Learn Article: System.Drawing.Common only supported on Windows](https://learn.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only).
@@ -182,3 +196,9 @@ The `GeneXus.Drawing` library is based on the [SkiaSharp project](https://github
 > SkiaSharp is a cross-platform 2D graphics API for .NET platforms based on Google's Skia Graphics Library (skia.org). It provides a comprehensive 2D API that can be used across mobile, server and desktop models to render images.
 
 License (MIT): https://github.com/mono/SkiaSharp/blob/main/LICENSE.md
+
+# Contributing
+
+We welcome contributions from the community to improve this project. Please follow the guidelines outlined in the [CONTRIBUTION](CONTRIBUTION.md) file for that.
+
+Thank you for considering to work with us! We look forward to your contributions.
