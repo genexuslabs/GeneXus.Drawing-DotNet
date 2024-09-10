@@ -82,7 +82,11 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets or sets a <see cref='Region'/> that limits the drawing region of this <see cref='Graphics'/>.
 	/// </summary>
-	public Region Clip { get; set; }
+	public Region Clip
+	{
+		get => new Region(ClipRegion.m_region);
+		set => SetClip(value);
+	}
 
 	/// <summary>
 	///  Gets a <see cref='Rectangle'/> structure that bounds the clipping region of this <see cref='Graphics'/>.
@@ -1588,12 +1592,13 @@ public sealed class Graphics : IDisposable
 	{
 		m_context = -1;
 
-		// NOTE: reset without losing the transformation matrix
+		// NOTE: apply a full reset without losing the transformation matrix
 		var matrix = m_canvas.TotalMatrix;
 		m_canvas.RestoreToCount(m_context);
 		m_canvas.SetMatrix(matrix);
 
-		m_canvas.Clear(ClipColor.m_color);
+		ClipRegion.MakeInfinite();
+		SetClip(ClipRegion);
 	}
 
 	/// <summary>
@@ -1650,34 +1655,35 @@ public sealed class Graphics : IDisposable
 		switch (combineMode)
 		{
 			case CombineMode.Replace:
-				Clip = region;
+				ClipRegion = region;
 				break;
 
 			case CombineMode.Union:
-				Clip.Union(region);
+				ClipRegion.Union(region);
 				break;
 
 			case CombineMode.Intersect: 
-				Clip.Intersect(region);
+				ClipRegion.Intersect(region);
 				break;
 
 			case CombineMode.Exclude:
-				Clip.Exclude(region);
+				ClipRegion.Exclude(region);
 				break;
 
 			case CombineMode.Complement: 
-				Clip.Complement(region);
+				ClipRegion.Complement(region);
 				break;
 
 			case CombineMode.Xor: 
-				Clip.Xor(region);
+				ClipRegion.Xor(region);
 				break;
 
 			default:
 				throw new ArgumentException($"{combineMode} value is not supported", nameof(combineMode));
 		}
 		m_context = m_canvas.Save();
-		m_canvas.ClipRegion(Clip.m_region);
+		m_canvas.ClipRegion(ClipRegion.m_region);
+		m_canvas.Clear(ClipColor.m_color);
 	}
 
 	/// <summary>
@@ -1777,6 +1783,8 @@ public sealed class Graphics : IDisposable
 	#region Helpers
 
 	private Color ClipColor { get; set; }
+
+	private Region ClipRegion { get; set; }
 
 	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
 	{
