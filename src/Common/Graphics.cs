@@ -1284,6 +1284,27 @@ public sealed class Graphics : IDisposable
 	} 
 
 	/// <summary>
+	///  Combines current Graphics context with all previous contexts.
+	///  When BeginContainer() is called, a copy of the current context is pushed into the GDI+ context stack, it keeps track of the
+	///  absolute clipping and transform but reset the public properties so it looks like a brand new context.
+	///  When Save() is called, a copy of the current context is also pushed in the GDI+ stack but the public clipping and transform
+	///  properties are not reset (cumulative). Consecutive Save context are ignored with the exception of the top one which contains
+	///  all previous information.
+	///  The return value is an object array where the first element contains the cumulative clip region and the second the cumulative
+	///  translate transform matrix.
+	/// </summary>
+	public object GetContextInfo()
+	{
+		using var path = new GraphicsPath(m_path);
+
+		using var cumulativeClip = m_canvas.IsClipEmpty ? null : new Region(path);
+		var cumulativeTransform = TransformElements;
+
+		// TODO: keep the context tracking when calling to BeginContainer/Save and EndContainer/Restore
+		return new object[] { cumulativeClip ?? new Region(), new Matrix(cumulativeTransform) };
+	}
+
+	/// <summary>
 	///  Gets a handle to the current Windows halftone palette.
 	/// </summary>
 	public static IntPtr GetHalftonePalette()
