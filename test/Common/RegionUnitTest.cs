@@ -4,7 +4,7 @@ using GeneXus.Drawing.Drawing2D;
 
 namespace GeneXus.Drawing.Test;
 
-internal class RecgionUnitTest
+internal class RegionUnitTest
 {
 	private static readonly string IMAGE_PATH = Path.Combine(
 		Directory.GetParent(Environment.CurrentDirectory).Parent.FullName,
