@@ -246,7 +246,10 @@ public sealed class Graphics : IDisposable
 	///  and opens and uses a new graphics container.
 	/// </summary>
 	public GraphicsContainer BeginContainer()
-		=> BeginContainer(new RectangleF(0, 0, 1, 1), new RectangleF(0, 0, 1, 1), GraphicsUnit.Pixel);
+	{
+		var rect = new RectangleF(m_canvas.LocalClipBounds);
+		return BeginContainer(rect, rect, GraphicsUnit.Pixel);
+	}
 
 	/// <summary>
 	///  Saves a graphics container with the current state of this <see cref='Graphics'/> and
@@ -254,13 +257,13 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public GraphicsContainer BeginContainer(RectangleF dstRect, RectangleF srcRect, GraphicsUnit unit)
 	{
-		int state = m_canvas.Save();
+		int state = m_canvas.SaveLayer();
 
 		float factorX = GetFactor(DpiX, unit, GraphicsUnit.Pixel);
 		float factorY = GetFactor(DpiY, unit, GraphicsUnit.Pixel);
 
-		var src = RectangleF.Inflate(srcRect, factorX, factorY);
-		var dst = RectangleF.Inflate(dstRect, factorX, factorY);
+		var src = new RectangleF(srcRect.X, srcRect.Y, srcRect.Width * factorX, srcRect.Height * factorY);
+		var dst = new RectangleF(dstRect.X, dstRect.Y, dstRect.Width * factorX, dstRect.Height * factorY);
 
 		float scaleX = dst.Width / src.Width;
 		float scaleY = dst.Height / src.Height;
