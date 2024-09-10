@@ -263,7 +263,7 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public GraphicsContainer BeginContainer(RectangleF dstRect, RectangleF srcRect, GraphicsUnit unit)
 	{
-		int state = m_canvas.SaveLayer();
+		int state = m_canvas.Save();
 
 		float factorX = GetFactor(DpiX, unit, GraphicsUnit.Pixel);
 		float factorY = GetFactor(DpiY, unit, GraphicsUnit.Pixel);
@@ -277,9 +277,11 @@ public sealed class Graphics : IDisposable
 		float translateX = dst.Left - src.Left * scaleX;
 		float translateY = dst.Top - src.Top * scaleY;
 
+		m_canvas.ResetMatrix();
 		m_canvas.Translate(translateX, translateY);
 		m_canvas.Scale(scaleX, scaleY);
 
+		// TODO: reset all properties of this instance and restore them when calling to EndContainer
 		return new GraphicsContainer(state);
 	}
 
@@ -1656,7 +1658,7 @@ public sealed class Graphics : IDisposable
 	///  identifies the saved state with a <see cref="GraphicsState"/>.
 	/// </summary>
 	public GraphicsState Save()
-		=> new(m_canvas.Save());
+		=> new(m_canvas.SaveLayer());
 
 	/// <summary>
 	///  Applies the specified scaling operation to the transformation matrix of 
