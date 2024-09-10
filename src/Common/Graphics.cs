@@ -1373,7 +1373,7 @@ public sealed class Graphics : IDisposable
 	///  within the visible clip region of this <see cref="Graphics"/>.
 	/// </summary>
 	public bool IsVisible(PointF point)
-		=> m_canvas.LocalClipBounds.Contains(point.m_point);
+		=> IsVisible(new RectangleF(point, new SizeF(1, 1)));
 
 	/// <summary>
 	///  Indicates whether the specified <see cref="Point"/> structure is contained 
@@ -1387,7 +1387,11 @@ public sealed class Graphics : IDisposable
 	///  within the visible clip region of this <see cref="Graphics"/>.
 	/// </summary>
 	public bool IsVisible(RectangleF rect)
-		=> m_canvas.LocalClipBounds.Contains(rect.m_rect);
+	{
+		using var path = new GraphicsPath(m_path);
+		using var region = new Region(path);
+		return region.IsVisible(rect);
+	}
 
 	/// <summary>
 	///  Indicates whether the specified <see cref="Rectangle"/> structure is contained 
