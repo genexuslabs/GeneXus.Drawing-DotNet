@@ -1815,6 +1815,15 @@ public sealed class Graphics : IDisposable
 
 	private void PaintPath(SKPath path, SKPaint paint)
 	{
+		var render = paint.Clone();
+		render.BlendMode = CompositingMode switch
+		{
+			CompositeMode.SourceOver => SKBlendMode.SrcOver,
+			CompositeMode.SourceCopy => SKBlendMode.Src,
+			_ => throw new NotImplementedException()
+		};
+
+		m_canvas.DrawPath(path, render);
 		m_path.AddPath(path); // used by IsVisible method
 		m_canvas.DrawPath(path, paint);
 	}
