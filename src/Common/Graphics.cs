@@ -12,6 +12,7 @@ public sealed class Graphics : IDisposable
 {
 	internal readonly SKCanvas m_canvas;
 	internal readonly SKBitmap m_bitmap;
+	internal readonly SKPath m_path; // NOTE: tracks every shape added in order to implement IsVisible method
 	private int m_context;
 
 	internal static readonly (int X, int Y) DPI;
@@ -27,6 +28,7 @@ public sealed class Graphics : IDisposable
 	{
 		m_bitmap = bitmap;
 		m_canvas = new SKCanvas(m_bitmap);
+		m_path = new SKPath();
 		m_context = -1;
 
 		Clip = new Region(ClipBounds);
@@ -321,7 +323,11 @@ public sealed class Graphics : IDisposable
 	///  Draws an arc representing a portion of an ellipse specified by a <see cref='Rectangle'/> structure.
 	/// </summary>
 	public void DrawArc(Pen pen, RectangleF oval, float startAngle, float sweepAngle)
-		=> m_canvas.DrawArc(oval.m_rect, startAngle, sweepAngle, false, pen.m_paint);
+	{
+		using var path = new GraphicsPath();
+		path.AddArc(oval, startAngle, sweepAngle);
+		DrawPath(pen, path);
+	}
 
 	/// <summary>
 	///  Draws an arc representing a portion of an ellipse specified by a pair of coordinates, a width, and a height.
@@ -373,12 +379,9 @@ public sealed class Graphics : IDisposable
 		if (points.Length < 4 || points.Length % 3 != 1)
 			throw new ArgumentException("invalid number of points for drawing Bezier curves", nameof(points));
 
-		using var path = new SKPath();
-		path.MoveTo(points[0].m_point);
-		for (int i = 1; i < points.Length - 2; i += 3)
-			path.CubicTo(points[i].m_point, points[i + 1].m_point, points[i + 2].m_point);
-
-		m_canvas.DrawPath(path, pen.m_paint);
+		using var path = new GraphicsPath();
+		path.AddBeziers(points);
+		DrawPath(pen, path);
 	}
 
 	/// <summary>
@@ -399,7 +402,7 @@ public sealed class Graphics : IDisposable
 	public void DrawClosedCurve(Pen pen, PointF[] points, float tension = 0.5f, FillMode fillMode = FillMode.Winding)
 	{
 		using var path = GetCurvePath(points, fillMode, tension, true);
-		m_canvas.DrawPath(path.m_path, pen.m_paint);
+		DrawPath(pen, path);
 	}
 
 	/// <summary>
@@ -424,7 +427,7 @@ public sealed class Graphics : IDisposable
 		points = points.Skip(offset).Take(numberOfSegments).ToArray();
 
 		using var path = GetCurvePath(points, fillMode, tension, false);
-		m_canvas.DrawPath(path.m_path, pen.m_paint);
+		DrawPath(pen, path);
 	}
 
 	/// <summary>
@@ -457,7 +460,10 @@ public sealed class Graphics : IDisposable
 	///  Draws an ellipse specified by a bounding <see cref='RectangleF'/> structure.
 	/// </summary>
 	public void DrawEllipse(Pen pen, RectangleF rect)
-		=> m_canvas.DrawOval(rect.m_rect, pen.m_paint);
+	{
+		using var path = GetEllipsePath(rect);
+		DrawPath(pen, path);
+	}
 
 	/// <summary>
 	///  Draws an ellipse defined by a bounding rectangle specified by coordinates for the upper-left corner of the 
@@ -602,16 +608,14 @@ public sealed class Graphics : IDisposable
 	public void DrawImage(Image image, PointF[] destPoints, RectangleF srcRect, GraphicsUnit srcUnit, object imageAtt = null, object callback = null, int callbackData = 0)
 	{
 		// TODO: Implement ImageAttributes (attributes), DrawImageAbort (callback) and IntPtr (callbackData)
-		using var path = new SKPath();
-		
-		path.MoveTo(destPoints[0].m_point);
-		for (int i = 1; i < destPoints.Length; i++)
-			path.LineTo(destPoints[i].m_point);
-		path.Close();
+		using var path = new GraphicsPath();
+		path.AddLines(destPoints);
+		path.CloseFigure();
 
-		m_canvas.ClipPath(path);
+		m_path.AddPath(path.m_path);
+		m_canvas.ClipPath(path.m_path);
 
-		var dstRect = new RectangleF(path.Bounds);
+		var dstRect = path.GetBounds();
 
 		float factorX = GetFactor(DpiX, srcUnit, GraphicsUnit.Pixel);
 		float factorY = GetFactor(DpiY, srcUnit, GraphicsUnit.Pixel);
@@ -701,7 +705,11 @@ public sealed class Graphics : IDisposable
 	///  Draws a line connecting two <see cref='PointF'/> structures.
 	/// </summary>
 	public void DrawLine(Pen pen, PointF point1, PointF point2)
-		=> m_canvas.DrawLine(point1.m_point, point2.m_point, pen.m_paint);
+	{
+		using var path = new GraphicsPath();
+		path.AddLine(point1, point2);
+		DrawPath(pen, path);
+	}
 
 	/// <summary>
 	///  Draws a line connecting the two points specified by the coordinate pairs.
@@ -736,7 +744,7 @@ public sealed class Graphics : IDisposable
 	///  Draws a <see cref='GraphicsPath'/>.
 	/// </summary>
 	public void DrawPath(Pen pen, GraphicsPath path)
-		=> m_canvas.DrawPath(path.m_path, pen.m_paint);
+		=> PaintPath(path.m_path, pen.m_paint);
 
 	/// <summary>
 	///  Draws a pie shape defined by an ellipse specified by a <see cref='RectangleF'/> structure and two radial lines.
@@ -744,7 +752,7 @@ public sealed class Graphics : IDisposable
 	public void DrawPie(Pen pen, RectangleF rect, float startAngle, float sweepAngle)
 	{
 		using var path = GetPiePath(rect, startAngle, sweepAngle);
-		m_canvas.DrawPath(path.m_path, pen.m_paint);
+		DrawPath(pen, path);
 	}
 
 	/// <summary>
@@ -771,7 +779,7 @@ public sealed class Graphics : IDisposable
 	public void DrawPolygon(Pen pen, params PointF[] points)
 	{
 		using var path = GetPolygonPath(points, FillMode.Winding);
-		m_canvas.DrawPath(path.m_path, pen.m_paint);
+		DrawPath(pen, path);
 	}
 
 	/// <summary>
@@ -784,7 +792,10 @@ public sealed class Graphics : IDisposable
 	///  Draws a rectangle specified by a <see cref='RectangleF'/> structure.
 	/// </summary>
 	public void DrawRectangle(Pen pen, RectangleF rect)
-		=> m_canvas.DrawRect(rect.m_rect, pen.m_paint);
+	{
+		using var path = GetRectanglePath(rect);
+		DrawPath(pen, path);
+	}
 
 	/// <summary>
 	///  Draws a rectangle specified by a <see cref='Rectangle'/> structure.
@@ -859,7 +870,7 @@ public sealed class Graphics : IDisposable
 	{
 		using var path = new GraphicsPath();
 		path.AddString(text, font.FontFamily, (int)font.Style, font.Size, layout, format);
-		m_canvas.DrawPath(path.m_path, brush.m_paint);
+		FillPath(brush, path);
 	}
 
 	/// <summary>
@@ -1142,7 +1153,7 @@ public sealed class Graphics : IDisposable
 	public void FillClosedCurve(Brush brush, PointF[] points, FillMode fillMode = FillMode.Alternate, float tension = 0.5f)
 	{
 		using var path = GetCurvePath(points, fillMode, tension, true);
-		m_canvas.DrawPath(path.m_path, brush.m_paint);
+		FillPath(brush, path);
 	}
 
 	/// <summary>
@@ -1171,7 +1182,10 @@ public sealed class Graphics : IDisposable
 	///  specified by a Rectangle structure.
 	/// </summary>
 	public void FillEllipse(Brush brush, RectangleF rect)
-		=> m_canvas.DrawOval(rect.m_rect, brush.m_paint);
+	{
+		using var path = GetEllipsePath(rect);
+		FillPath(brush, path);
+	}
 
 	/// <summary>
 	///  Fills the interior of an ellipse defined by a bounding <see cref="Rectangle"/> 
@@ -1184,7 +1198,7 @@ public sealed class Graphics : IDisposable
 	///  Fills the interior of a <see cref='GraphicsPath'/>.
 	/// </summary>
 	public void FillPath(Brush brush, GraphicsPath path)
-		=> m_canvas.DrawPath(path.m_path, brush.m_paint);
+		=> PaintPath(path.m_path, brush.m_paint);
 
 	/// <summary>
 	///  Fills the interior of a pie section defined by an ellipse specified by 
@@ -1193,7 +1207,7 @@ public sealed class Graphics : IDisposable
 	public void FillPie(Brush brush, RectangleF oval, float startAngle, float sweepAngle)
 	{
 		using var path = GetPiePath(oval, startAngle, sweepAngle);
-		m_canvas.DrawPath(path.m_path, brush.m_paint);
+		FillPath(brush, path);
 	}
 
 	/// <summary>
@@ -1224,7 +1238,7 @@ public sealed class Graphics : IDisposable
 	public void FillPolygon(Brush brush, PointF[] points, FillMode fillMode = FillMode.Alternate)
 	{
 		using var path = GetPolygonPath(points, fillMode);
-		m_canvas.DrawPath(path.m_path, brush.m_paint);
+		FillPath(brush, path);
 	}
 
 	/// <summary>
@@ -1238,7 +1252,10 @@ public sealed class Graphics : IDisposable
 	///  Fills the interior of a rectangle specified by a <see cref="RectangleF"/> structure.
 	/// </summary>
 	public void FillRectangle(Brush brush, RectangleF rect)
-		=> m_canvas.DrawRect(rect.m_rect, brush.m_paint);
+	{
+		using var path = GetRectanglePath(rect);
+		FillPath(brush, path);
+	}
 
 	/// <summary>
 	///  Fills the interior of a rectangle specified by a <see cref="Rectangle"/> structure.
@@ -1274,7 +1291,11 @@ public sealed class Graphics : IDisposable
 	///  Fills the interior of a <see cref="Region"/>.
 	/// </summary>
 	public void FillRegion(Brush brush, Region region)
-		=> m_canvas.DrawRegion(region.m_region, brush.m_paint);
+	{
+		using var boundaries = region.m_region.GetBoundaryPath();
+		using var path = new GraphicsPath(boundaries);
+		FillPath(brush, path);
+	}
 
 	/// <summary>
 	///  Forces execution of all pending graphics operations with the method waiting 
@@ -1786,6 +1807,12 @@ public sealed class Graphics : IDisposable
 
 	private Region ClipRegion { get; set; }
 
+	private void PaintPath(SKPath path, SKPaint paint)
+	{
+		m_path.AddPath(path); // used by IsVisible method
+		m_canvas.DrawPath(path, paint);
+	}
+
 	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
 	{
 		if (points.Length < 3)
@@ -1800,6 +1827,13 @@ public sealed class Graphics : IDisposable
 		return path;
 	}
 
+	private static GraphicsPath GetEllipsePath(RectangleF rect)
+	{
+		var path = new GraphicsPath();
+		path.AddEllipse(rect);
+		return path;
+	}
+
 	private static GraphicsPath GetPiePath(RectangleF rect, float startAngle, float sweepAngle)
 	{
 		var path = new GraphicsPath();
@@ -1811,6 +1845,13 @@ public sealed class Graphics : IDisposable
 	{
 		var path = new GraphicsPath(fillMode);
 		path.AddPolygon(points);
+		return path;
+	}
+
+	private static GraphicsPath GetRectanglePath(RectangleF rect)
+	{
+		var path = new GraphicsPath();
+		path.AddRectangle(rect);
 		return path;
 	}
 
