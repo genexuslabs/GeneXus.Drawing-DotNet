@@ -308,7 +308,7 @@ public sealed class Graphics : IDisposable
 	///  from the screen to the drawing surface of the <see cref='Graphics'/>.
 	/// </summary>
 	public void CopyFromScreen(int srcX, int srcY, int dstX, int dstY, Size blockRegionSize, CopyPixelOperation copyPixelOperation = CopyPixelOperation.SourceCopy)
-		=> throw new NotSupportedException();
+		=> throw new NotSupportedException("skia unsupported feature");
 
 	/// <summary>
 	///  Draws an arc representing a portion of an ellipse specified by a <see cref='Rectangle'/> structure.
@@ -1571,13 +1571,13 @@ public sealed class Graphics : IDisposable
 	///  the <see cref="GetHdc"/> method of this <see cref="Graphics"/>.
 	/// </summary>
 	public void ReleaseHdc(IntPtr hdc)
-		=> throw new NotSupportedException();
+		=> throw new NotSupportedException("skia unsupported feature");
 
 	/// <summary>
 	///  Releases a handle to a device context.
 	/// </summary>
 	public void ReleaseHdcInternal(IntPtr hdc)
-		=> throw new NotSupportedException();
+		=> throw new NotSupportedException("skia unsupported feature");
 
 	/// <summary>
 	///  Resets the clip region of this <see cref="Graphics"/> to an infinite region.
