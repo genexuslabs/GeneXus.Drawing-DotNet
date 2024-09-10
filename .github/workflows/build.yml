@@ -92,12 +92,14 @@ jobs:
       run: |
         if ( '${{ env.IS_PUBLISH_TO_NUGETORG }}' -eq 'true' ) {
           # NuGet feed already defined at NuGet.Config
-          $pushArgs = @('--source', 'nuget.org', '--api-key', '${{ secrets.NUGET_ORG_TOKEN }}')
+          $pushArgs=@('--source', 'nuget.org', '--api-key', '${{ secrets.NUGET_ORG_TOKEN }}')
         } else {
-          $pushArgs = @('--source', 'NuGetFeed4Deploy', '--api-key', 'DUMMY-KEY')
-          dotnet nuget add source ${{ vars.AZURE_NEXUS_PRERELEASES_FEED }} --name NuGetFeed4Deploy --username gxbuilder --password ${{ secrets.AZURE_ARTIFACTS_TOKEN }}
-        }
+          $feedName="NuGetFeed4Deploy"
+          $pushArgs=@('--source', $feedName, '--api-key', 'DUMMY-KEY')
+          dotnet nuget add source ${{ vars.AZURE_NEXUS_PRERELEASES_FEED }} --name $feedName --username gxbuilder --password ${{ secrets.AZURE_ARTIFACTS_TOKEN }}
+        }$feedName
         $args = $pushArgs -join " "
+        write-host [debug] Push arguments: dotnet push $args
         Get-ChildItem .\_packages\$Env:Configuration\*.nupkg -Recurse |
           ForEach-Object {
             dotnet nuget push $_.FullName $args 
