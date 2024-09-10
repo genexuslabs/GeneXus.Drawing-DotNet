@@ -1296,29 +1296,7 @@ public sealed class Graphics : IDisposable
 	///  Gets the nearest color to the specified <see cref="Drawing.Color"/> structure.
 	/// </summary>
 	public Color GetNearestColor(Color color)
-	{
-		var closest = SKColor.Empty;
-		var pivot = double.MaxValue;
-
-		foreach (var candidate in m_bitmap.Pixels.Distinct())
-		{
-			var powDiffs = new double[]
-			{
-				Math.Pow(color.R - candidate.Red, 2),
-				Math.Pow(color.G - candidate.Green, 2),
-				Math.Pow(color.B - candidate.Blue, 2),
-				Math.Pow(color.A - candidate.Alpha, 2)
-			};
-
-			var distance = Math.Sqrt(powDiffs.Sum());
-			if (distance < pivot)
-			{
-				closest = candidate;
-				pivot = distance;
-			}
-		}
-		return new Color(closest);
-	}
+		=> color; // NOTE: skia does not provides the device color palette to find the nearest color
 
 	/// <summary>
 	///  Updates the clip region of this <see cref="Graphics"/> to the intersection
