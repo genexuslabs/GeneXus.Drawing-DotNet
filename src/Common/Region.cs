@@ -10,7 +10,7 @@ public sealed class Region : IDisposable
 {
 	internal readonly SKRegion m_region;
 
-	private Region(SKRegion region)
+	internal Region(SKRegion region)
 	{
 		m_region = region;
 	}
@@ -368,7 +368,7 @@ public sealed class Region : IDisposable
 	///  Initializes this <see cref='Region'/> to an empty interior.
 	/// </summary>
 	public void MakeInfinite()
-		=> m_region.SetRect(SKRectI.Create(int.MaxValue, int.MaxValue));
+		=> m_region.SetRect(SKRectI.Create(-4194304, -4194304, 8388608, 8388608));
 
 	/// <summary>
 	///  Releases the handle of the <see cref='Region'/>.
