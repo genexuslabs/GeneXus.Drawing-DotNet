@@ -66,8 +66,8 @@ internal class HatchBrushUnitTest
 	[TestCase(HatchStyle.SolidDiamond)]
 	public void Constructor_StyleForeBack(HatchStyle style)
 	{
-		var back = Color.Red;
-		var fore = Color.Blue;
+		var fore = Color.Red;
+		var back = Color.Blue;
 
 		using var brush = new HatchBrush(style, fore, back);
 		Assert.Multiple(() =>

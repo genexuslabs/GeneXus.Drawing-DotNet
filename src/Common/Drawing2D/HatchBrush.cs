@@ -132,12 +132,12 @@ public sealed class HatchBrush : Brush
 		using var canvas = new SKCanvas(bitmap);
 		using var paint = new SKPaint
 		{
-			Color = m_back.m_color,
+			Color = m_fore.m_color,
 			Style = SKPaintStyle.Fill,
 			IsAntialias = false
 		};
 
-		canvas.Clear(m_fore.m_color);
+		canvas.Clear(m_back.m_color);
 
 		for (int x = 0; x < data.Width; x++)
 		{
