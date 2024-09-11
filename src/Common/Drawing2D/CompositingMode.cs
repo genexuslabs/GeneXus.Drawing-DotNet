@@ -3,7 +3,7 @@ namespace GeneXus.Drawing.Drawing2D;
 /// <summary>
 ///  Specifies how the source colors are combined with the background colors.
 /// </summary>
-public enum CompositeMode
+public enum CompositingMode
 {
 	/// <summary>
 	///  Specifies that when a color is rendered, it overwrites the background color.

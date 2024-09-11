@@ -98,7 +98,7 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets a value that specifies how composited images are drawn to this <see cref='Graphics'/>.
 	/// </summary>
-	public CompositeMode CompositingMode { get; set; } = CompositeMode.SourceOver;
+	public CompositingMode CompositingMode { get; set; } = CompositingMode.SourceOver;
 
 	/// <summary>
 	///  Gets or sets the rendering quality of composited images drawn to this <see cref='Graphics'/>.
@@ -1818,8 +1818,8 @@ public sealed class Graphics : IDisposable
 		using var render = paint.Clone();
 		render.BlendMode = CompositingMode switch
 		{
-			CompositeMode.SourceOver => SKBlendMode.SrcOver,
-			CompositeMode.SourceCopy => SKBlendMode.Src,
+			CompositingMode.SourceOver => SKBlendMode.SrcOver,
+			CompositingMode.SourceCopy => SKBlendMode.Src,
 			_ => throw new NotImplementedException()
 		};
 
