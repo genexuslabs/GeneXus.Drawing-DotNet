@@ -1822,6 +1822,22 @@ public sealed class Graphics : IDisposable
 			CompositingMode.SourceCopy => SKBlendMode.Src,
 			_ => throw new NotImplementedException()
 		};
+		render.FilterQuality = InterpolationMode switch
+		{
+			InterpolationMode.NearestNeighbor
+				=> SKFilterQuality.None,
+			InterpolationMode.Low 
+				=> SKFilterQuality.Low,
+			InterpolationMode.Default or
+			InterpolationMode.Bilinear 
+				=> SKFilterQuality.Medium,
+			InterpolationMode.High or
+			InterpolationMode.Bicubic or
+			InterpolationMode.HighQualityBilinear or
+			InterpolationMode.HighQualityBicubic 
+			 	=> SKFilterQuality.High,
+			_ => throw new NotImplementedException()
+		};
 
 		if (render.IsDither)
 		{
