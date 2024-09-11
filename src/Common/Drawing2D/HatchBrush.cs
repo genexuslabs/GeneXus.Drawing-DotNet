@@ -15,7 +15,7 @@ public sealed class HatchBrush : Brush
 	///  specified <see cref="Drawing2D.HatchStyle"/> enumeration, foreground color, and background color.
 	/// </summary>
 	public HatchBrush(HatchStyle hatchStyle, Color foreColor, Color backColor)
-		: base(new SKPaint { })
+		: base(new SKPaint { IsDither = true })
 	{
 		m_fore = foreColor;
 		m_back = backColor;

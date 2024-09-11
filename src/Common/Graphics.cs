@@ -1815,7 +1815,7 @@ public sealed class Graphics : IDisposable
 
 	private void PaintPath(SKPath path, SKPaint paint)
 	{
-		var render = paint.Clone();
+		using var render = paint.Clone();
 		render.BlendMode = CompositingMode switch
 		{
 			CompositeMode.SourceOver => SKBlendMode.SrcOver,
@@ -1823,9 +1823,14 @@ public sealed class Graphics : IDisposable
 			_ => throw new NotImplementedException()
 		};
 
+		if (render.IsDither)
+		{
+			var translation = SKMatrix.CreateTranslation(RenderingOrigin.X, RenderingOrigin.Y);
+			render.Shader = render.Shader.WithLocalMatrix(translation);
+		}
+
 		m_canvas.DrawPath(path, render);
 		m_path.AddPath(path); // used by IsVisible method
-		m_canvas.DrawPath(path, paint);
 	}
 
 	private static GraphicsPath GetCurvePath(PointF[] points, FillMode fillMode, float tension, bool closed)
