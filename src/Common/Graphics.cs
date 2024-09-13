@@ -1390,7 +1390,8 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public bool IsVisible(RectangleF rect)
 	{
-		using var path = new GraphicsPath(m_path);
+		using var copy = new SKPath(m_path);
+		using var path = new GraphicsPath(copy);
 		using var region = new Region(path);
 		return region.IsVisible(rect);
 	}
