@@ -1474,7 +1474,7 @@ public sealed class Graphics : IDisposable
 	///  a <see cref="SizeF"/> structure.
 	/// </summary>
 	public SizeF MeasureString(string text, Font font, SizeF layoutArea, StringFormat format = null)
-		=> MeasureString(text, font, new RectangleF(default, layoutArea), format);
+		=> MeasureString(text, font, new RectangleF(0, 0, layoutArea), format);
 
 	/// <summary>
 	///  Measures the specified string when drawn with the specified <see cref="Font"/> from an origin <see cref="PointF"/>, formatted 
@@ -1482,7 +1482,7 @@ public sealed class Graphics : IDisposable
 	///  a <see cref="PointF"/> structure.
 	/// </summary>
 	public SizeF MeasureString(string text, Font font, PointF origin, StringFormat format = null)
-		=> MeasureString(text, font, new RectangleF(origin, default), format);
+		=> MeasureString(text, font, new RectangleF(origin, 0, 0), format);
 
 	/// <summary>
 	///  Measures the specified string when drawn with the specified <see cref="Font"/> and certain width area, formatted
