@@ -1829,6 +1829,7 @@ public sealed class Graphics : IDisposable
 			 	=> SKFilterQuality.High,
 			_ => throw new NotImplementedException()
 		};
+		render.IsAntialias = SmoothingMode == SmoothingMode.AntiAlias;
 
 		if (render.IsDither)
 		{
