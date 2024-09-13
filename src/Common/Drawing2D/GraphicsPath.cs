@@ -913,14 +913,16 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 	private void AddString(string text, FontFamily family, int style, float emSize, SKRect layout, StringFormat format)
 	{
-		format ??= new StringFormat();
+		if (string.IsNullOrEmpty(text)) return;
+		format ??= new StringFormat(StringFormatFlags.NoWrap | StringFormatFlags.NoClip);
 
 		bool isRightToLeft = format.FormatFlags.HasFlag(StringFormatFlags.DirectionRightToLeft);
 
-		using var paint = new SKPaint
+		using var typeface = family.GetTypeface((FontStyle)style);
+		using var font = new SKFont(typeface, (int)emSize);
+
+		using var paint = new SKPaint(font)
 		{
-			Typeface = family.GetTypeface((FontStyle)style),
-			TextSize = emSize,
 			TextAlign = format.Alignment switch
 			{
 				StringAlignment.Near => isRightToLeft ? SKTextAlign.Right : SKTextAlign.Left,
@@ -931,14 +933,6 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			Style = SKPaintStyle.Stroke
 		};
 
-		float baselineHeight = -paint.FontMetrics.Ascent;
-		float underlineOffset = paint.FontMetrics.UnderlinePosition ?? 1.8f;
-		float underlineHeight = paint.FontMetrics.UnderlineThickness ?? paint.GetTextPath("_", 0, 0).Bounds.Height;
-		float paragraphOffset = paint.FontSpacing - baselineHeight - underlineHeight - underlineOffset;
-
-		// define offset based on System.Drawing (based on trial/error comparison)
-		float offsetX = isRightToLeft ? 0 : 5, offsetY = baselineHeight - 6;
-
 		// apply format to the string
 		text = format.ApplyDirection(text);
 		text = format.ApplyTabStops(text);
@@ -948,49 +942,60 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		text = format.ApplyTrimming(text, layout, paint.FontSpacing, paint.MeasureText);
 		text = format.ApplyHotkey(text, out var underlines);
 
+		// calculate line and underline vertical sizes (https://fiddle.skia.org/i/b5b76e0a15da0c3530071186a9006498_raster.png)
+		float lineHeight = paint.FontMetrics.Bottom - paint.FontMetrics.Top;
+		float underlineOffset = paint.FontMetrics.UnderlinePosition ?? 1.8f;
+		float underlineHeight = paint.FontMetrics.UnderlineThickness ?? paint.GetTextPath("_", 0, 0).Bounds.Height;
+
+		underlineOffset -= underlineHeight / 2;
+
 		// create returning path
 		var path = new SKPath();
 
 		// get path for current text, including breaklines and underlines
-		float lineHeightOffset = 0f;
+		float lineHeightOffset = 1f, lineWidthOffset = 2f; // NOTE: these values were gotten from trial & error
 		int lineIndexOffset = 0;
-		int breaklineOffset = format.FormatFlags.HasFlag(StringFormatFlags.NoWrap) ? 1 : 0;
-		foreach (string line in text.Split(StringFormat.BREAKLINES, StringSplitOptions.None))
+		foreach (string textLine in text.Split(StringFormat.BREAKLINES, StringSplitOptions.None))
 		{
 			// check if the line fits within the layout height
-			if (format.FormatFlags.HasFlag(StringFormatFlags.LineLimit) && lineHeightOffset + baselineHeight > layout.Height)
+			if (format.FormatFlags.HasFlag(StringFormatFlags.LineLimit) && lineHeightOffset + lineHeight > layout.Height)
 				break;
 
 			// get text path for current line
-			var linePath = paint.GetTextPath(line, 0, lineHeightOffset);
+			var textPath = paint.GetTextPath(textLine, 0, 0);
 
-			// Adjust horizontal alignments for right-to-left text
-			float rtlOffset = isRightToLeft ? layout.Width - paint.MeasureText(line) - 5 : 0;
-			linePath.Offset(rtlOffset, 0);
+			// adjust horizontal alignments for right-to-left text
+			float rtlOffsetX = isRightToLeft ? layout.Width - paint.MeasureText(textLine) - lineWidthOffset : 0;
+			textPath.Offset(rtlOffsetX, 0);
 
 			// get rect path for each underline defined by hotkey prefix
-			foreach (var index in underlines.Where(idx => idx >= lineIndexOffset && idx < lineIndexOffset + line.Length))
+			float underlineTop = (int)(lineHeightOffset + underlineOffset);
+			foreach (var underlineIndex in underlines.Where(idx => idx >= lineIndexOffset && idx < lineIndexOffset + textLine.Length))
 			{
-				int relIndex = index - lineIndexOffset;
-				if (isRightToLeft && relIndex == 0 && line[relIndex] == '…')
-					relIndex += 1; // TODO: look for a better fix for this (in rtl)
+				int relativeIndex = underlineIndex - lineIndexOffset;
 
-				float origin = paint.MeasureText(line.Substring(0, relIndex));
-				float length = paint.MeasureText(line.Substring(relIndex, 1));
+				float origin = paint.MeasureText(textLine.Substring(0, relativeIndex));
+				float length = paint.MeasureText(textLine.Substring(relativeIndex, 1));
 				
 				var underline = new SKRect(
-					origin + rtlOffset,
-					lineHeightOffset + underlineOffset,
-					origin + length + rtlOffset,
-					lineHeightOffset + underlineOffset + underlineHeight);
-				linePath.AddRect(underline);
+					origin + rtlOffsetX, 
+					underlineTop,
+					origin + length + rtlOffsetX,
+					underlineTop + underlineHeight);
+				textPath.AddRect(underline);
 			}
 
+			// translate path
+			textPath.Offset(
+				-textPath.Bounds.Left + lineWidthOffset + rtlOffsetX,
+				-paint.FontMetrics.Ascent + lineHeightOffset);
+			
 			// add line path
-			path.AddPath(linePath);
+			path.AddPath(textPath);
 
-			lineIndexOffset += line.Length + breaklineOffset;
-			lineHeightOffset += baselineHeight + paragraphOffset;
+			// update offsets
+			lineIndexOffset += textLine.Length + "\n".Length;
+			lineHeightOffset += lineHeight;
 		}
 
 		// align path vertically
@@ -1005,21 +1010,19 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			float fitOffsetX = isRightToLeft
 				? Math.Min(0, layout.Right - path.Bounds.Right)
 				: Math.Max(0, layout.Left - path.Bounds.Left);
-			path.Offset(fitOffsetX, 0);
+			path.Offset(fitOffsetX - lineWidthOffset, 0);
 		}
-
-		// apply offset reltive to layout
-		path.Offset(layout.Left + offsetX, layout.Top + offsetY);
 
 		// apply rotation and offset if required
 		if (format.FormatFlags.HasFlag(StringFormatFlags.DirectionVertical))
 		{
 			path.Transform(SKMatrix.CreateRotationDegrees(90));
-			path.Offset(path.Bounds.Standardized.Height + paragraphOffset + underlineOffset + underlineHeight, 0);
+			float rotOffsetX = path.Bounds.Standardized.Height + underlineOffset + underlineHeight;
+			path.Offset(rotOffsetX, 0);
 		}
 
 		// apply clip if required
-		if (!format.FormatFlags.HasFlag(StringFormatFlags.NoClip))
+		if (!format.FormatFlags.HasFlag(StringFormatFlags.NoClip) && layout.Width > 0 && layout.Height > 0)
 		{
 			var clip = new SKPath();
 			clip.AddRect(new SKRect(
@@ -1030,6 +1033,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			path = path.Op(clip, SKPathOp.Intersect);
 		}
 
+		// add text path to this path
 		m_path.AddPath(path);
 	}
 
