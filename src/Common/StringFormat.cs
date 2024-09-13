@@ -377,7 +377,7 @@ public sealed class StringFormat : ICloneable, IDisposable
 			foreach (var word in line.Split(' '))
 			{
 				var curWidth = measureText(word);
-				if ((accWidth += curWidth) > boundBox.Width)
+				if (Math.Ceiling(accWidth += curWidth) >= boundBox.Width)
 				{
 					sb.Append('\n').Append(' ');
 					accWidth = curWidth;
@@ -414,7 +414,7 @@ public sealed class StringFormat : ICloneable, IDisposable
 				}
 			}
 
-			if ((accWidth += curWidth) + endLen > boundBox.Width)
+			if (Math.Ceiling((accWidth += curWidth) + endLen) >= boundBox.Width)
 			{
 				if (FormatFlags.HasFlag(StringFormatFlags.DirectionRightToLeft))
 					sb.Insert(0, endToken);
