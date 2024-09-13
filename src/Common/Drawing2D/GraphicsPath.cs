@@ -498,13 +498,13 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 	///  Adds a text string to this path starting from a <see cref='PointF'/> structure.
 	/// </summary>
 	public void AddString(string text, FontFamily family, int style, float emSize, PointF origin, StringFormat format)
-		=> AddString(text, family, style, emSize, new RectangleF(origin, float.MaxValue, float.MaxValue), format);
+		=> AddString(text, family, style, emSize, new RectangleF(origin, float.PositiveInfinity, float.PositiveInfinity), format);
 
 	/// <summary>
 	///  Adds a text string to this path starting from a <see cref='Point'/> structure.
 	/// </summary>
 	public void AddString(string text, FontFamily family, int style, float emSize, Point origin, StringFormat format)
-		=> AddString(text, family, style, emSize, new Rectangle(origin, int.MaxValue, int.MaxValue), format);
+		=> AddString(text, family, style, emSize, new PointF(origin.m_point), format);
 
 	/// <summary>
 	///  Clears all markers from this path.
