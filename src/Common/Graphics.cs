@@ -848,14 +848,14 @@ public sealed class Graphics : IDisposable
 	///  <see cref="Font"/> objects using the formatting attributes of the specified StringFormat.
 	/// </summary
 	public void DrawString(ReadOnlySpan<char> text, Font font, Brush brush, PointF point, StringFormat format = null)
-		=> DrawString(new string(text.ToArray()), font, brush, new RectangleF(point.X, point.Y, 0, 0), format);
+		=> DrawString(new string(text.ToArray()), font, brush, point, format);
 
 	/// <summary>
 	///  Draws the specified text string in the specified location with the specified <see cref="Brush"/> and 
 	///  <see cref="Font"/> objects using the formatting attributes of the specified StringFormat.
 	/// </summary
 	public void DrawString(string text, Font font, Brush brush, PointF point, StringFormat format = null)
-		=> DrawString(text, font, brush, new RectangleF(point.X, point.Y, 0, 0), format);
+		=> DrawString(text, font, brush, new RectangleF(point, float.PositiveInfinity, float.PositiveInfinity), format);
 
 	/// <summary>
 	///  Draws the specified text string in the specified rectangle with the specified <see cref="Brush"/> and 
@@ -871,7 +871,7 @@ public sealed class Graphics : IDisposable
 	public void DrawString(string text, Font font, Brush brush, RectangleF layout, StringFormat format = null)
 	{
 		using var path = new GraphicsPath();
-		path.AddString(text, font.FontFamily, (int)font.Style, font.Size, layout, format);
+		path.AddString(text, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layout, format);
 		FillPath(brush, path);
 	}
 
