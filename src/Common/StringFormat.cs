@@ -114,7 +114,7 @@ public sealed class StringFormat : ICloneable, IDisposable
 	/// </summary>
 	public static StringFormat GenericTypographic => new()
 	{
-		FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit,
+		FormatFlags = StringFormatFlags.FitBlackBox | StringFormatFlags.LineLimit | StringFormatFlags.NoClip,
 		Trimming = StringTrimming.None
 	};
 
