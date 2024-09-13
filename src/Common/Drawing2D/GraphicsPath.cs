@@ -943,7 +943,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 		text = format.ApplyHotkey(text, out var underlines);
 
 		// calculate line and underline vertical sizes (https://fiddle.skia.org/i/b5b76e0a15da0c3530071186a9006498_raster.png)
-		float lineHeight = paint.FontMetrics.Bottom - paint.FontMetrics.Top;
+		float lineHeight = paint.FontMetrics.Descent - paint.FontMetrics.Ascent + paint.FontMetrics.Leading;
 		float underlineOffset = paint.FontMetrics.UnderlinePosition ?? 1.8f;
 		float underlineHeight = paint.FontMetrics.UnderlineThickness ?? paint.GetTextPath("_", 0, 0).Bounds.Height;
 
