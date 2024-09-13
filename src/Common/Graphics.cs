@@ -870,8 +870,10 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public void DrawString(string text, Font font, Brush brush, RectangleF layout, StringFormat format = null)
 	{
+		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
+
 		using var path = new GraphicsPath();
-		path.AddString(text, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layout, format);
+		path.AddString(text, font.FontFamily, (int)font.Style, emSize, layout, format);
 		FillPath(brush, path);
 	}
 
@@ -1447,11 +1449,13 @@ public sealed class Graphics : IDisposable
 		if (text == null) throw new ArgumentNullException(nameof(text));
 		if (font == null) throw new ArgumentNullException(nameof(font));
 
+		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
+
 		var regions = new List<Region>();
 		foreach (var substring in format.ApplyRanges(text))
 		{
 			using var path = new GraphicsPath();
-			path.AddString(substring, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layout, format);
+			path.AddString(substring, font.FontFamily, (int)font.Style, emSize, layout, format);
 
 			var bounds = path.GetBounds();
 			var region = new Region(bounds);
@@ -1554,8 +1558,10 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public SizeF MeasureStringInternal(string text, Font font, RectangleF layoutArea, StringFormat format, out int charsFitted, out int linesFilled)
 	{
+		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
+
 		using var path = new GraphicsPath();
-		path.AddString(text, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layoutArea, format);
+		path.AddString(text, font.FontFamily, (int)font.Style, emSize, layoutArea, format);
 
 		var bounds = path.GetBounds();
 		var lines = text.Split(StringFormat.BREAKLINES, StringSplitOptions.None);
