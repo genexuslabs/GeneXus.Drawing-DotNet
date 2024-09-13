@@ -269,6 +269,21 @@ public sealed class StringFormat : ICloneable, IDisposable
 
 	#region Helpers
 
+	internal string[] ApplyRanges(string text)
+	{
+		var substrings = new List<string>();
+		foreach (var range in Ranges)
+		{
+			int idx = Math.Max(0, range.First);
+			int end = Math.Min(idx + range.Length, idx + text.Length);
+			if (idx == end)
+				continue;
+			string substring = text.Substring(idx, end - idx);
+			substrings.Add(substring);
+		}
+		return substrings.ToArray();
+	}
+
 	internal string ApplyDirection(string text)
 		=> FormatFlags.HasFlag(StringFormatFlags.DirectionVertical)
 			? string.Join("\n", text.Split(BREAKLINES, StringSplitOptions.None).Reverse())

@@ -1443,27 +1443,18 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public Region[] MeasureCharacterRanges(string text, Font font, RectangleF layout, StringFormat format)
 	{
-		// TODO: implement StringFormat
 		if (text == null) throw new ArgumentNullException(nameof(text));
 		if (font == null) throw new ArgumentNullException(nameof(font));
 
-		var localBounds = new RectangleF(m_canvas.LocalClipBounds);
-		var totalBounds = RectangleF.Intersect(localBounds, layout);
-
 		var regions = new List<Region>();
-		var lines = text.Split(StringFormat.BREAKLINES, StringSplitOptions.None);
-
-		foreach (var line in lines)
+		foreach (var substring in format.ApplyRanges(text))
 		{
-			foreach (var character in line)
-			{
-				var path = new GraphicsPath();
-				path.AddString(character.ToString(), font.FontFamily, (int)font.Style, font.Size, totalBounds, format);
+			using var path = new GraphicsPath();
+			path.AddString(substring, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layout, format);
 
-				var charBounds = path.GetBounds();
-				var charRegion = new Region(charBounds);
-				regions.Add(charRegion);
-			}
+			var bounds = path.GetBounds();
+			var region = new Region(bounds);
+			regions.Add(region);
 		}
 
 		return regions.ToArray();
