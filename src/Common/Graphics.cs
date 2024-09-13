@@ -1554,22 +1554,20 @@ public sealed class Graphics : IDisposable
 	public SizeF MeasureStringInternal(string text, Font font, RectangleF layoutArea, StringFormat format, out int charsFitted, out int linesFilled)
 	{
 		using var path = new GraphicsPath();
-		path.AddString(text, font.FontFamily, (int)font.Style, font.Size, layoutArea, format);
+		path.AddString(text, font.FontFamily, (int)font.Style, font.Size * DpiY / 72, layoutArea, format);
 
 		var bounds = path.GetBounds();
+		var lines = text.Split(StringFormat.BREAKLINES, StringSplitOptions.None);
 
-		var charWidth = bounds.Width / text.Split(StringFormat.BREAKLINES, StringSplitOptions.None).Max(line => line.Length);
-		var availableWidth = Math.Min(layoutArea.Width, m_canvas.LocalClipBounds.Width);
-		charsFitted = (int)(availableWidth / charWidth);
+		float totalWidth = bounds.Width + 2 * bounds.Left;
+		float charWidth = totalWidth / lines.Max(line => line.Length);
+		charsFitted = (int)(totalWidth / charWidth);
 
-		var lineHeight = bounds.Height;
-		var availableHeight = Math.Min(layoutArea.Height, m_canvas.LocalClipBounds.Height);
-		linesFilled = (int)(availableHeight / lineHeight);
+		float totalHeight = bounds.Height + 2 * bounds.Top;
+		float lineHeight = totalHeight / lines.Length;
+		linesFilled = (int)(totalHeight / lineHeight);
 
-		var width = Math.Min(bounds.Width, availableWidth);
-		var height = Math.Min(bounds.Height, availableHeight);
-
-		return new SizeF(width, height);
+		return new SizeF(totalWidth, totalHeight);
 	}
 
 	/// <summary>
