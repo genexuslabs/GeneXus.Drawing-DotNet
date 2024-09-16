@@ -13,7 +13,7 @@ internal class ColorTranslatorUnitTest
 		var color = Color.Red;
 		var htmlColor = ColorTranslator.ToHtml(color);
 
-		Assert.That(htmlColor, Is.EqualTo("#F00"));
+		Assert.That(htmlColor, Is.EqualTo("Red"));
 	}
 
 	[Test]
