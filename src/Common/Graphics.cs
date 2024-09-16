@@ -143,7 +143,7 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets or sets a value specifying how pixels are offset during rendering of this <see cref='Graphics'/>.
 	/// </summary>
-	public PixelOffsetMode PixelOffsetMode { get; set; } = PixelOffsetMode.Default;
+	public PixelOffsetMode PixelOffsetMode { get; set; } = PixelOffsetMode.Default; // TODO: to be implemented
 
 	/// <summary>
 	///  Gets or sets the rendering origin of this <see cref='Graphics'/> for dithering and for hatch brushes.
@@ -158,12 +158,12 @@ public sealed class Graphics : IDisposable
 	/// <summary>
 	///  Gets or sets the gamma correction value for rendering text.
 	/// </summary>
-	public int TextContrast { get; set; } = 4;
+	public int TextContrast { get; set; } = 4; // TODO: to be implemented
 
 	/// <summary>
 	///  Gets or sets the rendering mode for text associated with this <see cref='Graphics'/>.
 	/// </summary>
-	public TextRenderingHint TextRenderingHint { get; set; } = TextRenderingHint.SystemDefault;
+	public TextRenderingHint TextRenderingHint { get; set; } = TextRenderingHint.SystemDefault; // TODO: to be implemented
 
 	/// <summary>
 	///  Gets or sets a copy of the geometric world transformation for this <see cref='Graphics'/>.
