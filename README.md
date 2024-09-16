@@ -92,6 +92,7 @@ Basic graphics funcionalities based on `System.Drawing`.
 | `Image`                 | Class    | Represents an image in a specific format.
 | `Pen`                   | Class    | Defines an object used to draw lines and curves.
 | `Region`                | Class    | Defines the area of a drawing surface.
+| `SolidBrush`            | Class    | Defines a brush of a single colo.
 | `Svg` <sup>(1)</sup>    | Class    | Represents Scalable Vector Graphics.
 | `TextureBrush`          | Class    | Defines a brush that uses an image to fill shapes.
 | `Point`                 | Struct   | Defines an x and y coordinate in a 2D plane.
