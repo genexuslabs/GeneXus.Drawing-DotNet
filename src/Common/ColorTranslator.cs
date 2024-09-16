@@ -4,7 +4,7 @@ using System.Globalization;
 namespace GeneXus.Drawing;
 
 /// <summary>
-/// Translates colors to and from GDI+ <see cref='Color'/> objects.
+/// Translates colors to and from <see cref='Color'/> objects.
 /// </summary>
 public static class ColorTranslator
 {
