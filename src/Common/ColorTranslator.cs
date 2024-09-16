@@ -36,19 +36,7 @@ public static class ColorTranslator
 	/// Translates an Html color representation to a <see cref='Color'/>.
 	/// </summary>
 	public static Color FromHtml(string htmlColor)
-	{
-		if (htmlColor.StartsWith("#"))
-			return Color.FromHex(htmlColor);
-
-		if (htmlColor.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || htmlColor.StartsWith("&h", StringComparison.OrdinalIgnoreCase))
-			return Color.FromArgb(Convert.ToInt32(htmlColor.Substring(2), 16));
-
-		var provider = (NumberFormatInfo)CultureInfo.CurrentCulture.GetFormat(typeof(NumberFormatInfo));
-		if (int.TryParse(htmlColor, NumberStyles.Integer, provider, out int value))
-			return Color.FromArgb(value);
-
-		return Color.FromName(htmlColor);
-	}
+		=> ConvertFromString(htmlColor, CultureInfo.CurrentCulture);
 
 	/// <summary>
 	/// Translates an Ole color value to a <see cref='Color'/>.
@@ -65,13 +53,28 @@ public static class ColorTranslator
 	#endregion
 
 
-	#region Helpers
+	#region Utilities
 
 	private static uint RefToArgb(uint value)
 		=> ((value >> R_SHIFT) & 0xFF) << 16
 		 | ((value >> G_SHIFT) & 0xFF) << 8
 		 | ((value >> B_SHIFT) & 0xFF) << 0
 		 | 0xFFu << 24;
+
+	internal static Color ConvertFromString(string value, CultureInfo culture)
+	{
+		if (value.StartsWith("#"))
+			return Color.FromHex(value);
+
+		if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || value.StartsWith("&h", StringComparison.OrdinalIgnoreCase))
+			return Color.FromArgb(Convert.ToInt32(value.Substring(2), 16));
+
+		var provider = (NumberFormatInfo)CultureInfo.CurrentCulture.GetFormat(typeof(NumberFormatInfo));
+		if (int.TryParse(value, NumberStyles.Integer, provider, out int argb))
+			return Color.FromArgb(argb);
+
+		return Color.FromName(value.Trim('\''));
+	}
 
 	#endregion
 }
