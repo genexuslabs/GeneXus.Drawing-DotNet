@@ -918,7 +918,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 
 		bool isRightToLeft = format.FormatFlags.HasFlag(StringFormatFlags.DirectionRightToLeft);
 
-		using var typeface = family.GetTypeface((FontStyle)style);
+		var typeface = family.GetTypeface((FontStyle)style);
 		using var font = new SKFont(typeface, (int)emSize);
 
 		using var paint = new SKPaint(font)
