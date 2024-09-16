@@ -982,6 +982,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 					underlineTop,
 					origin + length + rtlOffsetX,
 					underlineTop + underlineHeight);
+				underline = SKRectI.Ceiling(underline);
 				textPath.AddRect(underline);
 			}
 
