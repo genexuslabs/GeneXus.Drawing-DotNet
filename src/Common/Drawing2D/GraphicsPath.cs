@@ -141,7 +141,7 @@ public sealed class GraphicsPath : ICloneable, IDisposable
 			var points = new SKPoint[4];
 
 			SKPathVerb verb;
-			while ((verb = iterator.Next(points))!= SKPathVerb.Done)
+			while ((verb = iterator.Next(points)) != SKPathVerb.Done)
 			{
 				switch (verb)
 				{
