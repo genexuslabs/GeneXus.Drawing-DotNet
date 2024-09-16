@@ -874,7 +874,7 @@ public sealed class Graphics : IDisposable
 
 		using var path = new GraphicsPath();
 		path.AddString(text, font.FontFamily, (int)font.Style, emSize, layout, format);
-		FillPath(brush, path);
+		FillPath(brush, path); // NOTE: path has points defined by float values, but skia does not support subpixel path drawing
 	}
 
 	/// <summary>
