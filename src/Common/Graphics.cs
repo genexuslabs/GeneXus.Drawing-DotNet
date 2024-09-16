@@ -1446,18 +1446,10 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public Region[] MeasureCharacterRanges(string text, Font font, RectangleF layout, StringFormat format)
 	{
-		if (text == null) throw new ArgumentNullException(nameof(text));
-		if (font == null) throw new ArgumentNullException(nameof(font));
-
-		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
-
 		var regions = new List<Region>();
 		foreach (var substring in format.ApplyRanges(text))
 		{
-			using var path = new GraphicsPath();
-			path.AddString(substring, font.FontFamily, (int)font.Style, emSize, layout, format);
-
-			var bounds = path.GetBounds();
+			var bounds = GetStringBounds(substring, font, layout, format);
 			var region = new Region(bounds);
 			regions.Add(region);
 		}
@@ -1558,19 +1550,14 @@ public sealed class Graphics : IDisposable
 	/// </summary>
 	public SizeF MeasureStringInternal(string text, Font font, RectangleF layoutArea, StringFormat format, out int charsFitted, out int linesFilled)
 	{
-		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
-
-		using var path = new GraphicsPath();
-		path.AddString(text, font.FontFamily, (int)font.Style, emSize, layoutArea, format);
-
-		var bounds = path.GetBounds();
+		var bounds = GetStringBounds(text, font, layoutArea, format);
 		var lines = text.Split(StringFormat.BREAKLINES, StringSplitOptions.None);
 
-		float totalWidth = bounds.Width + 2 * bounds.Left;
+		float totalWidth = bounds.Width;
 		float charWidth = totalWidth / lines.Max(line => line.Length);
 		charsFitted = (int)(totalWidth / charWidth);
 
-		float totalHeight = bounds.Height + 2 * bounds.Top;
+		float totalHeight = bounds.Height;
 		float lineHeight = totalHeight / lines.Length;
 		linesFilled = (int)(totalHeight / lineHeight);
 
@@ -1886,6 +1873,29 @@ public sealed class Graphics : IDisposable
 		var path = new GraphicsPath();
 		path.AddRectangle(rect);
 		return path;
+	}
+
+	private RectangleF GetStringBounds(string text, Font font, RectangleF layout, StringFormat format)
+	{
+		/* NOTE: Skia's MeasureText is not used because of StringFormat rendering, that's why 
+		 * we use GraphicsPath that already supports StringFormat class definition
+		 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+		if (text == null) throw new ArgumentNullException(nameof(text));
+		if (font == null) throw new ArgumentNullException(nameof(font));
+
+		float emSize = DpiY * GetFactor(font.Size, font.Unit, GraphicsUnit.Pixel);
+
+		using var path = new GraphicsPath();
+		path.AddString(text, font.FontFamily, (int)font.Style, emSize, layout, format);
+
+		var bounds = path.GetBounds();
+
+		// NOTE: the Y value is always 0 in System.Drawing, so that distance is added to height twice (for top and bottom)
+		bounds.Height += 2 * bounds.Y;
+		bounds.Y = 0;
+
+		return bounds;
 	}
 
 	private void TransformPoints<T>(CoordinateSpace destination, CoordinateSpace source, T[] points, Func<T, SKPoint> getPoint, Func<SKPoint, T> newPoint)
