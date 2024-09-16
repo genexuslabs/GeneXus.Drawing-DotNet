@@ -9,6 +9,9 @@ using System.Reflection;
 
 namespace GeneXus.Drawing;
 
+/// <summary>
+///  Converts colors from one data type to another. Access this class through the <see cref='TypeDescriptor'/>.
+/// </summary>
 public class ColorConverter : TypeConverter
 {
 	private static readonly Lazy<StandardValuesCollection> s_valuesLazy = new(() =>

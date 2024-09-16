@@ -84,6 +84,7 @@ Basic graphics funcionalities based on `System.Drawing`.
 | `Bitmap`                | Class    | Represents an image defined by pixels.
 | `Brush`                 | Class    | Abstract class for brushes used to fill graphics shapes.
 | `Color`                 | Class    | Defines colors used for drawing.
+| `ColorConverter`        | Class    | Converts colors from one data type to another
 | `ColorTranslator`       | Class    | Translates colors to and from HTML, OLE and Win32 representations.
 | `Font`                  | Class    | Defines a format for text, including font family, size, and style.
 | `Graphics`              | Class    | Provides methods for drawing on a drawing surface.
