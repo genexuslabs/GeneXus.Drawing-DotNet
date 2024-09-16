@@ -99,6 +99,15 @@ internal abstract class Utils
 		using var g = Graphics.FromImage(bg);
 		g.FillRectangle(brush, bg.GetBounds(ref gu));
 
+		return CompareImage(filename, bg, save);
+	}
+
+	public static float CompareImage(string filename, Bitmap bg, bool save = false)
+	{
+		string filepath = Path.Combine(IMAGE_PATH, filename);
+		using var im = Image.FromFile(filepath);
+		using var bm = new Bitmap(im);
+
 		if (save)
 		{
 			string savepath = Path.Combine(IMAGE_PATH, ".out", filename);
