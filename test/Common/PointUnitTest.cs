@@ -150,4 +150,40 @@ internal class PointUnitTest
 			Assert.That(point.Y, Is.EqualTo(15f));
 		});
 	}
+
+	[Test]
+	public void Static_Method_Ceiling()
+	{
+		var point = new PointF(10.4f, 20.6f);
+		var result = Point.Ceiling(point);
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.X, Is.EqualTo(11));
+			Assert.That(result.Y, Is.EqualTo(21));
+		});
+	}
+
+	[Test]
+	public void Static_Method_Truncate()
+	{
+		var point = new PointF(10.9f, 20.6f);
+		var result = Point.Truncate(point);
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.X, Is.EqualTo(10));
+			Assert.That(result.Y, Is.EqualTo(20));
+		});
+	}
+
+	[Test]
+	public void Static_Method_Round()
+	{
+		var point = new PointF(10.4f, 20.6f);
+		var result = Point.Round(point);
+		Assert.Multiple(() =>
+		{
+			Assert.That(result.X, Is.EqualTo(10));
+			Assert.That(result.Y, Is.EqualTo(21));
+		});
+	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using SkiaSharp;
 
 namespace GeneXus.Drawing;
@@ -8,7 +9,7 @@ public struct PointF : IEquatable<PointF>
 {
 	internal SKPoint m_point;
 
-	private PointF(SKPoint point)
+	internal PointF(SKPoint point)
 	{
 		m_point = point;
 	}
@@ -32,6 +33,13 @@ public struct PointF : IEquatable<PointF>
 		: this(unchecked((short)((dw >> 0) & 0xFFFF)), unchecked((short)((dw >> 16) & 0xFFFF))) { }
 
 	/// <summary>
+	/// Initializes a new instance of the <see cref='PointF'/> struct from the specified
+	/// <see cref="Vector2"/>.
+	/// </summary>
+	public PointF(Vector2 vector)
+		: this(vector.X, vector.Y) { }
+
+	/// <summary>
 	/// Creates a human-readable string that represents this <see cref='PointF'/>.
 	/// </summary>
 	public override readonly string ToString() => $"{{X={X},Y={Y}}}";
@@ -50,6 +58,16 @@ public struct PointF : IEquatable<PointF>
 	public static explicit operator SizeF(PointF p) => new(p.X, p.Y);
 
 	/// <summary>
+	/// Converts the specified <see cref="PointF"/> to a <see cref="Vector2"/>.
+	/// </summary>
+	public static explicit operator Vector2(PointF point) => point.ToVector2();
+
+	/// <summary>
+	/// Converts the specified <see cref="Vector2"/> to a <see cref="PointF"/>.
+	/// </summary>
+	public static explicit operator PointF(Vector2 vector) => new(vector);
+
+	/// <summary>
 	/// Compares two <see cref='PointF'/> objects. The result specifies whether the values of the
 	/// <see cref='PointF.X'/> and <see cref='PointF.Y'/> properties of the two
 	/// <see cref='PointF'/> objects are equal.
@@ -59,7 +77,7 @@ public struct PointF : IEquatable<PointF>
 	/// <summary>
 	/// Compares two <see cref='PointF'/> objects. The result specifies whether the values of the
 	/// <see cref='PointF.X'/> or <see cref='PointF.Y'/> properties of the two
-	/// <see cref='PointF'/>  objects are unequal.
+	/// <see cref='PointF'/> objects are unequal.
 	/// </summary>
 	public static bool operator !=(PointF left, PointF right) => left.m_point != right.m_point;
 
@@ -139,6 +157,11 @@ public struct PointF : IEquatable<PointF>
 	#region Methods
 
 	/// <summary>
+	/// Creates a new <see cref="Vector2"/> from this <see cref="PointF"/>.
+	/// </summary>
+	public readonly Vector2 ToVector2() => new(m_point.X, m_point.Y);
+
+	/// <summary>
 	/// Translates a <see cref='PointF'/> by a given <see cref='SizeF'/> .
 	/// </summary>
 	public static PointF Add(PointF pt, SizeF sz) => new(pt.m_point + sz.m_size);
@@ -147,21 +170,6 @@ public struct PointF : IEquatable<PointF>
 	/// Translates a <see cref='PointF'/> by the negative of a given <see cref='SizeF'/> .
 	/// </summary>
 	public static PointF Subtract(PointF pt, SizeF sz) => new(pt.m_point - sz.m_size);
-
-	/// <summary>
-	/// Converts a <see cref='PointF'/> by performing a ceiling operation on all the coordinates.
-	/// </summary>
-	public static PointF Ceiling(PointF value) => new(unchecked((int)Math.Ceiling(value.X)), unchecked((int)Math.Ceiling(value.Y)));
-
-	/// <summary>
-	/// Converts a <see cref='PointF'/> by performing a truncate operation on all the coordinates.
-	/// </summary>
-	public static PointF Truncate(PointF value) => new(unchecked((int)value.X), unchecked((int)value.Y));
-
-	/// <summary>
-	/// Converts a <see cref='PointF'/> by performing a round operation on all the coordinates.
-	/// </summary>
-	public static PointF Round(PointF value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
 
 	/// <summary>
 	/// Translates this <see cref='PointF'/> by the specified amount.

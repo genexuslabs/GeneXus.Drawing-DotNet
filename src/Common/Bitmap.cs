@@ -53,8 +53,12 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size 
 	/// and with the resolution of the specified <see cref='Graphics'/> object.
 	/// </summary>
-	//public Bitmap(int width, int height, object g) // TODO: Implement Graphics
-	//	: this(width, height) => throw new NotImplementedException();
+	public Bitmap(int width, int height, Graphics g)
+		: this(width, height)
+	{
+		HorizontalResolution = g.DpiX;
+		VerticalResolution = g.DpiY;
+	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref='Bitmap'/> class with the specified size and format.
@@ -119,12 +123,19 @@ public sealed class Bitmap : Image, IDisposable, ICloneable
 	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
 	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
 	/// </summary>
-	public object Clone(Rectangle rect, PixelFormat format)
+	public object Clone(RectangleF rect, PixelFormat format)
 	{
 		var bitmap = new Bitmap(rect.Width, rect.Height);
 		var portion = SKRectI.Truncate(rect.m_rect);
 		return m_bitmap.ExtractSubset(bitmap.m_bitmap, portion) ? bitmap : Clone();
 	}
+
+	/// <summary>
+	/// Creates a copy of the section of this <see cref='Bitmap'/> defined 
+	/// by <see cref='Rectangle'/> structure and with a specified PixelFormat enumeration.
+	/// </summary>
+	public object Clone(Rectangle rect, PixelFormat format)
+		=> Clone(new RectangleF(rect.m_rect), format);
 
 	#endregion
 

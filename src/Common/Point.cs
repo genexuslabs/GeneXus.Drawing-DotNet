@@ -8,7 +8,7 @@ public struct Point : IEquatable<Point>
 {
 	internal SKPoint m_point;
 
-	private Point(SKPoint point)
+	internal Point(SKPoint point)
 	{
 		m_point = point;
 	}
@@ -59,7 +59,7 @@ public struct Point : IEquatable<Point>
 	/// <summary>
 	/// Compares two <see cref='Point'/> objects. The result specifies whether the values of the
 	/// <see cref='Point.X'/> or <see cref='Point.Y'/> properties of the two
-	/// <see cref='Point'/>  objects are unequal.
+	/// <see cref='Point'/> objects are unequal.
 	/// </summary>
 	public static bool operator !=(Point left, Point right) => left.m_point != right.m_point;
 
@@ -147,6 +147,21 @@ public struct Point : IEquatable<Point>
 	/// Translates a <see cref='Point'/> by the negative of a given <see cref='Size'/> .
 	/// </summary>
 	public static Point Subtract(Point pt, Size sz) => new(pt.m_point - sz.m_size);
+
+	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a ceiling operation on all the coordinates.
+	/// </summary>
+	public static Point Ceiling(PointF value) => new(unchecked((int)Math.Ceiling(value.X)), unchecked((int)Math.Ceiling(value.Y)));
+
+	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a truncate operation on all the coordinates.
+	/// </summary>
+	public static Point Truncate(PointF value) => new(unchecked((int)value.X), unchecked((int)value.Y));
+
+	/// <summary>
+	/// Converts a <see cref='PointF'/> by performing a round operation on all the coordinates.
+	/// </summary>
+	public static PointF Round(PointF value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
 
 	/// <summary>
 	/// Translates this <see cref='Point'/> by the specified amount.

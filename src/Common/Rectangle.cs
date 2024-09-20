@@ -46,7 +46,15 @@ public struct Rectangle : IEquatable<Rectangle>
 
 	#region Operators
 
+	/// <summary>
+	/// Converts the specified <see cref='Rectangle'/> to a <see cref='SKRect'/>.
+	/// </summary>
 	public static explicit operator SKRect(Rectangle rect) => rect.m_rect;
+
+	/// <summary>
+	/// Creates a <see cref='RectangleF'/> with the coordinates of the specified <see cref='Rectangle'/> .
+	/// </summary>
+	public static implicit operator RectangleF(Rectangle rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
 	/// <summary>
 	/// Tests whether two <see cref='Rectangle'/> objects have equal location and size.
@@ -189,6 +197,17 @@ public struct Rectangle : IEquatable<Rectangle>
 	/// or a <see cref='Rectangle.Height'/> of 0.
 	/// </summary>
 	public readonly bool IsEmpty => m_rect.IsEmpty;
+
+	/// <summary>
+	/// Gets a secuencie of <see cref='Point'/> that defines this <see cref='Rectangle'/>.
+	/// </summary>
+	public readonly Point[] Points => new[]
+	{
+		new Point(Left, Top),
+		new Point(Right, Top),
+		new Point(Right, Bottom),
+		new Point(Left, Bottom)
+	};
 
 	#endregion
 

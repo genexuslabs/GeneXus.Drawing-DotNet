@@ -288,7 +288,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	/// <returns>The em-size, in points, of this <see cref='Font'/>.</returns>
 	[Browsable(false)]
-	public float SizeInPoints => Size * GetFactor(DPI, Unit, GraphicsUnit.Point);
+	public float SizeInPoints => Size * Graphics.GetFactor(Graphics.DPI.Y, Unit, GraphicsUnit.Point);
 	
 	/// <summary>
 	/// Gets the unit of measure for this <see cref='Font'/>.
@@ -320,26 +320,29 @@ public sealed class Font : IDisposable, ICloneable
 	/// Returns the line spacing, in pixels, of this <see cref='Font'/>.
 	/// </summary>
 	public float GetHeight()
-		=> GetHeight(DPI);
+	{
+		using var graphics = new Graphics(new SKBitmap(1, 1)) { PageUnit = Unit };
+		return GetHeight(graphics);
+	}
 
 	/// <summary>
 	/// Returns the line spacing, in the current unit of a specified Graphics, of this <see cref='Font'/>.
 	/// </summary>
-	public float GetHeight(object graphics)
-		=> throw new NotImplementedException(); // TODO: will be replaced by GetHeight(graphics.PageUnit, graphics.DpiY) when Graphics class had been implemented
+	public float GetHeight(Graphics graphics)
+		=> GetHeight(graphics.PageUnit, graphics.DpiY);
 
 	/// <summary>
-	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution.
+	/// Returns the height, in pixels, of this <see cref='Font'/> when drawn to a device with the specified vertical resolution.
 	/// </summary>
 	public float GetHeight(float dpi)
 		=> GetHeight(Unit, dpi);
 
 	/// <summary>
-	/// Returns the height, in pixels, of this  <see cref='Font'/> when drawn to a device with the specified vertical resolution
+	/// Returns the height, in pixels, of this <see cref='Font'/> when drawn to a device with the specified vertical resolution
 	/// and with the specified <see cref='GraphicsUnit'>.
 	/// </summary>
 	private float GetHeight(GraphicsUnit unit, float dpi)
-		=> (Metrics.Descent - Metrics.Ascent + Metrics.Leading) * GetFactor(dpi, unit, GraphicsUnit.Pixel);
+		=> (Metrics.Descent - Metrics.Ascent + Metrics.Leading) * Graphics.GetFactor(dpi, unit, GraphicsUnit.Pixel);
 
 	/// <summary>
 	/// Creates a <see cref="Font"/> from the specified handle to a device context (HDC).
@@ -391,7 +394,7 @@ public sealed class Font : IDisposable, ICloneable
 		=> ToLogFont(out logFont, null);
 
 	/// <inheritdoc cref="ToLogFont(object, object)"/>
-	public void ToLogFont(out Interop.LOGFONT logFont, object graphics)
+	public void ToLogFont(out Interop.LOGFONT logFont, Graphics graphics)
 		=> ToLogFont(logFont = new Interop.LOGFONT(), graphics);
 
 	/// <summary>
@@ -406,7 +409,7 @@ public sealed class Font : IDisposable, ICloneable
 	/// </summary>
 	/// <param name="logFont">An <see cref="Object"/> to represent the <see cref="Interop.LOGFONT"/> structure that this method creates.</param>
 	/// <param name="graphics">A Graphics that provides additional information for the <see cref="Interop.LOGFONT"/> structure.</param>
-	public void ToLogFont(object logFont, object graphics)
+	public void ToLogFont(object logFont, Graphics graphics)
 		=> throw new NotSupportedException("unsupported by skia.");
 
 	#endregion
@@ -455,34 +458,6 @@ public sealed class Font : IDisposable, ICloneable
 	private SKTypeface Typeface => FontFamily.GetTypeface(Style);
 
 	private SKFontMetrics Metrics => Typeface.ToFont(Size).Metrics;
-
-	private static int DPI
-	{
-		get
-		{
-			using var surface = SKSurface.Create(new SKImageInfo(50, 50));
-			return (int)(100f * surface.Canvas.DeviceClipBounds.Width / surface.Canvas.LocalClipBounds.Width);
-		}
-	}
-
-	private static float GetFactor(float dpi, GraphicsUnit sourceUnit, GraphicsUnit targetUnit)
-	{
-		float sourceFactor = GetPointFactor(sourceUnit, dpi);
-		float targetFactor = GetPointFactor(targetUnit, dpi);
-		return sourceFactor / targetFactor;
-
-		static float GetPointFactor(GraphicsUnit unit, float dpi) => unit switch
-		{
-			GraphicsUnit.World => throw new NotSupportedException("World unit conversion is not supported."),
-			GraphicsUnit.Display => 72 / dpi, // Assuming display unit is pixels
-			GraphicsUnit.Pixel => 72 / dpi, // 1 pixel = 72 points per inch / Dots Per Inch
-			GraphicsUnit.Point => 1, // Already in points
-			GraphicsUnit.Inch => 72, // 1 inch = 72 points
-			GraphicsUnit.Document => 72 / 300f, // 1 document unit = 1/300 inch
-			GraphicsUnit.Millimeter => 72 / 25.4f, // 1 millimeter = 1/25.4 inch
-			_ => throw new ArgumentException("Invalid GraphicsUnit")
-		};
-	}
 
 	#endregion
 }

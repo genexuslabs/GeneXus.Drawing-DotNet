@@ -46,6 +46,9 @@ public struct RectangleF : IEquatable<RectangleF>
 
 	#region Operators
 
+	/// <summary>
+	/// Converts the specified <see cref='RectangleF'/> to a <see cref='SKRect'/>.
+	/// </summary>
 	public static explicit operator SKRect(RectangleF rect) => rect.m_rect;
 
 	/// <summary>
@@ -190,6 +193,17 @@ public struct RectangleF : IEquatable<RectangleF>
 	/// </summary>
 	public readonly bool IsEmpty => m_rect.IsEmpty;
 
+	/// <summary>
+	/// Gets a secuencie of <see cref='PointF'/> that defines this <see cref='RectangleF'/>.
+	/// </summary>
+	public readonly PointF[] Points => new[]
+	{
+		new PointF(Left, Top),
+		new PointF(Right, Top),
+		new PointF(Right, Bottom),
+		new PointF(Left, Bottom)
+	};
+
 	#endregion
 
 
@@ -285,6 +299,11 @@ public struct RectangleF : IEquatable<RectangleF>
 	/// Adjusts the location of this <see cref='RectangleF'/> by the specified amount.
 	/// </summary>
 	public void Offset(PointF pos) => Offset(pos.X, pos.Y);
+
+	/// <summary>
+	/// Converts a <see cref='RectangleF'/> by performing a round operation on all the coordinates.
+	/// </summary>
+	public static Rectangle Truncate(RectangleF rect) => new(unchecked((int)rect.X), unchecked((int)rect.Y), unchecked((int)rect.Width), unchecked((int)rect.Height));
 
 	#endregion
 }

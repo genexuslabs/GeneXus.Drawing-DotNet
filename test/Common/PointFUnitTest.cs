@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace GeneXus.Drawing.Test;
 
 internal class PointFUnitTest
@@ -64,6 +66,18 @@ internal class PointFUnitTest
 		{
 			Assert.That(point.X, Is.EqualTo(x));
 			Assert.That(point.Y, Is.EqualTo(y));
+		});
+	}
+
+	[Test]
+	public void Constructor_Vector2()
+	{
+		var vector = new Vector2(10f, 20f);
+		var point = new PointF(vector);
+		Assert.Multiple(() =>
+		{
+			Assert.That(point.X, Is.EqualTo(vector.X));
+			Assert.That(point.Y, Is.EqualTo(vector.Y));
 		});
 	}
 
@@ -151,38 +165,14 @@ internal class PointFUnitTest
 	}
 
 	[Test]
-	public void Static_Method_Ceiling()
+	public void Method_ToVector2()
 	{
-		var point = new PointF(10.4f, 20.6f);
-		var result = PointF.Ceiling(point);
+		var point = new PointF(10f, 20f);
+		var vector = point.ToVector2();
 		Assert.Multiple(() =>
 		{
-			Assert.That(result.X, Is.EqualTo(11f));
-			Assert.That(result.Y, Is.EqualTo(21f));
-		});
-	}
-
-	[Test]
-	public void Static_Method_Truncate()
-	{
-		var point = new PointF(10.9f, 20.6f);
-		var result = PointF.Truncate(point);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.X, Is.EqualTo(10f));
-			Assert.That(result.Y, Is.EqualTo(20f));
-		});
-	}
-
-	[Test]
-	public void Static_Method_Round()
-	{
-		var point = new PointF(10.4f, 20.6f);
-		var result = PointF.Round(point);
-		Assert.Multiple(() =>
-		{
-			Assert.That(result.X, Is.EqualTo(10f));
-			Assert.That(result.Y, Is.EqualTo(21f));
+			Assert.That(vector.X, Is.EqualTo(point.X));
+			Assert.That(vector.Y, Is.EqualTo(point.Y));
 		});
 	}
 }
